@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    tools:context=".ui.dashboard.DashboardFragment">
+
+    <ScrollView
+        android:id="@+id/user_profile_scroll_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/dashboard_user_title_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/small_text_margin"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="@dimen/small_text_margin"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/dashboard_user_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/small_text_margin"
+                        android:layout_marginTop="@dimen/medium_text_margin"
+                        android:layout_marginEnd="@dimen/tiny_text_margin"
+                        android:layout_marginBottom="@dimen/small_text_margin"
+                        android:text="@string/greetings"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_extra_large"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/dashboard_user_profile_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/tiny_text_margin"
+                        android:layout_marginTop="@dimen/medium_text_margin"
+                        android:layout_marginEnd="@dimen/small_text_margin"
+                        android:layout_marginBottom="@dimen/small_text_margin"
+                        android:text="@string/user_name"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_extra_large"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/expiring_products_list_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="44dp"
+                    android:text="@string/expiring_product_list_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="@dimen/text_large"
+                    app:layout_constraintEnd_toEndOf="@+id/dashboard_user_title_container"
+                    app:layout_constraintHorizontal_bias="0.051"
+                    app:layout_constraintStart_toStartOf="@+id/dashboard_user_title_container"
+                    app:layout_constraintTop_toBottomOf="@id/dashboard_user_title_container" />
+
+                <LinearLayout
+                    android:id="@+id/more_button_container_one"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="@+id/expiring_products_list_title"
+                    app:layout_constraintStart_toStartOf="@+id/expiring_products_list_title"
+                    app:layout_constraintTop_toBottomOf="@+id/expiring_products_list_title">
+
+                    <TextView
+                        android:id="@+id/dashboard_more_button_one"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/tiny_text_margin"
+                        android:layout_marginEnd="@dimen/super_large_text_margin"
+                        android:clickable="true"
+                        android:gravity="center_vertical"
+                        android:text="@string/show_more"
+                        android:textColor="@color/red_200"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expiring_product_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="@dimen/small_cardview_margin"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="@+id/more_button_container_one"
+                    app:layout_constraintStart_toStartOf="@+id/more_button_container_one"
+                    app:layout_constraintTop_toBottomOf="@+id/more_button_container_one">
+
+                    <!-- IngredientList Child Fragment -->
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/expiring_products_list_fragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </androidx.fragment.app.FragmentContainerView>
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/current_recipe_suggestions_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="75dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/aktuelle_rezeptvorschl_ge"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="@dimen/text_large"
+                    app:layout_constraintEnd_toEndOf="@+id/expiring_products_list_title"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/expiring_products_list_title"
+                    app:layout_constraintTop_toBottomOf="@id/expiring_product_container" />
+
+                <LinearLayout
+                    android:id="@+id/more_button_container_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="@+id/expiring_product_container"
+                    app:layout_constraintStart_toStartOf="@+id/expiring_product_container"
+                    app:layout_constraintTop_toBottomOf="@+id/current_recipe_suggestions_title">
+
+                    <TextView
+                        android:id="@+id/dashboard_more_button_two"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/tiny_text_margin"
+                        android:layout_marginEnd="@dimen/super_large_text_margin"
+                        android:clickable="true"
+                        android:gravity="center_vertical"
+                        android:text="@string/show_more"
+                        android:textColor="@color/red_200"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/recipe_detail_fragment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/tiny_text_margin"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="@+id/expiring_product_container"
+                    app:layout_constraintStart_toStartOf="@+id/expiring_product_container"
+                    app:layout_constraintTop_toBottomOf="@id/more_button_container_two">
+
+                    <!-- Number Once Recipes Child Fragment -->
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/number_one_recipe_list_fragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </androidx.fragment.app.FragmentContainerView>
+
+                </LinearLayout>
+
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/btn_push"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/red_200"
+                    android:clickable="true"
+                    android:contentDescription="@string/neues_produkt_zum_inventar_hinzuf_gen"
+                    android:elevation="@dimen/medium_card_elevation"
+                    android:src="@android:color/transparent"
+                    android:text="Push-test"
+                    android:textColor="@color/white"
+                    android:textStyle="normal"
+                    app:layout_constraintEnd_toEndOf="@+id/recipe_detail_fragment_container"
+                    app:layout_constraintStart_toStartOf="@+id/recipe_detail_fragment_container"
+                    app:layout_constraintTop_toBottomOf="@id/recipe_detail_fragment_container"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintVertical_bias="0.0" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

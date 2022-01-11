@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/user_profile_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_background"
+        android:clickable="true"
+        android:padding="@dimen/large_text_margin"
+        app:cardCornerRadius="@dimen/card_view_corner_radius"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        card_view:cardElevation="@dimen/medium_card_elevation"
+        card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:id="@+id/user_profile_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/small_text_margin">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/user_profile_image"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_marginStart="@dimen/large_cardview_margin"
+                android:layout_marginTop="@dimen/large_cardview_margin"
+                android:layout_marginEnd="@dimen/large_cardview_margin"
+                android:layout_marginBottom="@dimen/large_cardview_margin"
+                android:src="@drawable/user_profile" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/large_text_margin">
+
+                <LinearLayout
+                    android:id="@+id/user_profile_name_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/small_text_margin"
+                    android:layout_marginTop="@dimen/small_text_margin"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="@dimen/small_text_margin"
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toTopOf="@+id/user_profile_email_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/user_profile_name_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Name: "
+                        android:gravity="center_vertical"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                    <EditText
+                        android:id="@+id/user_profile_firstname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/small_text_margin"
+                        android:text="James "
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                    <EditText
+                        android:id="@+id/user_profile_lastname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dyson"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/user_profile_email_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_text_margin"
+                    android:layout_marginBottom="@dimen/small_text_margin"
+                    android:orientation="horizontal"
+                    android:gravity="start"
+                    app:layout_constraintBottom_toTopOf="@+id/user_profile_password_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/user_profile_name_container"
+                    app:layout_constraintTop_toBottomOf="@id/user_profile_name_container">
+
+                    <TextView
+                        android:id="@+id/user_profile_email_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="E-Mail: "
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                    <EditText
+                        android:id="@+id/user_profile_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="james.dyson@gmail.com"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/user_profile_password_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_text_margin"
+                    android:layout_marginBottom="@dimen/small_text_margin"
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/user_profile_email_container"
+                    app:layout_constraintStart_toStartOf="@+id/user_profile_email_container"
+                    app:layout_constraintTop_toBottomOf="@id/user_profile_email_container">
+
+                    <TextView
+                        android:id="@+id/user_profile_password_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:text="Passwort: "
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                    <EditText
+                        android:id="@+id/user_profile_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/small_text_margin"
+                        android:text="@string/password_string"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_small"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,123 @@
+package com.mobilesystems.feedme
+
+import android.content.Intent
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import com.mobilesystems.feedme.databinding.ActivityLoginBinding
+import com.mobilesystems.feedme.ui.authentication.AuthViewModel
+import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_login.*
+
+@AndroidEntryPoint
+class LoginActivity: AppCompatActivity() {
+
+    private val authViewModel: AuthViewModel by viewModels()
+
+    private var _binding: ActivityLoginBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        _binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.btnSignUp.setOnClickListener {
+            val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        binding.forgotPassword.setOnClickListener {
+            val intent = Intent(this@LoginActivity, PasswordActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        val usernameEditText = binding.username
+        val passwordEditText = binding.password
+        val loginButton = binding.login
+        val loadingProgressBar = binding.loading
+        loginButton.isEnabled = false
+
+        authViewModel.loginFormState.observe(this,
+            Observer { loginFormState ->
+                if (loginFormState == null) {
+                    return@Observer
+                }
+                loginButton.isEnabled = loginFormState.isDataValid
+                loginFormState.usernameError?.let {
+                    usernameEditText.error = getString(it)
+                }
+                loginFormState.passwordError?.let {
+                    passwordEditText.error = getString(it)
+                }
+            })
+
+        authViewModel.loginResult.observe(this,
+            Observer { loginResult ->
+                loginResult ?: return@Observer
+                loadingProgressBar.visibility = View.GONE
+                loginResult.error?.let {
+                    showLoginFailed(it)
+                }
+                loginResult.success?.let {
+                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            })
+
+        val afterTextChangedListener = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                // check Fields For Empty Values
+                loginButton.isEnabled =
+                    !(usernameEditText.equals("") || passwordEditText.equals(""))
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+                authViewModel.observeLoginDataChanged(
+                    usernameEditText.text.toString(),
+                    passwordEditText.text.toString()
+                )
+            }
+        }
+
+        usernameEditText.addTextChangedListener(afterTextChangedListener)
+        passwordEditText.addTextChangedListener(afterTextChangedListener)
+        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                authViewModel.login(
+                    usernameEditText.text.toString(),
+                    passwordEditText.text.toString()
+                )
+            }
+            false
+        }
+
+        loginButton.setOnClickListener {
+            loadingProgressBar.visibility = View.VISIBLE
+            authViewModel.login(
+                usernameEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+        }
+
+    }
+
+    private fun showLoginFailed(@StringRes errorString: Int) {
+        val appContext = applicationContext ?: return
+        Toast.makeText(appContext, errorString, Toast.LENGTH_LONG).show()
+    }
+}

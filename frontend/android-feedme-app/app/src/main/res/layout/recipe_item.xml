@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/tools">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/recipe_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium_text_margin"
+        android:layout_marginEnd="@dimen/medium_text_margin"
+        android:layout_marginBottom="@dimen/medium_text_margin"
+        android:layout_marginTop="@dimen/medium_text_margin"
+        android:background="@drawable/custom_background"
+        android:clickable="true"
+        app:cardCornerRadius="@dimen/card_view_corner_radius"
+        card_view:cardUseCompatPadding="true"
+        card_view:cardElevation="@dimen/medium_card_elevation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/recipe_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/recipe" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/recipe_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vegan"
+                        android:textColor="@color/dark_grey"
+                        android:textSize="12sp"
+                        android:textStyle="normal"
+                        android:gravity="right"/>
+
+                    <TextView
+                        android:id="@+id/recipe_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Buddha Bowl"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/text_rating"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginEnd="7dp"
+                            android:text="4.5"
+                            android:textColor="@color/black"
+                            android:textSize="13sp"
+                            android:textStyle="normal" />
+
+                        <RatingBar
+                            android:id="@+id/rating_bar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:stepSize="0.5"
+                            style="?android:attr/ratingBarStyleSmall"
+                            android:theme="@style/Widget.AppCompat.RatingBar"
+                            android:background="@color/white"
+                            android:numStars="5"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/cooking_difficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/simpel"
+                android:textColor="@color/red_200"
+                android:textSize="@dimen/text_small"
+                android:textStyle="normal"/>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
