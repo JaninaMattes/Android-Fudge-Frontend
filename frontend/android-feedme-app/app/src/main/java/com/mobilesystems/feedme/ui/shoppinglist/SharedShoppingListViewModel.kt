@@ -2,12 +2,13 @@ package com.mobilesystems.feedme.ui.shoppinglist
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.data.repository.ShoppingListRepositoryImpl
 import com.mobilesystems.feedme.domain.model.Product
+import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedShoppingListViewModel @Inject constructor(
-    private val androidApplication: Application,
+    androidApplication: Application,
     private val shoppingListRepository: ShoppingListRepositoryImpl) :
     BaseViewModel(androidApplication), BaseShoppingListViewModel {
 
@@ -24,7 +25,7 @@ class SharedShoppingListViewModel @Inject constructor(
     private var _currentShoppingList = MutableLiveData<List<Product>?>()
     private var _oldShoppingList = MutableLiveData<List<Product>?>()
     private var _selectedProduct = MutableLiveData<Product?>()
-    private var _currentUser = MutableLiveData<Int?>()
+    private var _currentUserId = MutableLiveData<Int?>()
 
     // Getter and setter
     val currentShoppingList : LiveData<List<Product>?>
@@ -39,13 +40,13 @@ class SharedShoppingListViewModel @Inject constructor(
     val selectedProduct : LiveData<Product?>
         get() = _selectedProduct
 
-    val currentUser : LiveData<Int?>
-        get() = _currentUser
+    val currentUserId : LiveData<Int?>
+        get() = _currentUserId
 
     init {
 
         val context = getApplication<Application>().applicationContext
-        getCurrentUser(context)
+        getCurrentUserId(context)
 
         if (currentShophasNoValues()) {
             // preload all values
@@ -68,18 +69,18 @@ class SharedShoppingListViewModel @Inject constructor(
     override fun loadAllCurrentShoppingListProducts() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = this@SharedShoppingListViewModel.currentUserId.value
             if (userId != null) {
                 shoppingListRepository.loadCurrentShoppingListProducts(userId)
                 _currentShoppingList = shoppingListRepository.currentShoppingListProducts
-            }
+                }
         }
     }
 
     override fun loadAllOldShoppingListProducts() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = this@SharedShoppingListViewModel.currentUserId.value
             if (userId != null) {
                 shoppingListRepository.loadOldShoppingListProducts(userId)
                 _oldShoppingList = shoppingListRepository.oldShoppingListProducts
@@ -89,7 +90,7 @@ class SharedShoppingListViewModel @Inject constructor(
 
     override fun saveCurrentState() {
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if (userId != null) {
                 shoppingListRepository.updateCurrentShoppingList(userId, currentShoppingList.value)
                 shoppingListRepository.updateOldShoppingList(userId, oldShoppingList.value)
@@ -110,79 +111,32 @@ class SharedShoppingListViewModel @Inject constructor(
     override fun updateCurrentShoppingList(shoppingList: List<Product>?) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if (userId != null) {
                 shoppingListRepository.updateCurrentShoppingList(userId, shoppingList)
             }
         }
+        // Update all
+        loadAllCurrentShoppingListProducts()
     }
 
     override fun addProductToCurrentShoppingList(product: Product) {
-        // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = this@SharedShoppingListViewModel.currentUserId.value
+            val tempList = findDuplicateProducts(product)
+            _currentShoppingList.value = tempList
             if (userId != null) {
-                val currentItems = currentShoppingList.value
-                var tempList: MutableList<Product> = ArrayList<Product>()
-                // Check if currentlist is empty
-                if (currentItems != null) {
-                    tempList = currentItems as MutableList<Product>
-                    // find duplicate items
-                    val duplicateValue = tempList.filter { p -> p.productName == product.productName }
-                    // duplicate values
-                    if (duplicateValue.isNotEmpty()) {
-                        for (i in duplicateValue.indices) {
-                            if (duplicateValue[i].productName == product.productName) {
-                                val newProduct = calculateNewProductAmount(
-                                    duplicateValue[i],
-                                    product,
-                                    currentShoppingList = true
-                                )
-                                tempList =
-                                    tempList.replace(
-                                        duplicateValue[i],
-                                        newProduct
-                                    ) as MutableList<Product>// Replace with new product
-                            }
-                        }
-                        // no duplicate values
-                    } else {
-                        tempList.add(product)
-                    }
-                    // empty list
-                } else {
-                    tempList.add(product)
-                }
-                _currentShoppingList.value = tempList
-
-                // Network call
-                shoppingListRepository.updateCurrentShoppingList(userId, currentShoppingList.value)
+                // add product to shoppinglist
+                shoppingListRepository.updateCurrentShoppingList(userId, tempList)
             }
+            // Update all
+            loadAllCurrentShoppingListProducts()
         }
     }
 
-    override fun removeProductFromCurrentShoppingList(product: Product) {
-        // This is a coroutine scope with the lifecycle of the ViewModel
-        viewModelScope.launch {
-            val userId = currentUser.value
-            if (userId != null) {
-                val currentValues = currentShoppingList.value
-                var tempList: MutableList<Product> = ArrayList<Product>()
-                if (currentValues != null) {
-                    tempList = currentValues as MutableList<Product>
-                    tempList.remove(product)
-                }
-                _currentShoppingList.value = tempList
-                shoppingListRepository.updateCurrentShoppingList(userId, currentShoppingList.value)
-            }
-        }
-    }
-
-    override fun addProductToOldShoppingList(product: Product) {
-        val currentItems = oldShoppingList.value
+    private fun findDuplicateProducts(product: Product): MutableList<Product>{
+        val currentItems = currentShoppingList.value
         var tempList: MutableList<Product> = ArrayList<Product>()
-        // Remove product amount
-        //val newProduct = createProductForOldShoppingList(product)
         // Check if currentlist is empty
         if (currentItems != null) {
             tempList = currentItems as MutableList<Product>
@@ -192,15 +146,9 @@ class SharedShoppingListViewModel @Inject constructor(
             if (duplicateValue.isNotEmpty()) {
                 for (i in duplicateValue.indices) {
                     if (duplicateValue[i].productName == product.productName) {
-                        val newProduct = calculateNewProductAmount(
-                            duplicateValue[i],
-                            product,
-                            currentShoppingList = false
-                        )
-                        tempList = tempList.replace(
-                            duplicateValue[i],
-                            newProduct
-                        ) as MutableList<Product>// Replace with new product
+                        val newProduct = calculateNewProductAmount(duplicateValue[i], product, currentShoppingList = true)
+                        tempList =
+                            tempList.replace(duplicateValue[i], newProduct) as MutableList<Product>// Replace with new product
                     }
                 }
                 // no duplicate values
@@ -211,15 +159,77 @@ class SharedShoppingListViewModel @Inject constructor(
         } else {
             tempList.add(product)
         }
-        // Network call
-        _oldShoppingList.value = tempList
-        updateOldShoppingList(oldShoppingList.value)
+        return tempList
+    }
+
+    override fun removeProductFromCurrentShoppingList(product: Product) {
+        // This is a coroutine scope with the lifecycle of the ViewModel
+        viewModelScope.launch {
+            val userId = currentUserId.value
+            if (userId != null) {
+                val currentValues = currentShoppingList.value
+                var tempList: MutableList<Product> = ArrayList<Product>()
+                if (currentValues != null) {
+                    tempList = currentValues as MutableList<Product>
+                    tempList.remove(product)
+                }
+                _currentShoppingList.value = tempList
+                shoppingListRepository.removeProductFromCurrentShoppingList(userId, product)
+                this@SharedShoppingListViewModel.addProductToOldShoppingList(product)
+            }
+            //update all
+            loadAllCurrentShoppingListProducts()
+        }
+    }
+
+    override fun addProductToOldShoppingList(product: Product) {
+        viewModelScope.launch {
+            val userId = this@SharedShoppingListViewModel.currentUserId.value
+            val tempList = findDuplicateOldShoppingList(product)
+            _oldShoppingList.value = tempList
+            if (userId != null) {
+                shoppingListRepository.updateOldShoppingList(userId, tempList)
+            }
+            // Update all
+            loadAllOldShoppingListProducts()
+        }
+    }
+
+    private fun findDuplicateOldShoppingList(product: Product): MutableList<Product>{
+        val currentItems = oldShoppingList.value
+        var tempList: MutableList<Product> = ArrayList<Product>()
+        //remove product amount
+        val newProduct = createProductForOldShoppingList(product)
+        // Check if currentlist is empty
+        if (currentItems != null) {
+            tempList = currentItems as MutableList<Product>
+            // find duplicate items
+            val duplicateValue= tempList.filter { p -> p.productName == newProduct.productName }
+            // duplicate values
+            if (duplicateValue.isNotEmpty()) {
+                for (i in duplicateValue.indices) {
+                    if (duplicateValue[i].productName == newProduct.productName) {
+                        tempList = tempList.replace(
+                            duplicateValue[i],
+                            newProduct
+                        ) as MutableList<Product>// Replace with new product
+                    }
+                }
+                // no duplicate values
+            } else {
+                tempList.add(newProduct)
+            }
+            // empty list
+        } else {
+            tempList.add(newProduct)
+        }
+        return tempList
     }
 
     override fun updateOldShoppingList(shoppingList: List<Product>?) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if (userId != null) {
                 shoppingListRepository.updateOldShoppingList(userId, shoppingList)
             }
@@ -231,7 +241,7 @@ class SharedShoppingListViewModel @Inject constructor(
     override fun removeProductFromOldShoppingList(product: Product) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if (userId != null) {
                 val currentValues = oldShoppingList.value
                 var tempList: MutableList<Product> = ArrayList<Product>()
@@ -241,10 +251,11 @@ class SharedShoppingListViewModel @Inject constructor(
                 }
                 _oldShoppingList.value = tempList
                 shoppingListRepository.removeProductFromOldShoppingList(userId, product)
+                this@SharedShoppingListViewModel.addProductToCurrentShoppingList(product)
             }
         }
         // Update all
-        loadAllOldShoppingListProducts()
+        loadAllCurrentShoppingListProducts()
     }
 
     private fun currentShophasNoValues(): Boolean{
@@ -303,7 +314,7 @@ class SharedShoppingListViewModel @Inject constructor(
             productName = product.productName,
             expirationDate = "-",
             labels = product.labels,
-            quantity = "0 $amountType",
+            quantity = "1 $amountType",
             manufacturer = "-",
             nutritionValue = product.nutritionValue,
             imageUrl = product.imageUrl
@@ -313,9 +324,9 @@ class SharedShoppingListViewModel @Inject constructor(
 
     private fun <Product> List<Product>.replace(old: Product, new: Product) = map { if (it == old) new else it }
 
-    private fun getCurrentUser(context: Context): LiveData<Int?>{
+    private fun getCurrentUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
-        _currentUser.value = result
-        return  currentUser
+        _currentUserId.value = result?.userId
+        return  currentUserId
     }
 }

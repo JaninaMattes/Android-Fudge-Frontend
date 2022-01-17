@@ -1,19 +1,22 @@
 package com.mobilesystems.feedme.ui.register
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.mobilesystems.feedme.R
-import com.mobilesystems.feedme.common.networkresult.Response
 import com.mobilesystems.feedme.data.repository.AuthRepositoryImpl
 import com.mobilesystems.feedme.ui.authentication.AuthFormState
 import com.mobilesystems.feedme.ui.authentication.AuthResult
 import com.mobilesystems.feedme.ui.authentication.LoggedInUser
+import com.mobilesystems.feedme.ui.common.utils.decodeJWTToken
+import com.mobilesystems.feedme.ui.common.utils.saveObjectToSharedPreference
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,22 +32,45 @@ class RegisterViewModel @Inject constructor(
     val registerResult: LiveData<AuthResult> = _registerResult
 
     override fun register(username: String, email: String, password: String, passwordConfirm: String) {
-        // can be launched in a separate asynchronous job
-        // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val result = registerRepository.register(username, email, password, passwordConfirm)
+            try {
+                val result = registerRepository.register(username, username, email, password)
+                if (result.data != null) {
+                    // stores less data for displaying
+                    val registeredUser = convertTokenToUser(result.data["token"])
+                    if (registeredUser != null){
+                        _registerResult.value = AuthResult(success = registeredUser)
+                    }else {
+                        _registerResult.value = AuthResult(error = R.string.register_failed)
+                    }
+                } else {
+                    _registerResult.value = AuthResult(error = R.string.register_failed)
+                }
 
-            if (result is Response.Success && result.data != null) {
-                val registeredUser = LoggedInUser(
-                    userId = result.data.userId,
-                    firstName = result.data.firstName,
-                    lastName = result.data.lastName
-                )
-                _registerResult.value = AuthResult(success = registeredUser)
-            } else {
-                _registerResult.value = AuthResult(error = R.string.login_failed)
+            } catch (error: Throwable) {
+                // Notify view login attempt failed
+                Log.e("AuthViewModel", "error during registering $error")
+                _registerResult.value = AuthResult(error = R.string.register_failed)
             }
         }
+    }
+
+    private fun convertTokenToUser(jwt: String?): LoggedInUser? {
+        var user: LoggedInUser? = null
+        if(jwt != null){
+            saveObjectToSharedPreference(context, "mPreference", "jwtToken", jwt);
+            val decoded = decodeJWTToken(jwt)
+            Log.d("Decoded token", decoded)
+            val jsonObj = JSONObject(decoded)
+            Log.d("Json object", jsonObj.toString())
+            user = LoggedInUser(
+                userId = jsonObj.get("userId") as Int,
+                firstName = jsonObj.get("firstName") as String,
+                lastName = jsonObj.get("lastName") as String,
+                email = jsonObj.get("email") as String
+            )
+        }
+    return user
     }
 
     override fun registerDataChanged(username: String, email: String, password: String, passwordConfirm: String) {

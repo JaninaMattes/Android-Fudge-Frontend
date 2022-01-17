@@ -1,12 +1,14 @@
 package com.mobilesystems.feedme.ui.profile
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.mobilesystems.feedme.R
@@ -15,6 +17,14 @@ import com.mobilesystems.feedme.domain.model.Settings
 import com.mobilesystems.feedme.domain.model.User
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.app.ActivityCompat.startActivityForResult
+
+import android.content.Intent
+
+import android.os.Build
+
+
+
 
 @AndroidEntryPoint
 class UserProfileFragment : Fragment() {
@@ -37,7 +47,6 @@ class UserProfileFragment : Fragment() {
         val rootView =  inflater.inflate(R.layout.user_profile_fragment, container, false)
 
         // view elements by id
-        val scrollView: ScrollView = rootView.findViewById(R.id.user_profile_scroll_view)
         val profileImageView: ImageView = rootView.findViewById(R.id.user_profile_image)
         val profileFirstName: TextView = rootView.findViewById(R.id.user_profile_firstname)
         val profileLastName: TextView = rootView.findViewById(R.id.user_profile_lastname)
@@ -66,25 +75,37 @@ class UserProfileFragment : Fragment() {
                 // use picasso to locally store image
                 userId = user.userId
                 userImage = user.userImage
-
-                Picasso.get().load(userImage).into(profileImageView)
-                userName = user.userName
+                if(userImage.isNullOrEmpty()){
+                    profileImageView.setImageDrawable(ResourcesCompat.getDrawable(resources,
+                        R.drawable.default_user_profile, null))
+                }else{
+                    Picasso.get().load(userImage).into(profileImageView)
+                }
+                userName = user.firstName
                 profileFirstName.text = user.firstName
                 profileLastName.text = user.lastName
                 profileEmail.text = user.email
                 profilePassword.text = user.password // TODO fix password
 
                 userSettings = user.userSettings
-                userTags = user.userTags
+                userTags = user.dietaryPreferences
                 // Setup buttons toggled
                 btnExpirationReminder.isChecked = user.userSettings?.reminderProductExp == true
                 btnPushNotification.isChecked = user.userSettings?.allowPushNotifications == true
                 btnRecommendShoppingList.isChecked = user.userSettings?.suggestRecipes == true
+            } else {
+                Log.d("UserProfileFragment", "User is null.")
             }
         }
 
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         sharedViewModel.loggedInUser.observe(viewLifecycleOwner, userObserver)
+
+        profileImageView.setOnClickListener {
+            // TODO: Implement image picking from Gallery/Photo 
+            val context = activity?.applicationContext
+            Toast.makeText(context,"Not yet implemented!!", Toast.LENGTH_SHORT).show()
+        }
 
         btnAddRecipeLabel.setOnClickListener{
             // TODO: Implement shared view model for products behind button
@@ -154,7 +175,7 @@ class UserProfileFragment : Fragment() {
 
             // TODO check if editText is empty
 
-            user = User(userId, userImage, userName, firstName, lastName, email, password, userSettings, userTags)
+            user = User(userId, firstName, lastName, email, password, userSettings, userTags, userImage)
 
             sharedViewModel.updateLoggedInUser(user)
 
@@ -185,11 +206,15 @@ class UserProfileFragment : Fragment() {
     private fun addChildFragment(){
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
-
+        val child = childFragmentManager.findFragmentById(R.id.user_tag_list_fragment)
         val tagListFragment = UserFoodPrefListFragment()
-        childFragmentManager.beginTransaction().apply {
-            add(R.id.user_tag_list_fragment, tagListFragment)
-            commit()
+
+        if(child == null) {
+            childFragmentManager.beginTransaction().apply {
+                add(R.id.user_tag_list_fragment, tagListFragment)
+                addToBackStack(null)
+                commit()
+            }
         }
     }
 

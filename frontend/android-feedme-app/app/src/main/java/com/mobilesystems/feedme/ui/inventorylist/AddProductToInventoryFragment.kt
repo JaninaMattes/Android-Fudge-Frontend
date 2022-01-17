@@ -27,13 +27,14 @@ import android.widget.*
 import androidx.core.text.isDigitsOnly
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.ui.common.utils.addDaysToCurrentDate
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 @AndroidEntryPoint
 class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedListener{
 
-    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
     private val calendar: Calendar = Calendar.getInstance()
     private lateinit var alertDialog: AlertDialog
 

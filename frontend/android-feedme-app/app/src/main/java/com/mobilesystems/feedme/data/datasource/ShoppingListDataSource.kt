@@ -9,10 +9,18 @@ interface ShoppingListDataSource{
 
     suspend fun loadAllProductsInOldShoppingList(): Response<List<Product>>?
 
-    suspend fun updateProductInCurrentShoppingList(shoppingList: List<Product>?)
+    suspend fun addProductToCurrentShoppingList(userId: Int, product: Product)
 
-    suspend fun updateProductInOldShoppingList(shoppingList: List<Product>?)
+    suspend fun addProductToOldShoppingList(userId: Int, product: Product)
 
-    suspend fun loadSuggestedProductsForShoppingList(): Response<List<Product>>?
+    suspend fun updateCurrentShoppingList(userId: Int, shoppingList: List<Product>?)
+
+    suspend fun updateOldShoppingList(userId: Int, shoppingList: List<Product>?)
+
+    suspend fun removeProductFromOldShoppingList(userId: Int, product: Product)
+
+    suspend fun removeProductFromCurrentShoppingList(userId: Int, product: Product)
+
+    suspend fun loadSuggestedProductsForShoppingList(): Response<List<Product>>? // Future feature
 
 }

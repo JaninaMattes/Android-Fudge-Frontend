@@ -33,7 +33,7 @@ class DashboardRecipeListFragment: Fragment() {
         override fun passData(recipe: Recipe, itemView: View) {
             // pass data and navigate to product detail view
             Log.d(TAG, "Recipe ${recipe.recipeName} selected.")
-            sharedViewModel.selectRecipe(recipe)
+            sharedViewModel.selectedRecipe(recipe)
             val action = DashboardFragmentDirections.actionNavigationDashboardToRecipeFragment()
             findNavController().navigate(action)
         }

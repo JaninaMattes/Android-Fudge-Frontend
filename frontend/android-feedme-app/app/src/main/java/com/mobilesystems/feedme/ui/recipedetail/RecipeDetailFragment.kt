@@ -10,17 +10,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.mobilesystems.feedme.domain.model.Recipe
-import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
 import com.squareup.picasso.Picasso
 import android.widget.*
 import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RecipeDetailFragment : Fragment() {
 
     // shared view model
-    private val sharedViewModel: SharedRecipesViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
 
     // content on view
     private var recipeId: Int? = null
@@ -96,10 +96,11 @@ class RecipeDetailFragment : Fragment() {
     private fun addChildFragment(){
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
-
         val ingredientListFragment = RecipeIngredientListFragment()
+
         childFragmentManager.beginTransaction().apply {
             add(R.id.ingredient_list_fragment, ingredientListFragment)
+            addToBackStack(null)
             commit()
         }
     }
@@ -117,7 +118,7 @@ class RecipeDetailFragment : Fragment() {
         val okButton = dialogView.findViewById<View>(R.id.dialog_button_export) as Button
         val cancelButton = dialogView.findViewById<View>(R.id.dialog_button_cancel) as Button
 
-        editText.text = "Möchtest Du ${amount} Zutaten zu deiner Shoppingliste hinzufügen?."
+        editText.text = "Möchtest Du ${amount} Zutaten zu deiner Shoppingliste hinzufügen?"
         // confirm and cancel button
         builder.setCancelable(true)
 

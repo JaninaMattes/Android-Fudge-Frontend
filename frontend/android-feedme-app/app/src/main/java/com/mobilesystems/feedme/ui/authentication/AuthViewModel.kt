@@ -1,14 +1,17 @@
 package com.mobilesystems.feedme.ui.authentication
 
 import android.app.Application
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.mobilesystems.feedme.data.repository.AuthRepositoryImpl
 import com.mobilesystems.feedme.R
-import com.mobilesystems.feedme.common.networkresult.Response
-import com.mobilesystems.feedme.ui.common.utils.saveObjectToSharedPreference
+import com.mobilesystems.feedme.data.repository.UserRepositoryImpl
+import com.mobilesystems.feedme.domain.model.User
+import com.mobilesystems.feedme.ui.common.utils.*
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,36 +24,78 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val androidApplication : Application,
-    private val loginRepository: AuthRepositoryImpl) : BaseViewModel(androidApplication), BaseAuthViewModel {
+    androidApplication : Application,
+    private val loginRepository: AuthRepositoryImpl,
+    private val userRepository: UserRepositoryImpl
+) : BaseViewModel(androidApplication), BaseAuthViewModel {
 
+    // Only expose immutable types
     private val _loginForm = MutableLiveData<AuthFormState>()
-    val loginFormState: LiveData<AuthFormState> = _loginForm
+    val loginFormState: LiveData<AuthFormState>
+        get() = _loginForm
 
     private val _loginResult = MutableLiveData<AuthResult>()
-    val loginResult: LiveData<AuthResult> = _loginResult
+    val loginResult: LiveData<AuthResult>
+        get() = _loginResult
 
     private val _registerForm = MutableLiveData<AuthFormState>()
-    val registerFormState: LiveData<AuthFormState> = _registerForm
+    val registerFormState: LiveData<AuthFormState>
+        get() = _registerForm
 
     private val _registerResult = MutableLiveData<AuthResult>()
-    val registerResult: LiveData<AuthResult> = _registerResult
+    val registerResult: LiveData<AuthResult>
+        get() = _registerResult
 
-    override fun login(username: String, password: String) {
+    private var _loggedInUser = MutableLiveData<User?>()
+    val loggedInUser : LiveData<User?>
+        get() = _loggedInUser
+
+    private var _currentUser = MutableLiveData<LoggedInUser?>()
+    val currentUser : LiveData<LoggedInUser?>
+        get () = _currentUser
+
+    init{
+        val context = getApplication<Application>().applicationContext
+        getCurrentUser(context)
+        val userId = currentUser.value
+        if (userId != null){
+            loadLoggedIndUser()
+        }
+    }
+
+    override fun loadLoggedIndUser() {
         viewModelScope.launch {
-            // can be launched in a separate asynchronous job
-            val result = loginRepository.login(username, password)
+            // This is a coroutine scope with the lifecycle of the ViewModel
+            val user = currentUser.value
+            if(user != null) {
+                userRepository.getLoggedInUser(user.userId)
+                _loggedInUser = userRepository.currentLoggedInUser
+            }
+        }
+    }
 
-            if (result is Response.Success && result.data != null) {
-                // stores less data for displaying
-                val loggedInUser = LoggedInUser(
-                    userId = result.data.userId,
-                    firstName = result.data.firstName,
-                    lastName = result.data.lastName)
-                _loginResult.value = AuthResult(success = loggedInUser)
-                // make logged in user information available
-                saveLoggedInUserToSharedPreference(loggedInUser)
-            } else {
+    override fun login(email: String, password: String) {
+        viewModelScope.launch {
+            try {
+                // can be launched in a separate asynchronous job
+                val result = loginRepository.login(email, password)
+                if (result.data != null) {
+                    // stores less data for displaying
+                    val context = getApplication<Application>().applicationContext
+                    val loggedInUser = convertTokenToUser(context, result.data["token"])
+                    if (loggedInUser != null) {
+                        _loginResult.value = AuthResult(success = loggedInUser)
+                        // make logged in user information available
+                        saveLoggedInUserToSharedPreference(context, loggedInUser)
+                    } else {
+                        _loginResult.value = AuthResult(error = R.string.login_failed)
+                    }
+                } else {
+                    _loginResult.value = AuthResult(error = R.string.login_failed)
+                }
+            }catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Authentification", "error during login $error")
                 _loginResult.value = AuthResult(error = R.string.login_failed)
             }
         }
@@ -66,29 +111,36 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    override fun register(username: String, email: String, password: String, passwordConfirm: String) {
-
+    override fun register(firstname: String, lastname: String, email: String, password: String, passwordConfirm: String) {
         viewModelScope.launch {
-            // can be launched in a separate asynchronous job
-            val result = loginRepository.register(username, email, password, passwordConfirm)
+            try {
+                val result = loginRepository.register(firstname, lastname, email, password)
+                if (result.data != null) {
+                    // stores less data for displaying
+                    val context = getApplication<Application>().applicationContext
+                    val registeredUser = convertTokenToUser(context, result.data["token"])
+                    if (registeredUser != null){
+                        _registerResult.value = AuthResult(success = registeredUser)
+                    }else {
+                        _registerResult.value = AuthResult(error = R.string.register_failed)
+                    }
 
-            if (result is Response.Success && result.data != null) {
-                // stores less data for displaying
-                val registeredUser = LoggedInUser(
-                    userId = result.data.userId,
-                    firstName = result.data.firstName,
-                    lastName = result.data.lastName)
-                _registerResult.value = AuthResult(success = registeredUser)
-                // make logged in user information available
-                saveLoggedInUserToSharedPreference(registeredUser)
-            } else {
-                _registerResult.value = AuthResult(error = R.string.login_failed)
+                } else {
+                    _registerResult.value = AuthResult(error = R.string.register_failed)
+                }
+
+            } catch (error: Throwable) {
+                // Notify view login attempt failed
+                Log.e("AuthViewModel", "error during registering $error")
+                _registerResult.value = AuthResult(error = R.string.register_failed)
             }
         }
     }
 
-    override fun observeRegisterDataChanged(username: String, email: String, password: String, passwordConfirm: String) {
-        if (!isUserNameValid(username)) {
+    override fun observeRegisterDataChanged(firstname:String, lastname: String, email: String, password: String, passwordConfirm: String) {
+        if (!isUserNameValid(firstname)) {
+            _registerForm.value = AuthFormState(usernameError = R.string.invalid_username)
+        } else if (!isUserNameValid(lastname)){
             _registerForm.value = AuthFormState(usernameError = R.string.invalid_username)
         } else if (!isUserNameValid(email)) {
             _registerForm.value = AuthFormState(emailError = R.string.invalid_username)
@@ -98,6 +150,12 @@ class AuthViewModel @Inject constructor(
             _registerForm.value = AuthFormState(confirmPasswordError = R.string.invalid_passwords)
         }else {
             _registerForm.value = AuthFormState(isDataValid = true)
+        }
+    }
+
+    override fun logout(username:String, password:String){
+        viewModelScope.launch {
+            loginRepository.logout(username, password)
         }
     }
 
@@ -123,10 +181,9 @@ class AuthViewModel @Inject constructor(
         return password == passwordConfirm
     }
 
-    private fun saveLoggedInUserToSharedPreference(user: LoggedInUser){
-        val context = getApplication<Application>().applicationContext
-        saveObjectToSharedPreference(context,
-            "mPreference",
-            "loggedInUser", user)
+    private fun getCurrentUser(context: Context): LiveData<LoggedInUser?>{
+        val result = getLoggedInUser(context)
+        _currentUser.value = result
+        return  currentUser
     }
 }

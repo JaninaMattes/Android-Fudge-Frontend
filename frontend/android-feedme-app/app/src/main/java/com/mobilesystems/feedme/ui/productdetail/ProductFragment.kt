@@ -15,7 +15,7 @@ import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.databinding.ProductDetailFragmentBinding
 import com.mobilesystems.feedme.domain.model.Label
 import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.inventorylist.SharedInventoryViewModel
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,7 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ProductFragment : Fragment() {
 
-    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
 
     //view binding
     private var _binding: ProductDetailFragmentBinding? = null
@@ -169,17 +169,18 @@ class ProductFragment : Fragment() {
     private fun addChildFragment(){
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
-
         val productTagListFragment = ProductTagListFragment()
+
         childFragmentManager.beginTransaction().apply {
             add(R.id.product_label_list_fragment, productTagListFragment)
+            addToBackStack(null)
             commit()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //    _binding = null
+        _binding = null
         // sharedViewModel.updateProduct()
     }
 

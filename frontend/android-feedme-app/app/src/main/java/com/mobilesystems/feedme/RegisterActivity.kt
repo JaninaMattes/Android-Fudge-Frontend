@@ -2,7 +2,6 @@ package com.mobilesystems.feedme
 
 import android.content.Intent
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -13,13 +12,13 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.mobilesystems.feedme.databinding.ActivityRegisterBinding
-import com.mobilesystems.feedme.ui.register.RegisterViewModel
+import com.mobilesystems.feedme.ui.authentication.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
-    private val registerViewModel: RegisterViewModel by viewModels()
+    private val registerViewModel: AuthViewModel by viewModels()
     private var _binding: ActivityRegisterBinding? = null
     private val binding get() = _binding!!
 
@@ -35,7 +34,8 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
 
-        val usernameEditText = binding.inputUsername
+        val firstNameEditText = binding.inputFirstName
+        val lastNameEditText = binding.inputLastName
         val emailEditText = binding.inputEmail
         val passwordEditText = binding.inputPassword
         val confirmPasswordEditText = binding.inputConfirmPassword
@@ -50,7 +50,10 @@ class RegisterActivity : AppCompatActivity() {
                 }
                 registerButton.isEnabled = registerFormState.isDataValid
                 registerFormState.usernameError?.let {
-                    usernameEditText.error = getString(it)
+                    firstNameEditText.error = getString(it)
+                }
+                registerFormState.usernameError?.let {
+                    lastNameEditText.error = getString(it)
                 }
                 registerFormState.emailError?.let {
                     emailEditText.error = getString(it)
@@ -84,16 +87,18 @@ class RegisterActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 // check Fields For Empty Values
-                registerButton.isEnabled =
-                    (!(usernameEditText.equals("") || emailEditText.equals("") || passwordEditText.equals("") || confirmPasswordEditText.equals("")) && (passwordEditText != confirmPasswordEditText))
+                registerButton.isEnabled = (!(firstNameEditText.equals("") ||
+                        lastNameEditText.equals("") ||
+                        emailEditText.equals("") ||
+                        passwordEditText.equals("") ||
+                        confirmPasswordEditText.equals("")) &&
+                        (passwordEditText != confirmPasswordEditText))
             }
 
             override fun afterTextChanged(s: Editable) {
-
-
-
-                registerViewModel.registerDataChanged(
-                    usernameEditText.text.toString(),
+                registerViewModel.observeRegisterDataChanged(
+                    firstNameEditText.text.toString(),
+                    lastNameEditText.text.toString(),
                     emailEditText.text.toString(),
                     passwordEditText.text.toString(),
                     confirmPasswordEditText.text.toString()
@@ -101,14 +106,17 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        usernameEditText.addTextChangedListener(afterTextChangedListener)
+        firstNameEditText.addTextChangedListener(afterTextChangedListener)
+        lastNameEditText.addTextChangedListener(afterTextChangedListener)
         emailEditText.addTextChangedListener(afterTextChangedListener)
         confirmPasswordEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
+
         confirmPasswordEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 registerViewModel.register(
-                    usernameEditText.text.toString(),
+                    firstNameEditText.text.toString(),
+                    lastNameEditText.text.toString(),
                     emailEditText.text.toString(),
                     passwordEditText.text.toString(),
                     confirmPasswordEditText.text.toString()
@@ -120,7 +128,8 @@ class RegisterActivity : AppCompatActivity() {
         registerButton.setOnClickListener {
             loadingProgressBar.visibility = View.VISIBLE
             registerViewModel.register(
-                usernameEditText.text.toString(),
+                firstNameEditText.text.toString(),
+                lastNameEditText.text.toString(),
                 emailEditText.text.toString(),
                 passwordEditText.text.toString(),
                 confirmPasswordEditText.text.toString()

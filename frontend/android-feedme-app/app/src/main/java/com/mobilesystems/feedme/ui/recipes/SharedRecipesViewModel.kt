@@ -5,12 +5,12 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.data.repository.InventoryRepositoryImpl
 import com.mobilesystems.feedme.data.repository.RecipeRepositoryImpl
 import com.mobilesystems.feedme.data.repository.ShoppingListRepositoryImpl
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.domain.model.Recipe
+import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -240,7 +240,7 @@ class SharedRecipesViewModel @Inject constructor(
 
     private fun getCurrentUser(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
-        _currentUser.value = result
+        _currentUser.value = result?.userId
         return  currentUser
     }
 }

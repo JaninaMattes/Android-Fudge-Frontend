@@ -31,7 +31,7 @@
         android:id="@+id/register_user"/>
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/email"
         android:background="@drawable/input_bg"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
@@ -44,8 +44,8 @@
         android:paddingTop="10dp"
         android:paddingStart="10dp"
         android:inputType="textPersonName|textEmailAddress"
-        android:hint="Username/E-Mail"
-        android:autofillHints="Username/E-Mail"
+        android:hint="E-Mail"
+        android:autofillHints="E-Mail"
         android:ems="10"
         android:drawablePadding="10dp"
         android:drawableStart="@drawable/ic_baseline_email_24"
@@ -58,9 +58,9 @@
         android:background="@drawable/input_bg"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        app:layout_constraintStart_toStartOf="@+id/username"
-        app:layout_constraintEnd_toEndOf="@+id/username"
-        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintStart_toStartOf="@+id/email"
+        app:layout_constraintEnd_toEndOf="@+id/email"
+        app:layout_constraintTop_toBottomOf="@+id/email"
         app:layout_constraintHorizontal_bias="1.0"
         android:paddingBottom="10dp"
         android:paddingEnd="10dp"

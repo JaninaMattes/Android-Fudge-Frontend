@@ -22,11 +22,12 @@
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_username">Dies ist kein valider Nutzername.</string>
+    <string name="invalid_password">Das Passwort sollte >5 Charakter enthalten.</string>
     <string name="invalid_passwords">Passwörter stimmen nicht überein</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="simpel">simpel</string>
+    <string name="login_failed">"Der Login ist fehlgeschlagen."</string>
+    <string name="register_failed">"Die Registrierung ist fehlgeschlagen."</string>
+    <string name="simpel">einfach</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -182,5 +183,11 @@
     <string name="pizza">Pizza</string>
     <string name="_3">3</string>
     <string name="food_dummy_image">food_dummy_image</string>
+    <string name="vorname">Vorname</string>
+    <string name="nachname">Nachname</string>
+    <string name="logout">Logout</string>
+    <string name="dummy_text_email">max.mustermann@test.com</string>
+    <string name="dummy_text_lastname">Mustermann</string>
+    <string name="dummy_text_firstname">Max</string>
 
 </resources>

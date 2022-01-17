@@ -24,6 +24,9 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
+    private val searchView: SearchView? = null
+    private val searchItem: MenuItem? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,9 +55,9 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.top_search_menu, menu)
 
-        val searchItem: MenuItem? = menu?.findItem(R.id.action_search)
+        val searchItem= menu?.findItem(R.id.action_search)
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView: SearchView? = searchItem?.actionView as SearchView
+        val searchView = searchItem?.actionView as SearchView
 
         searchView?.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         searchView?.setOnQueryTextListener(this)
@@ -70,6 +73,9 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
             }
             R.id.favorite_recipes -> {
                 Toast.makeText(this, "Not yet implemented!!", Toast.LENGTH_SHORT).show()
+            }R.id.logout ->{
+                navController.navigateUp()
+                navController.navigate(R.id.logoutFragment)
             }
             R.id.more -> {
                 Toast.makeText(this, "Not yet implemented!!", Toast.LENGTH_SHORT).show()
@@ -83,25 +89,30 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-    // Search functionality
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        // TODO Add global search for new query
-        // This method can be used when a query is submitted eg. creating search history using SQLite DB
-        Toast.makeText(this, "Query Inserted", Toast.LENGTH_SHORT).show()
-        return true
-    }
-
-    override fun onQueryTextChange(query: String?): Boolean {
-        // TODO Add global search for new query
-        //Filter for text in Fragment Adapter
-        // adapter.filter(query)
-        return true
-    }
 
     // Barcode Scanning with ZXing
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // This is important, otherwise the result will not be passed to the fragment
+        // TODO: Fix deprecated onActivtiyResult
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        searchView?.clearFocus()
+        searchView?.setQuery("", false)
+        searchItem?.collapseActionView()
+
+        // TODO Add global search for new query
+        // This method can be used when a query is submitted eg. creating search history using SQLite DB
+        Toast.makeText(this@MainActivity, "Looking for $query", Toast.LENGTH_SHORT).show()
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        // TODO Add global search for new query
+        //Filter for text in Fragment Adapter
+        // adapter.filter(query)
+        return false
     }
 
 }

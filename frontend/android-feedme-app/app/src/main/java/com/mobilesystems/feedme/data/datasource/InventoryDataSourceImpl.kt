@@ -14,26 +14,29 @@ class InventoryDataSourceImpl @Inject constructor(
     @AppModule.DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
     @AppModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : InventoryDataSource {
 
-    private lateinit var fakeInventoryList: MutableList<Product>
+    private var fakeInventoryList: MutableList<Product>
+
+    init {
+        // TODO: Remove placeholder
+        fakeInventoryList = InventoryListPlaceholderContent.VARIOUS_ITEMS
+    }
 
     // TODO: Pass token for authentification
     override suspend fun getAllProductsInInventoryList(userId: Int): Response<List<Product>>? {
         return try {
 
             // TODO: Remove placeholder data with network call to backend
-            fakeInventoryList = InventoryListPlaceholderContent.VARIOUS_ITEMS
             //foodTrackerApi.getAllProductsInInventoryList(userId)
+
             Response.Success(fakeInventoryList)
         } catch (e: Throwable) {
             Response.Error("IOException")
         }
     }
 
-    override suspend fun updateCurrentShoppingList(
-        userId: Int,
-        currentShoppingList: List<Product>
-    ) {
-        TODO("Not yet implemented")
+    override suspend fun addProductToInventory(userId: Int, product: Product) {
+        // TODO: Persist current state in backend database
+        fakeInventoryList.add(product)
     }
 
     override suspend fun updateProductInventoryList(userId: Int, inventoryList: List<Product>?) {
@@ -45,13 +48,7 @@ class InventoryDataSourceImpl @Inject constructor(
 
     override suspend fun removeProductFromInventoryList(userId: Int, product: Product) {
         // TODO: Remove placeholder data with network call to backend
-        try {
-            fakeInventoryList.remove(product)
-            Response.Success(fakeInventoryList)
-        } catch (e: Throwable)
-        {
-            Response.Error("IOException")
-        }
+        fakeInventoryList.remove(product)
     }
 
 }

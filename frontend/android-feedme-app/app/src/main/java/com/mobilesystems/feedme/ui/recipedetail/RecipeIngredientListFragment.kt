@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.RecipeIngredientListFragmentBinding
 import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -22,7 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class RecipeIngredientListFragment : Fragment() {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedRecipesViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var ingredientRecyclerView: RecyclerView

@@ -1,7 +1,9 @@
 package com.mobilesystems.feedme.data.repository
 
-import com.mobilesystems.feedme.common.networkresult.Response
+import com.mobilesystems.feedme.common.networkresult.Resource
 import com.mobilesystems.feedme.data.datasource.AuthDataSourceImpl
+import com.mobilesystems.feedme.data.request.LoginRequest
+import com.mobilesystems.feedme.data.request.RegisterRequest
 import com.mobilesystems.feedme.domain.model.User
 import javax.inject.Inject
 
@@ -15,7 +17,11 @@ class AuthRepositoryImpl @Inject constructor(private val dataSourceImpl: AuthDat
     var user: User? = null
         private set
 
+    var token: String? = null
+        private set
+
     val isLoggedIn: Boolean
+    // TODO: Get value from backend
         get() = user != null
 
     init {
@@ -24,23 +30,19 @@ class AuthRepositoryImpl @Inject constructor(private val dataSourceImpl: AuthDat
         user = null
     }
 
-    override suspend fun login(username: String, password: String): Response<User> {
+    override suspend fun login(email: String, password: String) : Resource<Map<String, String>> {
         // handle login
-        val result = dataSourceImpl.login(username, password)
-
-        if (result is Response.Success) {
-            setLoggedInUser(result.data)
-        }
+        val request = LoginRequest(email, password)
+        val result = dataSourceImpl.login(request)
+        setLoggedInUserToken(result.data?.get("token"))
         return result
     }
 
-    override suspend fun register(username: String, email: String, password: String, passwordConfirm: String): Response<User> {
-
-        val result = dataSourceImpl.register(username, email, password, passwordConfirm)
-
-        if (result is Response.Success) {
-            setLoggedInUser(result.data)
-        }
+    override suspend fun register(firstName: String, lastName: String, email: String, password: String) : Resource<Map<String, String>> {
+        // handle register
+        val request = RegisterRequest(firstName, lastName, email, password)
+        val result = dataSourceImpl.register(request)
+        setLoggedInUserToken(result.data?.get("token"))
         return result
     }
 
@@ -54,5 +56,9 @@ class AuthRepositoryImpl @Inject constructor(private val dataSourceImpl: AuthDat
         // TODO: Use Keystore
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
+    }
+
+    private fun setLoggedInUserToken(token: String?) {
+        this.token = token
     }
 }

@@ -1,11 +1,19 @@
 package com.mobilesystems.feedme.ui.search
 
+import android.app.SearchManager
+import android.content.Intent
 import android.os.Bundle
+import android.provider.SearchRecentSuggestions
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.FragmentSearchListBinding
+import com.mobilesystems.feedme.ui.inventorylist.InventoryListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 /**
  * A simple [Fragment] subclass.
@@ -16,6 +24,16 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SearchListFragment : Fragment() {
 
+    private val viewModel: SearchSearchViewModel by activityViewModels()
+
+    private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var searchRecyclerView: RecyclerView
+    private lateinit var adapter: SearchListAdapter
+
+    //view binding
+    private var _binding: FragmentSearchListBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -25,7 +43,16 @@ class SearchListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_list, container, false)
+        _binding = FragmentSearchListBinding.inflate(inflater, container, false)
+
+        // Setup recycler view
+        searchRecyclerView = binding.recyclerviewSearchList
+        linearLayoutManager = LinearLayoutManager(context)
+        searchRecyclerView.layoutManager = linearLayoutManager
+        //adapter = SearchListAdapter(context, dataset, itemClickListener)
+        //searchRecyclerView.adapter = adapter
+
+        return binding.root
     }
 
     companion object {

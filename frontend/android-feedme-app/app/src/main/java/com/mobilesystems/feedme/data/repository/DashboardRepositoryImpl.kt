@@ -6,9 +6,12 @@ import com.mobilesystems.feedme.common.networkresult.Response
 import com.mobilesystems.feedme.data.datasource.InventoryDataSourceImpl
 import com.mobilesystems.feedme.data.datasource.RecipeDataSourceImpl
 import com.mobilesystems.feedme.data.datasource.UserDataSourceImpl
+import com.mobilesystems.feedme.data.response.UserResponse
+import com.mobilesystems.feedme.domain.model.FoodType
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.domain.model.Recipe
 import com.mobilesystems.feedme.domain.model.User
+import com.mobilesystems.feedme.ui.common.utils.convertUserResponse
 import javax.inject.Inject
 
 class DashboardRepositoryImpl @Inject constructor(
@@ -24,11 +27,14 @@ class DashboardRepositoryImpl @Inject constructor(
     var loggedInUser: MutableLiveData<User?> = MutableLiveData<User?>()
 
     override suspend fun getCurrentLoggedInUser(userId: Int): MutableLiveData<User?> {
-        // TODO restructure project
-        val result = userDataSourceImpl.loadUser(userId)
-        if (result is Response.Success) {
-            loggedInUser.postValue(result.data)
+        // get currently logged in user
+        var user: User? = null
+        val result = userDataSourceImpl.getUserById(userId)
+        val userResponse = result.data
+        if(userResponse != null) {
+            user = convertUserResponse(userResponse)
         }
+        loggedInUser.postValue(user)
         return loggedInUser
     }
 
@@ -51,18 +57,6 @@ class DashboardRepositoryImpl @Inject constructor(
             expiringProductList.postValue(result.data)
         }
         return expiringProductList
-    }
-
-    override suspend fun updateCurrentShoppingList(userId: Int, currentShoppingList: List<Product>) {
-        inventoryDataSource.updateCurrentShoppingList(userId, currentShoppingList)
-    }
-
-    override suspend fun updateNumberOneRecipeProducts(userId: Int, recipe: Recipe) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun removeExpiringProduct(userId: Int, product: Product) {
-        TODO("Not yet implemented")
     }
 
     override suspend fun getProductsAroundMe(usrId: Int): MutableLiveData<Map<Location, Product>?> {

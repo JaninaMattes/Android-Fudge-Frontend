@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.ProductDetailTagListFragmentBinding
 import com.mobilesystems.feedme.domain.model.Label
-import com.mobilesystems.feedme.ui.inventorylist.SharedInventoryViewModel
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ProductTagListFragment: Fragment()  {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var tagRecyclerView: RecyclerView
     private lateinit var adapter: ProductTagListAdapter

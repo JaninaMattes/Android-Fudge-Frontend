@@ -56,11 +56,11 @@ object ShoppingListPlaceholderContent {
             "", "")
         )
         addVariousItems(
-            Product(2, "Brötchen", "", labels,"10 Stück", "",
+            Product(2, "Brötchen", "", labels,"1 Stück", "",
                 "", "")
         )
         addVariousItems(
-            Product(3, "Milch", "", labels,"2 Packungen", "",
+            Product(3, "Milch", "", labels,"1 Packungen", "",
                 "", "")
         )
 

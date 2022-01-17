@@ -19,7 +19,8 @@ enum class FoodType(val label: String) {
         return "[${label}] -> $printableLabel"
     }
 
+    // Workaround to select a Foodtype
     companion object {
-        fun from(label: String): Label? = Label.values().find { it.label == label }
+        fun from(label: String): FoodType? = values().find { it.label == label }
     }
 }

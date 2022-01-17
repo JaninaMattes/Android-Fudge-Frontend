@@ -27,6 +27,13 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/logout"
+        android:icon="@drawable/ic_logout"
+        android:title="@string/logout"
+        android:contentDescription="@string/logout"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/more"
         android:title="@string/more"
         android:contentDescription="@string/content_description_more"

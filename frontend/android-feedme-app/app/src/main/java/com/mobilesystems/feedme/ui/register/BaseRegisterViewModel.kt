@@ -1,6 +1,6 @@
 package com.mobilesystems.feedme.ui.register
 
-interface BaseRegisterViewModel {
+interface BaseRegisterViewModel{
 
     fun register(username: String, email: String, password: String, passwordConfirm: String)
 

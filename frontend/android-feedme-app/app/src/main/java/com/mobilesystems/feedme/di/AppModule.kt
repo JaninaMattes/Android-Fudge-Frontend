@@ -1,7 +1,5 @@
 package com.mobilesystems.feedme.di
 
-import android.app.Application
-import android.content.Context
 import com.mobilesystems.feedme.common.config.Constants
 import com.mobilesystems.feedme.data.datasource.*
 import com.mobilesystems.feedme.data.remote.FoodTrackerApi
@@ -17,6 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -68,33 +67,37 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesHttpLoggingInterceptor() = HttpLoggingInterceptor()
-        .apply {
-            level = HttpLoggingInterceptor.Level.BODY
+    @Named("loggingInterceptor")
+    fun providesHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            this.level = HttpLoggingInterceptor.Level.BODY
         }
+    }
 
     @Singleton
     @Provides
-    fun providesOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient =
-        OkHttpClient
+    fun providesOkHttpClient() : OkHttpClient{
+        return OkHttpClient
             .Builder()
             .connectTimeout(Constants.CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
             .readTimeout(Constants.READ_TIMEOUT, TimeUnit.MILLISECONDS)
-            .addInterceptor(httpLoggingInterceptor)
             .writeTimeout(Constants.WRITE_TIMEOUT, TimeUnit.MILLISECONDS)
             .build()
+    }
 
-    @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(baseUrl)
-        .client(okHttpClient)
-        .build()
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    @Singleton
     @Provides
-    fun provideFoodTrackerApi(retrofit: Retrofit): FoodTrackerApi = retrofit.create(FoodTrackerApi::class.java)
+    fun provideFoodTrackerApi(retrofit: Retrofit): FoodTrackerApi {
+        return retrofit.create(FoodTrackerApi::class.java)
+    }
 
     @Singleton
     @Provides

@@ -33,7 +33,7 @@ class ShoppingListOldProductsGridFragment : Fragment() {
         override fun passData(product: Product, itemView: View) {
             // pass data and navigate to product detail view
             sharedViewModel.removeProductFromOldShoppingList(product)
-            sharedViewModel.addProductToCurrentShoppingList(product)
+
         }
     }
 
@@ -43,7 +43,6 @@ class ShoppingListOldProductsGridFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        // TODO use ViewBinding
         // Inflate layout for this fragment
         _binding = ShoppingListOldFragmentBinding.inflate(inflater, container, false)
         // Setup recycler view

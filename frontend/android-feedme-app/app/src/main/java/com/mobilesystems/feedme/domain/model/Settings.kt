@@ -8,7 +8,6 @@ data class Settings(
     val reminderProductExp: Boolean? = null,
     val allowPushNotifications: Boolean? = null,
     val suggestRecipes: Boolean? = null,
-    val foodLabel: List<FoodType>? = null
 ) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
@@ -20,7 +19,6 @@ data class Settings(
         if (reminderProductExp != other.reminderProductExp) return false
         if (allowPushNotifications != other.allowPushNotifications) return false
         if (suggestRecipes != other.suggestRecipes) return false
-        if (foodLabel != other.foodLabel) return false
 
         return true
     }
@@ -29,12 +27,13 @@ data class Settings(
         var result = reminderProductExp?.hashCode() ?: 0
         result = 31 * result + (allowPushNotifications?.hashCode() ?: 0)
         result = 31 * result + (suggestRecipes?.hashCode() ?: 0)
-        result = 31 * result + (foodLabel?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "Settings(reminderProductExp=$reminderProductExp, allowPushNotifications=$allowPushNotifications, suggestRecipes=$suggestRecipes, foodLabel=$foodLabel)"
+        return "Settings(reminderProductExp=$reminderProductExp, " +
+                "allowPushNotifications=$allowPushNotifications, suggestRecipes=$suggestRecipes)"
     }
+
 
 }

@@ -14,15 +14,17 @@ class ShoppingListDataSourceImpl @Inject constructor(
     @AppModule.DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
     @AppModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : ShoppingListDataSource{
 
-    private lateinit var fakeCurrentShoppingList: MutableList<Product>
-    private lateinit var fakeOldShoppingList: MutableList<Product>
+    private var fakeCurrentShoppingList: MutableList<Product>
+    private var fakeOldShoppingList: MutableList<Product>
+
+    init {
+        fakeCurrentShoppingList = ShoppingListPlaceholderContent.VARIOUS_ITEMS_CURRENT_SHOP
+        fakeOldShoppingList = ShoppingListPlaceholderContent.VARIOUS_ITEMS_OLD_SHOP
+    }
 
     override suspend fun loadAllProductsInCurrentShoppingList(): Response<List<Product>>? {
         return try {
-
             // TODO: Remove placeholder data with network call to backend
-            fakeCurrentShoppingList = ShoppingListPlaceholderContent.VARIOUS_ITEMS_CURRENT_SHOP
-
             Response.Success(fakeCurrentShoppingList)
         } catch (e: Throwable) {
             Response.Error("IOException")
@@ -31,32 +33,48 @@ class ShoppingListDataSourceImpl @Inject constructor(
 
     override suspend fun loadAllProductsInOldShoppingList(): Response<List<Product>>? {
         return try {
-
             // TODO: Remove placeholder data with network call to backend
-            fakeOldShoppingList = ShoppingListPlaceholderContent.VARIOUS_ITEMS_OLD_SHOP
-
-            Response.Success(fakeCurrentShoppingList)
+            Response.Success(fakeOldShoppingList)
         } catch (e: Throwable) {
             Response.Error("IOException")
         }
     }
 
-    override suspend fun updateProductInCurrentShoppingList(shoppingList: List<Product>?) {
+    override suspend fun addProductToCurrentShoppingList(userId: Int, product: Product) {
+            // TODO: Remove placeholder data with network call to backend
+            fakeCurrentShoppingList.add(product)
+    }
+
+    override suspend fun addProductToOldShoppingList(userId: Int, product: Product) {
+            // TODO: Remove placeholder data with network call to backend
+            fakeOldShoppingList.add(product)
+    }
+
+    override suspend fun updateCurrentShoppingList(userId: Int, shoppingList: List<Product>?) {
         // TODO: Pass to database
         fakeCurrentShoppingList = shoppingList as MutableList<Product>
     }
 
-    override suspend fun updateProductInOldShoppingList(shoppingList: List<Product>?) {
+    override suspend fun updateOldShoppingList(userId: Int, shoppingList: List<Product>?) {
         // TODO: Pass to database
         fakeOldShoppingList = shoppingList as MutableList<Product>
     }
 
-    override suspend fun loadSuggestedProductsForShoppingList(): Response<List<Product>>? {
-        return try {
+    override suspend fun removeProductFromOldShoppingList(userId: Int, product: Product) {
+        // TODO: Pass to database
+        fakeOldShoppingList.remove(product)
+    }
 
+    override suspend fun removeProductFromCurrentShoppingList(userId: Int, product: Product){
+        // TODO: Pass to database
+        fakeCurrentShoppingList.remove(product)
+    }
+
+    override suspend fun loadSuggestedProductsForShoppingList(): Response<List<Product>>? {
+        // Helper function for future features
+        return try {
             // TODO: Remove placeholder data with network call to backend
             fakeOldShoppingList = ShoppingListPlaceholderContent.VARIOUS_ITEMS_OLD_SHOP
-
             Response.Success(fakeCurrentShoppingList)
         } catch (e: Throwable) {
             Response.Error("IOException")

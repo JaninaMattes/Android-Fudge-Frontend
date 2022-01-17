@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.mobilesystems.feedme.databinding.InventoryListFragmentBinding
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -24,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class InventoryListFragment : Fragment() {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var inventoryRecyclerView: RecyclerView

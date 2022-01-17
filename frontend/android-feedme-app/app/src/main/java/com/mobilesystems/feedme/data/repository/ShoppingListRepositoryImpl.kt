@@ -49,7 +49,7 @@ class ShoppingListRepositoryImpl @Inject constructor(private val dataSourceImpl:
 
     override suspend fun updateCurrentShoppingList(userId: Int, shoppingList: List<Product>?) {
         currentShoppingListProducts.postValue(shoppingList)
-        dataSourceImpl.updateProductInCurrentShoppingList(shoppingList)
+        dataSourceImpl.updateCurrentShoppingList(userId, shoppingList)
     }
 
     override suspend fun removeProductFromCurrentShoppingList(userId: Int, product: Product) {
@@ -60,7 +60,7 @@ class ShoppingListRepositoryImpl @Inject constructor(private val dataSourceImpl:
             tempList.remove(product)
             currentShoppingListProducts.value = tempList
         }
-        dataSourceImpl.updateProductInCurrentShoppingList(currentShoppingListProducts.value)
+        dataSourceImpl.updateCurrentShoppingList(userId, tempList)
     }
 
     override suspend fun addNewProductToCurrentShoppingList(userId: Int, product: Product) {
@@ -71,12 +71,12 @@ class ShoppingListRepositoryImpl @Inject constructor(private val dataSourceImpl:
             tempList.add(product)
             currentShoppingListProducts.value = tempList
         }
-        dataSourceImpl.updateProductInCurrentShoppingList(currentShoppingListProducts.value)
+        dataSourceImpl.addProductToCurrentShoppingList(userId, product)
     }
 
     override suspend fun updateOldShoppingList(userId: Int, oldShoppingList: List<Product>?) {
         oldShoppingListProducts.postValue(oldShoppingList)
-        dataSourceImpl.updateProductInOldShoppingList(oldShoppingList)
+        dataSourceImpl.updateOldShoppingList(userId, oldShoppingList)
     }
 
     override suspend fun removeProductFromOldShoppingList(userId: Int, product: Product) {
@@ -87,7 +87,7 @@ class ShoppingListRepositoryImpl @Inject constructor(private val dataSourceImpl:
             tempList.remove(product)
             oldShoppingListProducts.value = tempList
         }
-        dataSourceImpl.updateProductInOldShoppingList(oldShoppingListProducts.value)
+        dataSourceImpl.removeProductFromOldShoppingList(userId, product)
     }
 
     override suspend fun addProductToOldShoppingList(userId: Int, product: Product) {
@@ -98,7 +98,7 @@ class ShoppingListRepositoryImpl @Inject constructor(private val dataSourceImpl:
             tempList.add(product)
             oldShoppingListProducts.value = tempList
         }
-        dataSourceImpl.updateProductInOldShoppingList(oldShoppingListProducts.value)
+        dataSourceImpl.addProductToOldShoppingList(userId, product)
     }
 
 }

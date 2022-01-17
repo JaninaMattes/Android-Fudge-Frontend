@@ -57,9 +57,15 @@ class ShoppingListFragment : Fragment() {
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
         Log.d(TAG, "Add child fragment to parent.")
-        childFragmentManager.beginTransaction().apply {
-            add(viewId, childFragment)
-            commit()
+
+        val child = childFragmentManager.findFragmentById(viewId)
+
+        if(child == null) {
+            childFragmentManager.beginTransaction().apply {
+                add(viewId, childFragment)
+                addToBackStack(null)
+                commit()
+            }
         }
     }
 

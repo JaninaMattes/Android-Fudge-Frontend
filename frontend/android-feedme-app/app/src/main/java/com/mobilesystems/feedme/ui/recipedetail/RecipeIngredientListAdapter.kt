@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 
 /**
  * Tutorial: https://developer.android.com/guide/topics/ui/layout/recyclerview
@@ -18,7 +18,7 @@ import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
  */
 class RecipeIngredientListAdapter(
     private val context: Context,
-    private val sharedViewModel: SharedRecipesViewModel,
+    private val sharedViewModel: SharedDashboardViewModel,
     private val dataSet: List<Product>?
 ) : RecyclerView.Adapter<RecipeIngredientListAdapter.IngredientViewHolder>() {
 

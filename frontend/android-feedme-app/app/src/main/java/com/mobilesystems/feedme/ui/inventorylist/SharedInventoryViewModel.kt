@@ -6,10 +6,11 @@ import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.data.repository.InventoryRepositoryImpl
 import com.mobilesystems.feedme.domain.model.Label
 import com.mobilesystems.feedme.domain.model.Product
+import com.mobilesystems.feedme.ui.authentication.LoggedInUser
+import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class SharedInventoryViewModel @Inject constructor(
     private var _selectedProduct = MutableLiveData<Product?>()
     private var _selectedTagList = MutableLiveData<List<Label>?>()
     private var _allProductLabels = MutableLiveData<List<String>>()
-    private var _currentUser = MutableLiveData<Int?>()
+    private var _currentUser = MutableLiveData<LoggedInUser?>()
 
     val inventoryList : LiveData<List<Product>?>
         get() = _inventoryList
@@ -50,7 +51,7 @@ class SharedInventoryViewModel @Inject constructor(
     val allProductLabels : LiveData<List<String>>
         get() = _allProductLabels
 
-    val currentUser : LiveData<Int?>
+    val currentUser : LiveData<LoggedInUser?>
         get() = _currentUser
 
     init {
@@ -102,7 +103,7 @@ class SharedInventoryViewModel @Inject constructor(
         // Update the values of a product that already exists in inventory
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUser.value?.userId
             val currentValues = inventoryList.value
             var tempList: MutableList<Product> = ArrayList<Product>()
             if (currentValues != null) {
@@ -124,7 +125,7 @@ class SharedInventoryViewModel @Inject constructor(
     override fun addProductToInventoryList(product: Product) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUser.value?.userId
             val tempList = findDuplicateProducts(product)
             _inventoryList.value = tempList
             // Network call
@@ -189,7 +190,7 @@ class SharedInventoryViewModel @Inject constructor(
     override fun deleteProductInInventoryList(product: Product) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUser.value?.userId
             val currentValues = inventoryList.value
             var tempList: MutableList<Product> = ArrayList<Product>()
             if (currentValues != null) {
@@ -207,7 +208,7 @@ class SharedInventoryViewModel @Inject constructor(
     override fun loadAllProductsOfInventoryList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUser.value?.userId
             if(userId != null) {
                 inventoryRepository.loadInventoryListProducts(userId)
                 _inventoryList = inventoryRepository.inventoryList
@@ -225,7 +226,7 @@ class SharedInventoryViewModel @Inject constructor(
     override fun updateInventoryList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUser.value?.userId
             val currentValues = inventoryList.value
             var tempList: MutableList<Product> = ArrayList<Product>()
             if (currentValues != null) {
@@ -279,7 +280,7 @@ class SharedInventoryViewModel @Inject constructor(
         return sdf.parse(dateStr)
     }
 
-    private fun getCurrentUser(context: Context): LiveData<Int?>{
+    private fun getCurrentUser(context: Context): LiveData<LoggedInUser?>{
         val result = getLoggedInUser(context)
         _currentUser.value = result
         return  currentUser

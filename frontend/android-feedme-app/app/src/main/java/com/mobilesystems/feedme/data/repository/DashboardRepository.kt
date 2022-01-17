@@ -14,14 +14,6 @@ interface DashboardRepository {
 
     suspend fun getAllExpiringProducts(userId: Int): MutableLiveData<List<Product>?>
 
-    suspend fun updateCurrentShoppingList(userId: Int, currentShoppingList: List<Product>): Unit
-
-    // Update single recipe rating
-    suspend fun updateNumberOneRecipeProducts(userId: Int, recipe: Recipe): Unit
-
-    // Remove a product from the list
-    suspend fun removeExpiringProduct(userId: Int, product: Product): Unit
-
-    // TODO: Future integration of map
+    // TODO: Future integration of a map to bring in social component
     suspend fun getProductsAroundMe(usrId: Int): MutableLiveData<Map<Location, Product>?>
 }

@@ -25,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DashboardFragment : Fragment() {
 
-    // TODO: RecipeViewModel + ProductViewModel in SharedDashboardViewModel legen
     private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
 
     // view binding
@@ -109,8 +108,6 @@ class DashboardFragment : Fragment() {
     private fun addChildFragment(viewId: Int, childFragment: Fragment){
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
-        Log.d(TAG, "Child fragment is added to parent.")
-
         val child = childFragmentManager.findFragmentById(viewId)
 
         if(child == null){
@@ -124,6 +121,7 @@ class DashboardFragment : Fragment() {
 
     //push-notifikation für ablaufende Produkte
     fun showNotification(){
+        // TODO: Daten abrufen aus der Expiring Liste und 3-5 aktuell ablaufende Produkte anzeigen
         var context = activity?.applicationContext
         var builder = context?.let {
             NotificationCompat.Builder(it, CHANNEL_ID).apply{

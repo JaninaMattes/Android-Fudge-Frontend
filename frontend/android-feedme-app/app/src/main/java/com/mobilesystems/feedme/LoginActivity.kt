@@ -42,7 +42,7 @@ class LoginActivity: AppCompatActivity() {
             finish()
         }
 
-        val usernameEditText = binding.username
+        val emailEditText = binding.email
         val passwordEditText = binding.password
         val loginButton = binding.login
         val loadingProgressBar = binding.loading
@@ -55,7 +55,7 @@ class LoginActivity: AppCompatActivity() {
                 }
                 loginButton.isEnabled = loginFormState.isDataValid
                 loginFormState.usernameError?.let {
-                    usernameEditText.error = getString(it)
+                    emailEditText.error = getString(it)
                 }
                 loginFormState.passwordError?.let {
                     passwordEditText.error = getString(it)
@@ -83,23 +83,23 @@ class LoginActivity: AppCompatActivity() {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 // check Fields For Empty Values
                 loginButton.isEnabled =
-                    !(usernameEditText.equals("") || passwordEditText.equals(""))
+                    !(emailEditText.equals("") || passwordEditText.equals(""))
             }
 
             override fun afterTextChanged(editable: Editable) {
                 authViewModel.observeLoginDataChanged(
-                    usernameEditText.text.toString(),
+                    emailEditText.text.toString(),
                     passwordEditText.text.toString()
                 )
             }
         }
 
-        usernameEditText.addTextChangedListener(afterTextChangedListener)
+        emailEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 authViewModel.login(
-                    usernameEditText.text.toString(),
+                    emailEditText.text.toString(),
                     passwordEditText.text.toString()
                 )
             }
@@ -109,11 +109,10 @@ class LoginActivity: AppCompatActivity() {
         loginButton.setOnClickListener {
             loadingProgressBar.visibility = View.VISIBLE
             authViewModel.login(
-                usernameEditText.text.toString(),
+                emailEditText.text.toString(),
                 passwordEditText.text.toString()
             )
         }
-
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {

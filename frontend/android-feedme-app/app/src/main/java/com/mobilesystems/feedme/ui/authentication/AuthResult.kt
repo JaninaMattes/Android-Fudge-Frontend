@@ -1,7 +1,5 @@
 package com.mobilesystems.feedme.ui.authentication
 
-import com.mobilesystems.feedme.domain.model.User
-
 /**
  * Authentication result : success (user details) or error message.
  */

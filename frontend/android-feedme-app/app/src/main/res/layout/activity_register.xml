@@ -31,7 +31,7 @@
         android:text="@string/register"/>
 
     <EditText
-        android:id="@+id/inputUsername"
+        android:id="@+id/inputFirstName"
         android:background="@drawable/input_bg"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
@@ -43,7 +43,7 @@
         android:paddingTop="10dp"
         android:paddingStart="20dp"
         android:inputType="textPersonName"
-        android:hint="@string/username"
+        android:hint="@string/vorname"
         android:ems="10"
         android:drawablePadding="10dp"
         android:drawableStart="@drawable/ic_baseline_person_24"
@@ -52,13 +52,32 @@
         android:layout_marginStart="32dp"/>
 
     <EditText
+        android:id="@+id/inputLastName"
+        android:background="@drawable/input_bg"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toStartOf="@+id/inputFirstName"
+        app:layout_constraintEnd_toEndOf="@+id/inputFirstName"
+        app:layout_constraintTop_toBottomOf="@+id/inputFirstName"
+        android:paddingBottom="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="10dp"
+        android:paddingStart="20dp"
+        android:inputType="textPersonName"
+        android:hint="@string/nachname"
+        android:ems="10"
+        android:drawablePadding="10dp"
+        android:drawableStart="@drawable/ic_baseline_person_24"
+        android:layout_marginTop="16dp" />
+
+    <EditText
         android:id="@+id/inputEmail"
         android:background="@drawable/input_bg"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        app:layout_constraintStart_toStartOf="@+id/inputUsername"
-        app:layout_constraintEnd_toEndOf="@+id/inputUsername"
-        app:layout_constraintTop_toBottomOf="@+id/inputUsername"
+        app:layout_constraintStart_toStartOf="@+id/inputLastName"
+        app:layout_constraintEnd_toEndOf="@+id/inputLastName"
+        app:layout_constraintTop_toBottomOf="@+id/inputLastName"
         android:paddingBottom="10dp"
         android:paddingEnd="10dp"
         android:paddingTop="10dp"

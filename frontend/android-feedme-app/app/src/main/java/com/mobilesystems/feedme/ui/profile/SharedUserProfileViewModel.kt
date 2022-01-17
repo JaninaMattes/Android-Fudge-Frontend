@@ -2,14 +2,15 @@ package com.mobilesystems.feedme.ui.profile
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.data.repository.UserRepositoryImpl
 import com.mobilesystems.feedme.domain.model.FoodType
 import com.mobilesystems.feedme.domain.model.Settings
 import com.mobilesystems.feedme.domain.model.User
+import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ class SharedUserProfileViewModel @Inject constructor(
 
     private var _loggedInUser = MutableLiveData<User?>()
     private var _loggedInUserFoodTypeList = MutableLiveData<List<FoodType>?>()
-    private var _currentUser = MutableLiveData<Int?>()
+    private var _currentUserId = MutableLiveData<Int?>()
 
     val loggedInUser : LiveData<User?>
         get() = _loggedInUser
@@ -31,31 +32,33 @@ class SharedUserProfileViewModel @Inject constructor(
     val loggedInUserFoodTypeList : LiveData<List<FoodType>?>
         get() = _loggedInUserFoodTypeList
 
-    val currentUser : LiveData<Int?>
-        get() = _currentUser
+    val currentUserId : LiveData<Int?>
+        get() = _currentUserId
 
     init {
-
+        Log.d("UserViewModel", "Loading all data.")
         val context = getApplication<Application>().applicationContext
-        getCurrentUser(context)
-        val userId = currentUser.value
-
-        if(userId != null) {
-            loadLoggedIndUser()
-            loadLoggedInUserFoodTypeList()
-        }
+        // pre-fetch user from sharedPreferences
+        getCurrentUserId(context)
+        // load user from backend
+        loadLoggedIndUser()
     }
 
     override fun loadLoggedIndUser() {
         viewModelScope.launch {
             // This is a coroutine scope with the lifecycle of the ViewModel
-            val userId = currentUser.value
-
+            val userId = currentUserId.value
             if(userId != null) {
-                userRepository.getLoggedInUser(userId)
-                _loggedInUser = userRepository.currentLoggedInUser
+                val result = userRepository.getLoggedInUser(userId)
+                _loggedInUser.postValue(result)
+                Log.d("UserViewModel", "Loaded User Id ${loggedInUser.value?.userId}, " +
+                        "Name ${loggedInUser.value?.firstName}")
+            }else{
+                Log.e("UserViewModel", "No user id found.")
+                // TODO: If not user, then log user out
             }
         }
+        loadLoggedInUserFoodTypeList()
     }
 
     override fun updateLoggedInUser(user: User) {
@@ -68,7 +71,7 @@ class SharedUserProfileViewModel @Inject constructor(
 
     override fun deleteLoggedInUser() {
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if(userId != null) {
                 userRepository.deleteUser(userId)
             }
@@ -79,7 +82,9 @@ class SharedUserProfileViewModel @Inject constructor(
         // Helper function
         var tempUser = loggedInUser.value
         if(tempUser != null) {
-            _loggedInUserFoodTypeList.value = tempUser.userTags
+            _loggedInUserFoodTypeList.value = tempUser.dietaryPreferences
+        }else{
+            Log.d("UserViewModel", "User is null.")
         }
         return loggedInUserFoodTypeList
     }
@@ -141,9 +146,9 @@ class SharedUserProfileViewModel @Inject constructor(
         }
     }
 
-    private fun getCurrentUser(context: Context): LiveData<Int?>{
+    private fun getCurrentUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
-        _currentUser.value = result
-        return  currentUser
+        _currentUserId.value = result?.userId
+        return  currentUserId
     }
 }

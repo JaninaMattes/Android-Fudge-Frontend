@@ -40,7 +40,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/large_text_margin">
+                android:layout_marginStart="@dimen/large_text_margin"
+                android:layout_gravity="start">
 
                 <LinearLayout
                     android:id="@+id/user_profile_name_container"
@@ -73,7 +74,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/small_text_margin"
-                        android:text="James "
+                        android:text="@string/dummy_text_firstname"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_small"
                         android:textStyle="normal" />
@@ -82,7 +83,7 @@
                         android:id="@+id/user_profile_lastname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Dyson"
+                        android:text="@string/dummy_text_lastname"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_small"
                         android:textStyle="normal" />
@@ -117,7 +118,7 @@
                         android:id="@+id/user_profile_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="james.dyson@gmail.com"
+                        android:text="@string/dummy_text_email"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_small"
                         android:textStyle="normal" />
@@ -156,7 +157,7 @@
                         android:text="@string/password_string"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_small"
-                        android:textStyle="normal" />
+                        android:textStyle="normal"/>
 
                 </LinearLayout>
 

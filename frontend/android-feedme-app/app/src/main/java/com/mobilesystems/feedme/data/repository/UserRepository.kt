@@ -6,7 +6,7 @@ import com.mobilesystems.feedme.domain.model.User
 
 interface UserRepository {
 
-    suspend fun getLoggedInUser(userId: Int): MutableLiveData<User?>
+    suspend fun getLoggedInUser(userId: Int): User?
 
     suspend fun updateLoggedInUser(user: User): Unit
 
