@@ -1,5 +1,6 @@
 package com.mobilesystems.feedme.ui.inventorylist
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.icu.util.Calendar
@@ -22,19 +23,28 @@ import kotlinx.android.synthetic.main.inventory_add_product_fragment.*
 import kotlinx.android.synthetic.main.inventory_add_product_fragment.view.*
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.content.ActivityNotFoundException
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.icu.text.SimpleDateFormat
+import android.provider.MediaStore
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.ui.common.utils.addDaysToCurrentDate
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.InputStream
+import java.lang.Exception
 import java.util.*
+
 
 @AndroidEntryPoint
 class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedListener{
 
-    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
+    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
     private val calendar: Calendar = Calendar.getInstance()
     private lateinit var alertDialog: AlertDialog
 
@@ -44,21 +54,26 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
 
     private lateinit var product: Product
     private lateinit var productLabel: String
+    private var newProductBitmap: Bitmap? = null
+    private lateinit var loadingProgressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate layout for this fragment
         _binding = InventoryAddProductFragmentBinding.inflate(inflater, container, false)
         val rootView = binding.root
+
+        //add spinner
+        loadingProgressBar = binding.loadingBarcode
 
         // Add dropdown menu
         val spinner: Spinner = rootView.drop_down_add_new_product_labels_inventory
         val addExpirationDate: EditText = binding.editTextAddNewProductExpirationDateInventory
         // Create an ArrayAdapter using the string array and a default spinner layout
         val context = activity?.applicationContext
-        val values: List<String> = sharedViewModel.loadAllProductLabels().value!!
+        val values: List<String> = sharedViewModel.loadAllProductLabels()
 
         if (context != null){
             ArrayAdapter(context, android.R.layout.simple_spinner_item, values).also { adapter ->
@@ -66,8 +81,6 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner.adapter = adapter
             }
-        }else{
-            Log.d(TAG, "App context is empty.")
         }
         spinner.onItemSelectedListener = this
 
@@ -84,19 +97,43 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             addExpirationDate.setText(dateFormat.format(calendar.time))
         }
         // open on click to editText
-        addExpirationDate.setOnClickListener(View.OnClickListener {
-            val context = activity
-            if(context != null) {
-                DatePickerDialog(context, date, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        addExpirationDate.setOnClickListener {
+            val acitivtyContext = activity
+            if (acitivtyContext != null) {
+                DatePickerDialog(
+                    acitivtyContext,
+                    date,
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                ).show()
             }
-        })
+        }
 
         return rootView
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        button_add_image_to_product.setOnClickListener {
+            val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            // code for crop image
+            i.putExtra("crop", "true")
+            i.putExtra("aspectX", 100)
+            i.putExtra("aspectY", 100)
+            i.putExtra("outputX", 256)
+            i.putExtra("outputY", 356)
+
+            try {
+                i.putExtra("return-data", true)
+                startActivityForResult(Intent.createChooser(i, "Select Picture"), IMAGE_REQUEST_CODE)
+            } catch (ex: ActivityNotFoundException) {
+                ex.printStackTrace()
+                val context = activity?.applicationContext
+                Toast.makeText(context,"Gallery picker failed", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         button_scan_product.setOnClickListener {
             // Setup for Zxing Barcode Reader
@@ -113,96 +150,140 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
         }
 
         button_enteraddproducttoinventorylist.setOnClickListener {
-            var newLabel: Label?
-            val productname = binding.editTextAddnewproducttitleInventory.text.toString().trim() // TODO: Productname cannot be empty!!
+            val newLabel: Label?
+            val productname = binding.editTextAddnewproducttitleInventory.text.toString().trim()
             var productquantity = binding.editTextAddnewproductquantityInventory.text.toString().trim()
             var productExpirationDate = binding.editTextAddNewProductExpirationDateInventory.text.toString().trim()
             var productManufacturer = binding.editTextAddnewproductManufacturerInventory.text.toString().trim()
             var productNutrition = binding.editTextAddnewproductNutritionvalueInventory.text.toString().trim()
 
-            // TODO: Update list or single value for tag - one tag per product?
-            val productLabelList : MutableList<Label> = arrayListOf()
-            if(productLabel.isNotEmpty()) {
-                newLabel = Label.from(productLabel)
-
-                if (newLabel != null) {
-                    productLabelList.add(newLabel)
-                    if(productExpirationDate.isEmpty()){
-                        // calculate expiration
-                        productExpirationDate = calculateExpDate(newLabel)
-                    } else {
-                        Log.d(TAG, "The expiration date is empty.")
+            if(checkValues()){
+                val productLabelList : MutableList<Label> = arrayListOf()
+                if(productLabel.isNotEmpty()) {
+                    newLabel = Label.from(productLabel)
+                    if (newLabel != null) {
+                        productLabelList.add(newLabel)
+                        if(productExpirationDate.isEmpty()){
+                            // calculate expiration
+                            productExpirationDate = calculateExpDate(newLabel)
+                        } else {
+                            Log.d(TAG, "The expiration date is empty.")
+                        }
+                    }else{
+                        Log.d(TAG, "The label is empty.")
                     }
                 }else{
-                    Log.d(TAG, "The label is empty.")
+                    val alertBuilder = createAlert()
+                    // Show dialog
+                    alertDialog = alertBuilder.create()
+                    alertDialog.show()
                 }
 
-            }else{
-                val alertBuilder = createAlert()
-                // Show dialog
-                alertDialog = alertBuilder.create()
-                alertDialog.show()
-            }
-            // TODO: Similar to Login check error in seperate class
-            // Check product quantity
-            if(productquantity.isEmpty()){
-                productquantity = "1 Stück"
-            }else if (productquantity.isDigitsOnly()){
-                val quantity = productquantity.filter { it.isDigit() }
-                productquantity = "$quantity Stück"
-            }
-            // Check product manufacturer
-            if(productManufacturer.isEmpty()){
-                productManufacturer = "-"
-            }
-            // Check product nutrition value
-            if(productNutrition.isEmpty()){
-                productNutrition = "-"
-            }else if (productNutrition.isDigitsOnly()){
-                val quantity = productNutrition.filter { it.isDigit() }
-                productNutrition = "$quantity kcal"
+                // Check product quantity
+                if(productquantity.isEmpty()){
+                    productquantity = "1 Stück"
+                }else if (productquantity.isDigitsOnly()){
+                    val quantity = productquantity.filter { it.isDigit() }
+                    productquantity = "$quantity Stück"
+                }
+                // Check product manufacturer
+                if(productManufacturer.isEmpty()){
+                    productManufacturer = "-"
+                }
+                // Check product nutrition value
+                if(productNutrition.isEmpty()){
+                    productNutrition = "- kcal"
+                }else if (productNutrition.isDigitsOnly()){
+                    val quantity = productNutrition.filter { it.isDigit() }
+                    productNutrition = "$quantity kcal"
+                }
+                // create new image th
+                val productImage = Image(imageId = 0,
+                    imageName = "Produktbild",
+                    imageUrl = "https://cdn.pixabay.com/photo/2017/06/06/22/37/italian-cuisine-2378729_960_720.jpg",
+                    bitmap = newProductBitmap
+                )
+                // create new product object
+                product = Product(
+                    productId = 0,
+                    productName = productname,
+                    expirationDate = productExpirationDate,
+                    labels = productLabelList,
+                    quantity = productquantity,
+                    manufacturer = productManufacturer,
+                    nutritionValue = productNutrition,
+                    productImage = productImage)
+
+                sharedViewModel.addProductToInventoryList(product)
+
+                val action = AddProductToInventoryFragmentDirections.actionAddProductToInventoryFragmentToNavigationInventorylist()
+                findNavController().navigate(action)
             }
 
-            // TODO: Replace imageURL with images from database or photography
-            product = Product(0, productname, productExpirationDate, productLabelList, productquantity, productManufacturer,
-                productNutrition, "https://cdn.pixabay.com/photo/2020/06/23/09/06/donut-5331966_960_720.jpg")
-            sharedViewModel.addProductToInventoryList(product)
-            val action = AddProductToInventoryFragmentDirections.actionAddProductToInventoryFragmentToNavigationInventorylist()
-            findNavController().navigate(action)
+        }
+    }
+
+    private fun checkValues(): Boolean{
+        val context = activity?.applicationContext
+        var errorIcon: Drawable? = null
+        if(context != null){
+            errorIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_error_24)
+        }
+        return if(binding.editTextAddnewproducttitleInventory.text.toString().trim().isEmpty()){
+            binding.editTextAddnewproducttitleInventory.setError("Produktname darf nicht leer sein!", errorIcon)
+            false
+
+        }else {
+            true
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        // receive result
-        // ZXing Scan via Intent: https://github.com/zxing/zxing/wiki/Scanning-Via-Intent
-        // TODO: Update deprecated code
-        val scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (scanResult != null) {
-            if (scanResult.contents == null) {
-                Toast.makeText(context, "Barcode scan cancelled! ", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "$scanResult received from barcode scanner!")
-            } else {
-                Toast.makeText(context, "Scanned -> " + scanResult.contents, Toast.LENGTH_SHORT).show()
 
-                val results = scanResult.contents
-                val newProduct = sharedViewModel.getProductFromBarcodeScanResult(results)
+        // 1. Galery picker select image
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Log.d(TAG, "Gallery picker: Request code $requestCode and $resultCode received ")
+            newProductBitmap = loadImageFromGallery(data)
+        }
 
-                if(newProduct != null){
-                    Log.d(TAG, "$newProduct was created.")
-                    findNavController()
-                    // TODO: Navigate to results page and ask user for permission to store new product
+        // 2. ZXing Scan via Intent: https://github.com/zxing/zxing/wiki/Scanning-Via-Intent
+        else {
+            Log.d(TAG, "Barcode scan: Request code $requestCode and $resultCode received ")
+            val scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if (scanResult != null) {
+                if (scanResult.contents == null) {
+                    Toast.makeText(context, "Barcode scan cancelled! ", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "The $scanResult received from barcode scanner!")
+                } else {
+                    // Toast.makeText(context, "Scanned -> " + scanResult.contents, Toast.LENGTH_SHORT).show()
+                    val results = scanResult.contents
+
+                    //set spinner visible
+                    loadingProgressBar.visibility = View.VISIBLE
+
+                    Log.d(TAG, "The barcode scan result $results was received.")
+                    val newProduct = sharedViewModel.getProductFromBarcodeScanResult(results)
+                    Log.d(TAG, "The barcode product $newProduct was created.")
+                    binding.editTextAddnewproducttitleInventory.setText(newProduct?.productName)
+                    binding.editTextAddnewproductquantityInventory.setText(newProduct?.quantity)
+                    binding.editTextAddNewProductExpirationDateInventory.setText(newProduct?.expirationDate)
+                    binding.editTextAddnewproductManufacturerInventory.setText(newProduct?.manufacturer)
+                    binding.editTextAddnewproductNutritionvalueInventory.setText(newProduct?.nutritionValue)
+
+                    //set spinner visibility gone
+                    loadingProgressBar.visibility = View.GONE
                 }
+            } else {
+                Toast.makeText(context, "Barcode scan failed! ", Toast.LENGTH_LONG).show()
+                Log.d("Fragment", "$scanResult")
             }
-        } else {
-            Toast.makeText(context, "Barcode scan failed! ", Toast.LENGTH_SHORT).show()
-            Log.d("Fragment", "$scanResult")
         }
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         var selectedLabel = ""
         if (parent != null) {
-            selectedLabel = parent.getItemAtPosition(position).toString() // TODO: ProductLabel cannot be empty!!
+            selectedLabel = parent.getItemAtPosition(position).toString()
             Log.d(TAG, "Item $selectedLabel product label is selected.")
         }
         productLabel = selectedLabel
@@ -218,6 +299,37 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
         Log.d(TAG, "No value in dropdown menu selected.")
     }
 
+    override fun onPause() {
+        super.onPause()
+        newProductBitmap = null
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun loadImageFromGallery(data: Intent?) : Bitmap? {
+        var newProductImage: Bitmap? = null
+
+        try {
+            //profileImageView.setImageURI(data?.data)
+            val uri = data?.data
+            if(uri != null) {
+                val inputStream: InputStream? = activity?.contentResolver?.openInputStream(uri)
+                newProductImage = BitmapFactory.decodeStream(inputStream)
+                Log.d(TAG, "Set image from gallery.")
+            } else {
+                Log.d(TAG, "URI is null.")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val context = activity?.applicationContext
+            Toast.makeText(context,"Gallery picker failed", Toast.LENGTH_SHORT).show()
+        }
+
+        return  newProductImage
+    }
+
     private fun createAlert(): AlertDialog.Builder {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
 
@@ -230,7 +342,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
         val okButton = dialogView.findViewById<View>(R.id.dialog_button_export) as Button
         val cancelButton = dialogView.findViewById<View>(R.id.dialog_button_cancel) as Button
 
-        editText.text = "Bitte wähle einen Produkttyp aus der Dropdownlist aus."
+        editText.text = getString(R.string.dropDownProductTypeText)
         // confirm and cancel button
         builder.setCancelable(true)
 
@@ -257,6 +369,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
     }
 
     companion object {
+        const val IMAGE_REQUEST_CODE = 0
         const val TAG = "AddProductToInventoryFragment"
         fun newInstance() = AddProductToInventoryFragment()
     }

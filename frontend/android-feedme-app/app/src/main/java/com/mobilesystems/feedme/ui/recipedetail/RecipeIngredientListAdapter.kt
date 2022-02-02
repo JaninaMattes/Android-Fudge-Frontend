@@ -3,14 +3,14 @@ package com.mobilesystems.feedme.ui.recipedetail
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.RecipeIngredientItemBinding
 import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
+import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
 
 /**
  * Tutorial: https://developer.android.com/guide/topics/ui/layout/recyclerview
@@ -18,7 +18,7 @@ import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
  */
 class RecipeIngredientListAdapter(
     private val context: Context,
-    private val sharedViewModel: SharedDashboardViewModel,
+    private val sharedViewModel: SharedRecipesViewModel,
     private val dataSet: List<Product>?
 ) : RecyclerView.Adapter<RecipeIngredientListAdapter.IngredientViewHolder>() {
 
@@ -26,27 +26,23 @@ class RecipeIngredientListAdapter(
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    inner class IngredientViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        private var view: View = v
 
-        val ingredientNameTextView: TextView
-        val ingredientQuantityTextView: TextView
-        val ingredientAvailableIcon: ImageView
-        val ingredientAvailableTextView: TextView
+    private var _itemBinding: RecipeIngredientItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
-        init {
-            // bind views by view id
-            ingredientAvailableIcon = view.findViewById(R.id.ingredient_available_icon)
-            ingredientNameTextView = view.findViewById(R.id.text_ingredient_name)
-            ingredientQuantityTextView = view.findViewById(R.id.text_ingredient_quantity)
-            ingredientAvailableTextView = view.findViewById(R.id.text_ingredient_availability)
-        }
+    inner class IngredientViewHolder(itemBinding: RecipeIngredientItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+
+        val ingredientNameTextView: TextView = itemBinding.textIngredientName
+        val ingredientQuantityTextView: TextView = itemBinding.textIngredientQuantity
+        val ingredientAvailableIcon: ImageView = itemBinding.ingredientAvailableIcon
+        val ingredientAvailableTextView: TextView = itemBinding.textIngredientAvailability
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IngredientViewHolder {
         // Create a view which defines the UI of the list item
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.recipe_ingredient_item, parent, false)
-        return IngredientViewHolder(itemView)
+        _itemBinding = RecipeIngredientItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return IngredientViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(viewHolder: IngredientViewHolder, position: Int) {
@@ -59,12 +55,12 @@ class RecipeIngredientListAdapter(
                 viewHolder.ingredientAvailableIcon.setImageResource(R.mipmap.ic_available_icon)
                 viewHolder.ingredientAvailableIcon.visibility = ImageView.VISIBLE
                 viewHolder.ingredientAvailableTextView.setTextColor(color)
-                viewHolder.ingredientAvailableTextView.text = "vorhanden"
+                viewHolder.ingredientAvailableTextView.text = context.getString(R.string.Available)
             }else{
                 val color = ContextCompat.getColor(context, R.color.light_grey)
                 viewHolder.ingredientAvailableIcon.visibility = ImageView.GONE
                 viewHolder.ingredientAvailableTextView.setTextColor(color)
-                viewHolder.ingredientAvailableTextView.text = "nicht vorhanden"
+                viewHolder.ingredientAvailableTextView.text = context.getString(R.string.NotAvailable)
             }
             // pass values to view items
             viewHolder.ingredientNameTextView.text = currentItem.productName

@@ -2,6 +2,7 @@ package com.mobilesystems.feedme.data.datasource
 
 import com.mobilesystems.feedme.data.remote.FoodTrackerApi
 import com.mobilesystems.feedme.data.request.LoginRequest
+import com.mobilesystems.feedme.data.request.ChangeLoginStatusRequest
 import com.mobilesystems.feedme.data.request.RegisterRequest
 import com.mobilesystems.feedme.di.AppModule
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,7 +33,11 @@ class AuthDataSourceImpl @Inject constructor(
         getResult { foodTrackerApi.registerUser(request) }
     }
 
-    override suspend fun logout(username: String, password: String): Unit = withContext(ioDispatcher) {
-        //foodTrackerApi.logout(username, password)
+    override suspend fun logout(request: ChangeLoginStatusRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.logoutUser(request) }
+    }
+
+    override suspend fun updateLogin(request: ChangeLoginStatusRequest)= withContext(ioDispatcher) {
+        getResult { foodTrackerApi.putLoginUser(request) }
     }
 }

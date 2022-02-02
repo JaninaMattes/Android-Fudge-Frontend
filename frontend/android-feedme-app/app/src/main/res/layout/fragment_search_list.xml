@@ -34,6 +34,7 @@
                             android:layout_marginEnd="@dimen/medium_cardview_margin"
                             android:padding="@dimen/small_cardview_padding"
                             tools:listitem="@layout/fragment_search_list_item">
+
                         </androidx.recyclerview.widget.RecyclerView>
 
                     </LinearLayout>

@@ -1,6 +1,7 @@
 package com.mobilesystems.feedme.ui.inventorylist
 
 import androidx.lifecycle.LiveData
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.Label
 import com.mobilesystems.feedme.domain.model.Product
 
@@ -8,9 +9,7 @@ interface BaseInventoryViewModel {
 
     fun selectProduct(product: Product) // Select single product from inventory
 
-    fun deleteProductByPosition(position: Int)
-
-    fun getProductFromBarcodeScanResult(barcodeScanRes: String?)
+    fun getProductFromBarcodeScanResult(barcodeScanRes: String) : Product?
 
     fun addProductFromBarcodeScanResultToInventory(product: Product)
 
@@ -20,10 +19,13 @@ interface BaseInventoryViewModel {
 
     fun addProductToInventoryList(product: Product)
 
-    fun updateProductInInventoryList(product: Product)
-
-    fun deleteProductInInventoryList(product: Product)
+    fun updateProductOnInventory(product: Product)
 
     fun updateInventoryList()
 
+    fun updateImage(image: Image)
+
+    fun deleteProductInInventoryList(product: Product)
+
+    fun deleteProductByPosition(position: Int): Product? // helper function
 }

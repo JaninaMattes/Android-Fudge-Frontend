@@ -43,6 +43,9 @@ class RegisterActivity : AppCompatActivity() {
         val loadingProgressBar = binding.loadingRegister
         registerButton.isEnabled = false
 
+        // To show back button in actionbar
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         registerViewModel.registerFormState.observe(this,
             Observer { registerFormState ->
                 if (registerFormState == null) {

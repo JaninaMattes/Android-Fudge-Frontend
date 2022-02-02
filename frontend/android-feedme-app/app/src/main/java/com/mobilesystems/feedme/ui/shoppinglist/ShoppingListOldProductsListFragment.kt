@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.ShoppingListOldFragmentBinding
@@ -32,16 +31,19 @@ class ShoppingListOldProductsGridFragment : Fragment() {
 
         override fun passData(product: Product, itemView: View) {
             // pass data and navigate to product detail view
-            sharedViewModel.removeProductFromOldShoppingList(product)
-
+            sharedViewModel.addProductToCurrentShoppingList(product)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = ShoppingListOldFragmentBinding.inflate(inflater, container, false)
@@ -67,6 +69,16 @@ class ShoppingListOldProductsGridFragment : Fragment() {
         // update adapter after data is loaded
         sharedViewModel.oldShoppingList.observe(viewLifecycleOwner, productListObserver)
     }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
         const val TAG = "ShoppingListOldProductsGridFragment"
         fun newInstance() = ShoppingListOldProductsGridFragment()

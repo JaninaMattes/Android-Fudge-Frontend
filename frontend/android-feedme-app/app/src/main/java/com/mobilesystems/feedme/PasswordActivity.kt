@@ -4,15 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.mobilesystems.feedme.ui.authentication.AuthViewModel
 import com.mobilesystems.feedme.databinding.ActivityPasswordBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_login.*
 
 @AndroidEntryPoint
 class PasswordActivity : AppCompatActivity() {
 
-    private val authViewModel: AuthViewModel by viewModels()
+    private val passwordForgottenViewModel: AuthViewModel by viewModels()
     private var _binding: ActivityPasswordBinding? = null
     private val binding get() = _binding!!
 
@@ -31,12 +31,28 @@ class PasswordActivity : AppCompatActivity() {
         val emailEditText = binding.email
         val resetButton = binding.reset
         val loadingProgressBar = binding.loading
-        resetButton.isEnabled = true
+        resetButton.isEnabled = false
 
-        binding.reset.setOnClickListener {
+        // To show back button in actionbar
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        passwordForgottenViewModel.loginFormState.observe(this,
+            Observer { passwordResetFormState ->
+                if (passwordResetFormState == null) {
+                    return@Observer
+                }
+                resetButton.isEnabled = passwordResetFormState.isDataValid
+                passwordResetFormState.emailError?.let {
+                    emailEditText.error = getString(it)
+                }
+            })
+
+        resetButton.setOnClickListener {
             val intent = Intent(this@PasswordActivity, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
     }
+
+
 }

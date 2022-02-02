@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.DashboardExpiringProductsFragmentBinding
@@ -34,20 +34,23 @@ class DashboardExpiringProductListFragment : Fragment() {
             // pass data and navigate to product detail view
             Log.d(TAG, "Product ${product.productName} selected.")
             sharedViewModel.selectProduct(product)
-            val action = DashboardFragmentDirections.actionNavigationDashboardToProductFragment()
-            findNavController().navigate(action)
+            val action = DashboardFragmentDirections.actionNavigationDashboardToProductFragment(product)
+            Navigation.findNavController(itemView).navigate(action)
         }
+    }
+
+    override fun onCreate(savedInstance: Bundle?){
+        super.onCreate(savedInstance)
+        sharedViewModel.loadExpiringProducts()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
+    ): View {
         Log.d(TAG, "Called onCreateView.")
 
-        // TODO: Use ViewBinding
         // Inflate layout for this fragment
         _binding = DashboardExpiringProductsFragmentBinding.inflate(inflater, container, false)
 
@@ -68,6 +71,7 @@ class DashboardExpiringProductListFragment : Fragment() {
             if (productList != null) {
                 val context = activity?.applicationContext
                 if(context != null) {
+                    Log.d("DashboardExpiringProductList", "Expiring products $productList ")
                     adapter = DashboardExpiringProductListAdapter(context, productList, listener)
                     expiringListRecyclerView.adapter = adapter
                 }else{
@@ -86,7 +90,6 @@ class DashboardExpiringProductListFragment : Fragment() {
         super.onDestroyView()
         Log.d(TAG, "Called onDestroyView.")
     }
-
 
     companion object {
         const val TAG = "DashboardExpiringProductListFragment"

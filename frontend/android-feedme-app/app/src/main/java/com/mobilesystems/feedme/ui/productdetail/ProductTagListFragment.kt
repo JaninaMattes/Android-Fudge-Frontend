@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.ProductDetailTagListFragmentBinding
 import com.mobilesystems.feedme.domain.model.Label
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
+import com.mobilesystems.feedme.ui.inventorylist.SharedInventoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ProductTagListFragment: Fragment()  {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
+    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var tagRecyclerView: RecyclerView
     private lateinit var adapter: ProductTagListAdapter
@@ -31,7 +31,7 @@ class ProductTagListFragment: Fragment()  {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = ProductDetailTagListFragmentBinding.inflate(inflater, container, false)
@@ -62,7 +62,7 @@ class ProductTagListFragment: Fragment()  {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //    _binding = null
+        _binding = null
     }
 
     companion object {

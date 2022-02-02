@@ -2,15 +2,16 @@ package com.mobilesystems.feedme.ui.profile
 
 import androidx.lifecycle.LiveData
 import com.mobilesystems.feedme.domain.model.FoodType
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.User
 
 interface BaseUserProfileViewModel {
 
-    fun loadLoggedIndUser()
+    fun loadLoggedInUser()
 
     fun updateLoggedInUser(user: User)
 
-    fun deleteLoggedInUser()
+    fun updateUserImage(image: Image)
 
     fun loadLoggedInUserFoodTypeList(): LiveData<List<FoodType>?> // Helper function
 
@@ -20,5 +21,5 @@ interface BaseUserProfileViewModel {
 
     fun updateRecommendShopplingListSetting(remindMe: Boolean)
 
-    fun updateUserProfile()
+    fun deleteLoggedInUser() // delete user profile
 }

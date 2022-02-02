@@ -1,54 +1,58 @@
 package com.mobilesystems.feedme.data.datasource
 
-import com.mobilesystems.feedme.common.networkresult.Response
-import com.mobilesystems.feedme.data.datasource.placeholder.InventoryListPlaceholderContent
+import com.mobilesystems.feedme.common.networkresult.Resource
 import com.mobilesystems.feedme.data.remote.FoodTrackerApi
+import com.mobilesystems.feedme.data.request.DeleteProductRequest
+import com.mobilesystems.feedme.data.request.ImageRequest
+import com.mobilesystems.feedme.data.request.InventoryListRequest
+import com.mobilesystems.feedme.data.request.ProductRequest
+import com.mobilesystems.feedme.data.response.ImageIdResponse
 import com.mobilesystems.feedme.di.AppModule
-import com.mobilesystems.feedme.domain.model.Product
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class InventoryDataSourceImpl @Inject constructor(
     private val foodTrackerApi: FoodTrackerApi,
     @AppModule.DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
-    @AppModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : InventoryDataSource {
+    @AppModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
+    BaseDataSource(), InventoryDataSource {
 
-    private var fakeInventoryList: MutableList<Product>
-
-    init {
-        // TODO: Remove placeholder
-        fakeInventoryList = InventoryListPlaceholderContent.VARIOUS_ITEMS
+    override suspend fun getAllProductsInInventoryList(userId: Int) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.getAllProductsByUserId(userId) }
     }
 
-    // TODO: Pass token for authentification
-    override suspend fun getAllProductsInInventoryList(userId: Int): Response<List<Product>>? {
-        return try {
-
-            // TODO: Remove placeholder data with network call to backend
-            //foodTrackerApi.getAllProductsInInventoryList(userId)
-
-            Response.Success(fakeInventoryList)
-        } catch (e: Throwable) {
-            Response.Error("IOException")
-        }
+    override suspend fun getAllExpiringProductsByUserId(userId: Int) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.getExpiringProductsByUserId(userId) }
     }
 
-    override suspend fun addProductToInventory(userId: Int, product: Product) {
-        // TODO: Persist current state in backend database
-        fakeInventoryList.add(product)
+    override suspend fun addProductToInventory(request: ProductRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.addProductToInventory(request) }
     }
 
-    override suspend fun updateProductInventoryList(userId: Int, inventoryList: List<Product>?) {
-        // TODO: Persist current state in backend database
-        if (inventoryList != null) {
-            fakeInventoryList = inventoryList.toMutableList()
-        }
+    override suspend fun updateProductOnInventoryList(request: ProductRequest)= withContext(ioDispatcher) {
+        getResult { foodTrackerApi.updateProductOnInventory(request) }
     }
 
-    override suspend fun removeProductFromInventoryList(userId: Int, product: Product) {
-        // TODO: Remove placeholder data with network call to backend
-        fakeInventoryList.remove(product)
+    override suspend fun updateProductImage(request: ImageRequest): Resource<ImageIdResponse> = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.updateProductImage(request) }
+    }
+
+    override suspend fun updateInventoryList(request: InventoryListRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.updateInventoryList(request) }
+    }
+
+    override suspend fun removeProductFromInventoryList(request: DeleteProductRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.deleteProductFromInventory(request) }
+    }
+
+    override suspend fun updateProductOnInventory(request: ProductRequest) = withContext(ioDispatcher){
+        getResult { foodTrackerApi.updateProductOnInventory(request) }
+    }
+
+    override suspend fun getProductFromBarcodeScanResult(result: String) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.getProductFromBarcode(result) }
     }
 
 }

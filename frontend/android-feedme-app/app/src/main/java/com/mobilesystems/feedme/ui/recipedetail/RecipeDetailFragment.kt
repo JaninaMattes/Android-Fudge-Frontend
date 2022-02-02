@@ -7,25 +7,33 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.mobilesystems.feedme.domain.model.Recipe
 import com.squareup.picasso.Picasso
 import android.widget.*
+import androidx.navigation.fragment.navArgs
 import com.mobilesystems.feedme.R
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
+import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RecipeDetailFragment : Fragment() {
 
     // shared view model
-    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
+    private val sharedViewModel: SharedRecipesViewModel by activityViewModels()
+
+    //safeargs
+    private val args: RecipeDetailFragmentArgs by navArgs()
 
     // content on view
     private var recipeId: Int? = null
     private  var recipeImg: String? = null
     private lateinit var alertDialog: AlertDialog
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedViewModel.loadShoppingList()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +61,23 @@ class RecipeDetailFragment : Fragment() {
         // Button
         val buttonExport: ExtendedFloatingActionButton = rootView.findViewById(R.id.button_export_ingredients_to_shoppinglist)
 
+        //safeargs updates the UI
+        val recipe: Recipe = args.recipe
+        recipeId = recipe.recipeId
+        recipeImg = recipe.imageUrl
+        Picasso.get().load(recipeImg).into(recipeImageview)
+        recipeNameTextView.text = recipe.recipeName
+        recipeSubtitleTextView.text = recipe.recipeLabel
+        recipeCardNutritionTextView.text = recipe.recipeNutrition
+        recipeCardCookingTime.text = recipe.cookingTime
+        recipeCardRating.text = "${recipe.cummulativeRating}"
+        recipePreparationTextView.text = recipe.instructions
+        recipeRatingTextView.text = "${recipe.cummulativeRating}"
+        recipeRatingBar.rating = recipe.cummulativeRating
+
+        sharedViewModel.selectedRecipe(recipe)
+
+        /*
         // Create the observer which updates the UI.
         val productObserver = Observer<Recipe?> { recipe : Recipe? ->
             if (recipe != null) {
@@ -73,7 +98,7 @@ class RecipeDetailFragment : Fragment() {
         }
 
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
-        sharedViewModel.selectedRecipe.observe(viewLifecycleOwner, productObserver)
+        sharedViewModel.selectedRecipe.observe(viewLifecycleOwner, productObserver)*/
 
         buttonExport.setOnClickListener{
             val unavIng = sharedViewModel.notAvailableIngredients
@@ -118,7 +143,7 @@ class RecipeDetailFragment : Fragment() {
         val okButton = dialogView.findViewById<View>(R.id.dialog_button_export) as Button
         val cancelButton = dialogView.findViewById<View>(R.id.dialog_button_cancel) as Button
 
-        editText.text = "Möchtest Du ${amount} Zutaten zu deiner Shoppingliste hinzufügen?"
+        editText.text = "Möchtest Du $amount Zutaten zu deiner Shoppingliste hinzufügen?"
         // confirm and cancel button
         builder.setCancelable(true)
 
@@ -134,6 +159,11 @@ class RecipeDetailFragment : Fragment() {
         }
 
         return builder
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedViewModel.saveCurrentShoppingState()
     }
 
     companion object {

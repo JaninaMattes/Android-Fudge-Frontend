@@ -29,33 +29,33 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/current_shopping_list_card_view"
                     android:layout_width="match_parent"
-                    android:layout_height="500dp"
-                    android:foregroundGravity="top"
+                    android:layout_height="400dp"
                     android:layout_marginStart="@dimen/medium_text_margin"
                     android:layout_marginEnd="@dimen/medium_text_margin"
                     android:layout_marginBottom="@dimen/medium_text_margin"
-                    android:layout_marginTop="@dimen/medium_text_margin"
-                    android:clickable="false"
-                    app:cardCornerRadius="@dimen/card_view_corner_radius"
-                    card_view:cardUseCompatPadding="true"
-                    card_view:cardElevation="@dimen/medium_card_elevation"
                     android:background="@drawable/custom_background_shopping_card"
+                    android:clickable="false"
+                    android:foregroundGravity="top"
+                    app:cardCornerRadius="@dimen/card_view_corner_radius"
+                    app:layout_constraintBottom_toTopOf="@+id/old_shopping_list_title"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/old_shopping_list_title">
+                    card_view:cardElevation="@dimen/medium_card_elevation"
+                    card_view:cardUseCompatPadding="true">
 
                     <LinearLayout
                         android:id="@+id/current_shopping_list_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="@dimen/small_cardview_margin">
+                        android:layout_marginTop="@dimen/small_cardview_margin"
+                        android:orientation="vertical">
 
                         <!-- IngredientList Child Fragment -->
                         <androidx.fragment.app.FragmentContainerView
                             android:id="@+id/current_shopping_list_fragment"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
+
                         </androidx.fragment.app.FragmentContainerView>
 
                     </LinearLayout>
@@ -99,46 +99,34 @@
                     </LinearLayout>
 
 
-                <FrameLayout
-                    android:id="@+id/container_for_floating_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/large_text_margin"
-                    android:layout_marginBottom="@dimen/super_large_text_margin"
-                    android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginEnd="@dimen/super_large_text_margin"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@id/old_shopping_list_container"
-                    android:layout_gravity="bottom|end">
 
-                </FrameLayout>
-
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/button_create_new_product_for_shopping_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/red_200"
-                    android:clickable="true"
-                    android:contentDescription="@string/neues_produkt_zum_inventar_hinzuf_gen"
-                    android:elevation="@dimen/medium_card_elevation"
-                    android:src="@android:color/transparent"
-                    android:text="@string/add_product_to_shoppinglist"
-                    android:textColor="@color/white"
-                    android:textStyle="normal"
-                    app:icon="@drawable/ic_baseline_create_24"
-                    app:iconTint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </RelativeLayout>
 
     </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/container_for_floating_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="@dimen/large_text_margin"
+        android:layout_marginEnd="@dimen/super_large_text_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_create_new_product_for_shopping_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/salmon_red"
+            android:layout_margin="@dimen/tiny_btn_margin"
+            android:layout_gravity="bottom|center"
+            android:contentDescription="@string/neues_produkt_zum_inventar_hinzuf_gen"
+            app:srcCompat="@drawable/ic_addproducts" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

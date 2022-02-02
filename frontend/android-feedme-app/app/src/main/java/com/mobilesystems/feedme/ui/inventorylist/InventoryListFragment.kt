@@ -9,12 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
 import com.mobilesystems.feedme.domain.model.Product
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.mobilesystems.feedme.databinding.InventoryListFragmentBinding
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -25,8 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class InventoryListFragment : Fragment() {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
-
+    private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var inventoryRecyclerView: RecyclerView
     private lateinit var adapter: InventoryListAdapter
@@ -35,14 +34,14 @@ class InventoryListFragment : Fragment() {
     private var _binding: InventoryListFragmentBinding? = null
     private val binding get() = _binding!!
 
-// This property is only valid between onCreateView and onDestroyView
+    // This property is only valid between onCreateView and onDestroyView
     private val listener = object: InventoryListAdapter.ProductAdapterClickListener {
 
         override fun passData(product: Product, itemView: View) {
             // pass data and navigate to product detail view
             sharedViewModel.selectProduct(product)
-            val action = InventoryListFragmentDirections.actionNavigationInventorylistToProductFragment()
-            findNavController().navigate(action)
+            val action = InventoryListFragmentDirections.actionNavigationInventorylistToProductFragment(product)
+            Navigation.findNavController(itemView).navigate(action)
         }
     }
 
@@ -58,21 +57,20 @@ class InventoryListFragment : Fragment() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
-                sharedViewModel.deleteProductByPosition(viewHolder.absoluteAdapterPosition)
+                val product = sharedViewModel.deleteProductByPosition(viewHolder.absoluteAdapterPosition)
                 adapter.notifyItemRemoved(viewHolder.absoluteAdapterPosition)
+                if(product != null) {
+                    sharedViewModel.deleteProductInInventoryList(product)
+                }
             }
 
-            override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, fromPos: Int,
-                target: RecyclerView.ViewHolder, toPos: Int, x: Int, y: Int) {
-                super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
-            }
         }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = InventoryListFragmentBinding.inflate(inflater, container, false)
@@ -105,20 +103,23 @@ class InventoryListFragment : Fragment() {
                 val context = activity?.applicationContext
                 if(context != null) {
                     adapter = InventoryListAdapter(context, inventoryList, listener)
+                    inventoryRecyclerView.adapter = adapter
                 }
-                inventoryRecyclerView.adapter = adapter
             }
         }
 
         // update adapter after data is loaded
         sharedViewModel.inventoryList.observe(viewLifecycleOwner, inventoryListObserver)
+    }
 
+    override fun onCreate(savedInstance: Bundle?){
+        super.onCreate(savedInstance)
+        sharedViewModel.loadAllProductsOfInventoryList()
     }
 
     override fun onDestroyView() {
          super.onDestroyView()
-    //    _binding = null
-        sharedViewModel.updateInventoryList()
+        _binding = null
     }
 
     companion object {

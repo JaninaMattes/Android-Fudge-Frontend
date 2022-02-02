@@ -9,33 +9,33 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.DashboardExpiringProductItemBinding
 import com.mobilesystems.feedme.ui.common.utils.getTimeDiff
 import com.mobilesystems.feedme.domain.model.Product
 
 class DashboardExpiringProductListAdapter (
     private val context: Context,
     private val dataSet: List<Product>?,
-    private val itemClickListener: DashboardExpiringProductListAdapter.ExpiringProductsAdapterClickListener
+    private val itemClickListener: ExpiringProductsAdapterClickListener
 ) : RecyclerView.Adapter<DashboardExpiringProductListAdapter.ProductViewHolder>() {
 
     private lateinit var imageUrl: String
+
+    //view binding
+    private var _itemBinding: DashboardExpiringProductItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    inner class ProductViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+    inner class ProductViewHolder(itemBinding: DashboardExpiringProductItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 
-        private var view: View = v
-
-        val cardView: CardView
-        val productNameTextView: TextView
-        val productExpirationDate: TextView
+        val cardView: CardView = itemBinding.expiringProductItemCardView
+        val productNameTextView: TextView = itemBinding.textExpiringProductName
+        val productExpirationDate: TextView = itemBinding.textExpiringProductDate
 
         init {
-            cardView = view.findViewById(R.id.expiring_product_item_card_view)
-            productNameTextView = itemView.findViewById(R.id.text_expiring_product_name)
-            productExpirationDate = itemView.findViewById(R.id.text_expiring_product_date)
 
             // initialize clicklistener and pass clicked product for listitem position
             cardView.setOnClickListener{ v ->
@@ -47,14 +47,13 @@ class DashboardExpiringProductListAdapter (
     }
 
     interface ExpiringProductsAdapterClickListener {
-        fun passData(recipe: Product, itemView: View)
+        fun passData(product: Product, itemView: View)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         // Create a view which defines the UI of the list item
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.dashboard_expiring_product_item, parent, false)
-        return ProductViewHolder(itemView)
+        _itemBinding = DashboardExpiringProductItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ProductViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(productViewHolder: ProductViewHolder, position: Int) {
@@ -62,7 +61,8 @@ class DashboardExpiringProductListAdapter (
             // get selected product
             val currentItem = dataSet[position]
             // pass values to view items
-            imageUrl = currentItem.imageUrl
+            imageUrl = currentItem.productImage?.imageUrl ?:
+                "https://cdn.pixabay.com/photo/2017/06/06/22/37/italian-cuisine-2378729_960_720.jpg"// dummy image
             // Calculate difference between current date to expiration date
             val expDays = getTimeDiff(currentItem.expirationDate)
             if(expDays <= 3){
@@ -70,7 +70,12 @@ class DashboardExpiringProductListAdapter (
             } else {
                 productViewHolder.productExpirationDate.setTextColor(ContextCompat.getColor(context, R.color.black))
             }
-            productViewHolder.productExpirationDate.text = "$expDays Tagen"
+            val expText: String = if(expDays <= 0){
+                "Heute"
+            }else{
+                "$expDays Tagen"
+            }
+            productViewHolder.productExpirationDate.text = expText
             productViewHolder.productNameTextView.text = currentItem.productName
         }
     }

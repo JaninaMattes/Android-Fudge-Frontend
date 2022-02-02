@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.RecipeIngredientListFragmentBinding
 import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
+import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -22,7 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class RecipeIngredientListFragment : Fragment() {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
+    private val sharedViewModel: SharedRecipesViewModel by activityViewModels()
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var ingredientRecyclerView: RecyclerView
@@ -36,7 +36,7 @@ class RecipeIngredientListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = RecipeIngredientListFragmentBinding.inflate(inflater, container, false)
@@ -67,6 +67,11 @@ class RecipeIngredientListFragment : Fragment() {
 
         // update adapter after data is loaded
         sharedViewModel.selectedRecipeIngredients.observe(viewLifecycleOwner, ingredientListObserver)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

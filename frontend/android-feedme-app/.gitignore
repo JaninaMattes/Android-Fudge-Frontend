@@ -334,8 +334,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/java,linux,macos,windows,android,intellij,androidstudio
-
 
 *.iml
 .gradle
@@ -353,3 +351,5 @@ $RECYCLE.BIN/
 .cxx
 local.properties
 .vscode
+
+# End of https://www.gitignore.io/api/java,linux,macos,windows,android,intellij,androidstudio

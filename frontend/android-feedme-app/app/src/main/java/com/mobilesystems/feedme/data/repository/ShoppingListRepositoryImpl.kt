@@ -1,104 +1,94 @@
 package com.mobilesystems.feedme.data.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.mobilesystems.feedme.common.networkresult.Response
+import android.util.Log
 import com.mobilesystems.feedme.data.datasource.ShoppingListDataSourceImpl
 import com.mobilesystems.feedme.domain.model.Product
+import com.mobilesystems.feedme.ui.common.utils.*
 import javax.inject.Inject
 
-
-class ShoppingListRepositoryImpl @Inject constructor(private val dataSourceImpl: ShoppingListDataSourceImpl)
+class ShoppingListRepositoryImpl @Inject constructor(
+    private val dataSourceImpl: ShoppingListDataSourceImpl)
     : ShoppingListRepository {
 
-    // in-memory cache of the fetched objects
-    var currentShoppingListProducts: MutableLiveData<List<Product>?> = MutableLiveData<List<Product>?>()
-        private set
-    var oldShoppingListProducts: MutableLiveData<List<Product>?> = MutableLiveData<List<Product>?>()
-        private set
-    var suggestedShoppingListProducts: MutableLiveData<List<Product>?> = MutableLiveData<List<Product>?>()
-        private set
-
-    override suspend fun suggestProductsForShoppingList(userId: Int): MutableLiveData<List<Product>?> {
-        val result = dataSourceImpl.loadSuggestedProductsForShoppingList()
-
-        if (result is Response.Success) {
-            suggestedShoppingListProducts.postValue(result.data)
-        }
-        return suggestedShoppingListProducts
+    override suspend fun loadOldShoppingListProducts(userId: Int): List<Product>? {
+        // get old shoppinglist for current user
+        val result = dataSourceImpl.loadAllProductsInOldShoppingList(userId)
+        return convertShoppingListResponse(result.data)
     }
 
-    override suspend fun loadOldShoppingListProducts(userId: Int): MutableLiveData<List<Product>?> {
+    override suspend fun loadCurrentShoppingListProducts(userId: Int): List<Product>? {
         // get current shoppinglist for current user
-        val result = dataSourceImpl.loadAllProductsInOldShoppingList()
-
-        if (result is Response.Success) {
-            oldShoppingListProducts.postValue(result.data)
-        }
-        return oldShoppingListProducts
-    }
-
-    override suspend fun loadCurrentShoppingListProducts(userId: Int): MutableLiveData<List<Product>?> {
-        // get current shoppinglist for current user
-        val result = dataSourceImpl.loadAllProductsInCurrentShoppingList()
-
-        if (result is Response.Success) {
-            currentShoppingListProducts.postValue(result.data)
-        }
-        return currentShoppingListProducts
-    }
-
-    override suspend fun updateCurrentShoppingList(userId: Int, shoppingList: List<Product>?) {
-        currentShoppingListProducts.postValue(shoppingList)
-        dataSourceImpl.updateCurrentShoppingList(userId, shoppingList)
+        val result = dataSourceImpl.loadAllProductsInCurrentShoppingList(userId)
+        return convertShoppingListResponse(result.data)
     }
 
     override suspend fun removeProductFromCurrentShoppingList(userId: Int, product: Product) {
-        val currentItems = currentShoppingListProducts.value
-        var tempList = mutableListOf<Product>()
-        if(currentItems != null){
-            tempList = currentItems as MutableList<Product>
-            tempList.remove(product)
-            currentShoppingListProducts.value = tempList
-        }
-        dataSourceImpl.updateCurrentShoppingList(userId, tempList)
+        val request = convertShoppingListProductIDRequest(userId, product)
+        dataSourceImpl.removeProductFromCurrentShoppingList(request)
     }
 
-    override suspend fun addNewProductToCurrentShoppingList(userId: Int, product: Product) {
-        val currentItems = currentShoppingListProducts.value
-        var tempList = mutableListOf<Product>()
-        if(currentItems != null){
-            tempList = currentItems as MutableList<Product>
-            tempList.add(product)
-            currentShoppingListProducts.value = tempList
+    override suspend fun addNewProductToCurrentShoppingList(userId: Int, product: Product): Product {
+        val request = convertProductRequest(userId, product)
+        var newProduct: Product = product
+        if(request != null){
+            // create new product and get product id as result
+            val result = dataSourceImpl.createProductToCurrentShoppingList(request)
+            if(result.data != null && result.data.productId != 0){
+                newProduct = convertProductWithNewProductId(result.data, product)
+            }
         }
-        dataSourceImpl.addProductToCurrentShoppingList(userId, product)
+        return newProduct
     }
 
-    override suspend fun updateOldShoppingList(userId: Int, oldShoppingList: List<Product>?) {
-        oldShoppingListProducts.postValue(oldShoppingList)
-        dataSourceImpl.updateOldShoppingList(userId, oldShoppingList)
+    override suspend fun addProductToCurrentShoppingList(userId: Int, product: Product) {
+        val request = convertShoppingListProductIDRequest(userId, product)
+        dataSourceImpl.addProductToCurrentShoppingList(request)
     }
 
-    override suspend fun removeProductFromOldShoppingList(userId: Int, product: Product) {
-        val currentItems = oldShoppingListProducts.value
-        var tempList = mutableListOf<Product>()
-        if(currentItems != null){
-            tempList = currentItems as MutableList<Product>
-            tempList.remove(product)
-            oldShoppingListProducts.value = tempList
+    override suspend fun updateSingleProductOnCurrentShoppingList(userId: Int, product: Product) {
+        val request = convertProductRequest(userId, product)
+        if(request != null) {
+            dataSourceImpl.updateSingleProductOnCurrentShoppingList(request)
+        }else{
+            Log.d("ShoppingList Repository", "Shoppinglist is empty!")
         }
-        dataSourceImpl.removeProductFromOldShoppingList(userId, product)
     }
 
     override suspend fun addProductToOldShoppingList(userId: Int, product: Product) {
-        val currentItems = oldShoppingListProducts.value
-        var tempList: MutableList<Product>
-        if(currentItems != null){
-            tempList = currentItems as MutableList<Product>
-            tempList.add(product)
-            oldShoppingListProducts.value = tempList
-        }
-        dataSourceImpl.addProductToOldShoppingList(userId, product)
+        val request = convertShoppingListProductIDRequest(userId, product)
+        dataSourceImpl.addProductToOldShoppingList(request)
     }
 
+    override suspend fun updateSingleProductOnOldShoppingList(userId: Int, product: Product){
+        val request = convertProductRequest(userId, product)
+        if(request != null){
+            dataSourceImpl.updateSingleProductOnOldShoppingList(request)
+        }else{
+            Log.d("ShoppingList Repository", "Shoppinglist is empty!")
+        }
+    }
+
+    override suspend fun removeProductFromOldShoppingList(userId: Int, product: Product) {
+        val request = convertShoppingListProductIDRequest(userId, product)
+        dataSourceImpl.removeProductFromOldShoppingList(request)
+    }
+
+    override suspend fun updateCurrentShoppingList(userId: Int, currentShoppingList: List<Product>?) {
+        // TODO anbinden
+        // dataSourceImpl.updateCurrentShoppingList(request)
+    }
+
+    override suspend fun updateOldShoppingList(userId: Int, oldShoppingList: List<Product>?) {
+        //dataSourceImpl.updateOldShoppingList(userId, oldShoppingList)
+    }
+
+    /* //for future features
+    override suspend fun suggestProductsForShoppingList(userId: Int): MutableLiveData<List<Product>?> {
+         val result = dataSourceImpl.loadSuggestedProductsForShoppingList()
+
+         if (result is Response.Success) {
+             suggestedShoppingListProducts.postValue(result.data)
+         }
+         return suggestedShoppingListProducts
+     }*/
 }

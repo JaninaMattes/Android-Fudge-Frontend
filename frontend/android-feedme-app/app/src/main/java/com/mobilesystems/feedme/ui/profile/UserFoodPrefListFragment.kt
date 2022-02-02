@@ -30,7 +30,7 @@ class UserFoodPrefListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = UserProfileListFragmentBinding.inflate(inflater, container, false)
@@ -58,6 +58,17 @@ class UserFoodPrefListFragment : Fragment() {
 
         // update adapter after data is loaded
         sharedViewModel.loggedInUserFoodTypeList.observe(viewLifecycleOwner, tagListObserver)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedViewModel.loadLoggedInUser()
+        sharedViewModel.loggedInUserFoodTypeList
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

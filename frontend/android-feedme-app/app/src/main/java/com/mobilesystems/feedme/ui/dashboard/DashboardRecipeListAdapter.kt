@@ -1,5 +1,6 @@
 package com.mobilesystems.feedme.ui.dashboard
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,26 +9,28 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.DashboardNumberOneRecipeItemBinding
 import com.mobilesystems.feedme.domain.model.Recipe
 import com.squareup.picasso.Picasso
 
 class DashboardRecipeListAdapter (
     private val dataSet: List<Recipe>?,
-    private val itemClickListener: DashboardRecipeListAdapter.RecipeAdapterClickListener
+    private val itemClickListener: RecipeAdapterClickListener
 ) : RecyclerView.Adapter<DashboardRecipeListAdapter.RecipeListViewHolder>() {
 
     private lateinit var imageUrl: String
+
+    //view binding
+    private var _itemBinding: DashboardNumberOneRecipeItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    inner class RecipeListViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+    inner class RecipeListViewHolder(itemBinding: DashboardNumberOneRecipeItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 
-        private var view: View = v
-
-        val cardView: CardView
+        val cardView: CardView = itemBinding.noOneRecipeItemCardView
         val recipeImageView: ImageView
         val recipeTypeLabelTextView: TextView
         val recipeNameTextView: TextView
@@ -35,13 +38,12 @@ class DashboardRecipeListAdapter (
         val recipeCookingDifficulty: TextView
 
         init {
-            cardView = view.findViewById(R.id.no_one_recipe_item_card_view)
             // bind views by view id
-            recipeImageView = view.findViewById(R.id.no_one_recipe_image)
-            recipeTypeLabelTextView = view.findViewById(R.id.no_one_recipe_label)
-            recipeNameTextView = view.findViewById(R.id.no_one_recipe_name)
-            recipeRatingBar = view.findViewById(R.id.no_one_recipe_rating_bar)
-            recipeCookingDifficulty = view.findViewById(R.id.no_one_recipe_cooking_difficulty)
+            recipeImageView = itemBinding.noOneRecipeImage
+            recipeTypeLabelTextView = itemBinding.noOneRecipeLabel
+            recipeNameTextView = itemBinding.noOneRecipeName
+            recipeRatingBar = itemBinding.noOneRecipeRatingBar
+            recipeCookingDifficulty = itemBinding.noOneRecipeCookingDifficulty
 
             // initialize clicklistener and pass clicked product for listitem position
             cardView.setOnClickListener{ v ->
@@ -58,9 +60,8 @@ class DashboardRecipeListAdapter (
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeListViewHolder {
         // Create a view which defines the UI of the list item
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.dashboard_number_one_recipe_item, parent, false)
-        return RecipeListViewHolder(itemView)
+        _itemBinding = DashboardNumberOneRecipeItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return RecipeListViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(recipeViewHolder: RecipeListViewHolder, position: Int) {
@@ -69,9 +70,12 @@ class DashboardRecipeListAdapter (
             val currentItem = dataSet[position]
             // pass values to view items
             imageUrl = currentItem.imageUrl
-            Picasso.get().load(imageUrl).into(recipeViewHolder.recipeImageView)
+            if(imageUrl.isNotEmpty()) {
+                Picasso.get().load(imageUrl).into(recipeViewHolder.recipeImageView)
+                Log.d("RecipeListAdapter", "Load image url $imageUrl")
+            }
             recipeViewHolder.recipeCookingDifficulty.text = currentItem.difficulty
-            recipeViewHolder.recipeRatingBar.rating = currentItem.rating
+            recipeViewHolder.recipeRatingBar.rating = currentItem.cummulativeRating
             recipeViewHolder.recipeNameTextView.text = currentItem.recipeName
             recipeViewHolder.recipeTypeLabelTextView.text = currentItem.recipeLabel
         }

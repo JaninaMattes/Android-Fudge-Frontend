@@ -2,9 +2,12 @@ package com.mobilesystems.feedme.data.datasource
 
 import com.mobilesystems.feedme.common.networkresult.Resource
 import com.mobilesystems.feedme.data.remote.FoodTrackerApi
+import com.mobilesystems.feedme.data.request.ImageRequest
+import com.mobilesystems.feedme.data.request.UpdateUserRequest
+import com.mobilesystems.feedme.data.request.UserAllowSettingsRequest
+import com.mobilesystems.feedme.data.request.UserDietryTagRequest
 import com.mobilesystems.feedme.data.response.UserResponse
 import com.mobilesystems.feedme.di.AppModule
-import com.mobilesystems.feedme.domain.model.User
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,21 +19,39 @@ class UserDataSourceImpl @Inject constructor(
     @AppModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) :
     BaseDataSource(), UserDataSource {
 
-    // TODO: Pass token for authentification
     override suspend fun getUserById(userId: Int): Resource<UserResponse> = withContext(ioDispatcher) {
         getResult { foodTrackerApi.getUserById(userId) }
     }
 
-    override suspend fun updateUserById(user: User) = withContext(ioDispatcher) {
-        getResult { foodTrackerApi.updateUser(user) }
+    override suspend fun updateUserById(request: UpdateUserRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.updateUser(request) }
+    }
+
+    override suspend fun updateUserImageById(request: ImageRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.updateUserImage(request) }
     }
 
     override suspend fun deleteUserById(userId: Int) = withContext(ioDispatcher) {
         getResult { foodTrackerApi.deleteUser(userId) }
     }
 
-    override suspend fun isUserLoggedIn(userId: Int)= withContext(ioDispatcher) {
+    override suspend fun isUserLoggedIn(userId: Int) = withContext(ioDispatcher) {
         getResult { foodTrackerApi.getIsUserLoggedIn(userId) }
     }
 
+    override suspend fun allowPushNotification(allowSettings: UserAllowSettingsRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.allowPushNotification(allowSettings) }
+    }
+
+    override suspend fun allowReminder(allowSettings: UserAllowSettingsRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.allowReminder(allowSettings) }
+    }
+
+    override suspend fun allowSuggestion(allowSettings: UserAllowSettingsRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.allowSuggestion(allowSettings) }
+    }
+
+    override suspend fun createDietryTag(request: UserDietryTagRequest) = withContext(ioDispatcher) {
+        getResult { foodTrackerApi.createDietryTag(request) }
+    }
 }

@@ -12,7 +12,7 @@ data class Product(
     val quantity: String,
     val manufacturer: String,
     val nutritionValue: String,
-    val imageUrl: String) : Parcelable {
+    val productImage: Image?) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -27,7 +27,7 @@ data class Product(
         if (quantity != other.quantity) return false
         if (manufacturer != other.manufacturer) return false
         if (nutritionValue != other.nutritionValue) return false
-        if (imageUrl != other.imageUrl) return false
+        if (productImage != other.productImage) return false
 
         return true
     }
@@ -40,14 +40,14 @@ data class Product(
         result = 31 * result + quantity.hashCode()
         result = 31 * result + manufacturer.hashCode()
         result = 31 * result + nutritionValue.hashCode()
-        result = 31 * result + imageUrl.hashCode()
+        result = 31 * result + (productImage?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
         return "Product(productId=$productId, productName='$productName', " +
                 "expirationDate='$expirationDate', labels=$labels, quantity='$quantity', " +
-                "manufacturer='$manufacturer', nutritionValue='$nutritionValue', imageUrl='$imageUrl')"
+                "manufacturer='$manufacturer', nutritionValue='$nutritionValue', imageUrl=$productImage)"
     }
 
 

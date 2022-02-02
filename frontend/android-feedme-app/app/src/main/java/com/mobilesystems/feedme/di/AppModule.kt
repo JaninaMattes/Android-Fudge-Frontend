@@ -1,5 +1,10 @@
 package com.mobilesystems.feedme.di
 
+import android.content.Context
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
+import com.mobilesystems.feedme.common.backgroundService.PushWorker
+import com.mobilesystems.feedme.common.backgroundService.RecipeWorker
 import com.mobilesystems.feedme.common.config.Constants
 import com.mobilesystems.feedme.data.datasource.*
 import com.mobilesystems.feedme.data.remote.FoodTrackerApi
@@ -118,28 +123,20 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideProductDataSource(api: FoodTrackerApi): ProductDataSource = ProductDataSourceImpl(api)
-
-    @Singleton
-    @Provides
-    fun provideProductRepository(dataSource: ProductDataSourceImpl): ProductRepository = ProductRepositoryImpl(dataSource)
-
-    @Singleton
-    @Provides
     fun provideInventoryDataSource(api: FoodTrackerApi): InventoryDataSource = InventoryDataSourceImpl(api)
 
     @Singleton
     @Provides
-    fun provideInventoryRepository(productDataSource: ProductDataSourceImpl, inventoryDataSource: InventoryDataSourceImpl):
-            InventoryRepository = InventoryRepositoryImpl(productDataSource, inventoryDataSource)
-
+    fun provideInventoryRepository(inventoryDataSource: InventoryDataSourceImpl):
+            InventoryRepository = InventoryRepositoryImpl(inventoryDataSource)
+    
     @Singleton
     @Provides
     fun provideRecipeDataSource(api: FoodTrackerApi): RecipeDataSource = RecipeDataSourceImpl(api)
 
     @Singleton
     @Provides
-    fun provideRecipeRepository(dataSource: RecipeDataSourceImpl): RecipeRepository = RecipeRepositoryImpl(dataSource)
+    fun provideRecipeRepository(recipeDataSource: RecipeDataSourceImpl, shoppingDataSource: ShoppingListDataSourceImpl): RecipeRepository = RecipeRepositoryImpl(recipeDataSource, shoppingDataSource)
 
     @Singleton
     @Provides
@@ -154,4 +151,21 @@ object AppModule {
     fun provideDashboardRepository(inventoryDataSource: InventoryDataSourceImpl, recipeDataSourceImpl: RecipeDataSourceImpl,
                                    userDataSourceImpl: UserDataSourceImpl): DashboardRepository =
         DashboardRepositoryImpl(inventoryDataSource, recipeDataSourceImpl, userDataSourceImpl)
+
+    @Singleton
+    @Provides
+    fun provideWorkerDataSource(api: FoodTrackerApi): WorkerDataSource = WorkerDataSourceImpl(api)
+
+    @Singleton
+    @Provides
+    fun provideWorkerRepository(workerDataSource: WorkerDataSourceImpl): WorkerRepository = WorkerRepositoryImpl(workerDataSource)
+
+    @Singleton
+    @Provides
+    fun provideRecipeWorker(appContext: Context, workerParams: WorkerParameters, workerRepository: WorkerRepositoryImpl) : CoroutineWorker = RecipeWorker(appContext, workerParams, workerRepository)
+
+    @Singleton
+    @Provides
+    fun providePushWorker(appContext: Context, workerParams: WorkerParameters, workerRepository: WorkerRepositoryImpl) : CoroutineWorker = PushWorker(appContext, workerParams, workerRepository)
+
 }

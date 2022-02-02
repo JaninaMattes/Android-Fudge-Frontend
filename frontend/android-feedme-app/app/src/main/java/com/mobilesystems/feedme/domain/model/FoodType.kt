@@ -6,9 +6,10 @@ enum class FoodType(val label: String) {
     VEGETARIAN("Vegetarisch"),
     LOW_CARB("Low Carb"),
     FAST_FOOD("Fast Food"),
-    MEDITERRANEAN("Mediterrane Küche"),
+    MEDITERRANEAN("Mediterran"),
     AMERICAN("Ame"),
     ASIAN("Asiatisch"),
+    FITNESS("Fitness"),
     PALEO("Paleo");
 
     // custom properties

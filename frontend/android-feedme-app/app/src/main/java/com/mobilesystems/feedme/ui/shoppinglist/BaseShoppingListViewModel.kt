@@ -8,22 +8,28 @@ interface BaseShoppingListViewModel {
 
     fun setNewProduct(product: Product) // Helper function
 
-    fun updateCurrentShoppingList(shoppingList: List<Product>?)
-
-    fun addProductToCurrentShoppingList(product: Product)
-
-    fun removeProductFromCurrentShoppingList(product: Product)
-
-    fun addProductToOldShoppingList(product: Product)
-
-    fun updateOldShoppingList(shoppingList: List<Product>?)
-
-    fun removeProductFromOldShoppingList(product: Product)
-
     fun loadAllCurrentShoppingListProducts()
 
     fun loadAllOldShoppingListProducts()
 
     fun saveCurrentState()
+
+    fun addNewProductToCurrentShoppingList(product: Product)//newproduct
+
+    fun addProductToCurrentShoppingList(product: Product)//product from oldshoppinglist
+
+    fun addProductToOldShoppingList(product: Product)
+
+    fun updateProductOnOldShoppingList(product: Product)
+
+    fun updateProductOnCurrentShoppingList(product: Product)
+
+    fun updateCurrentShoppingList(shoppingList: List<Product>?)
+
+    fun updateOldShoppingList(shoppingList: List<Product>?)
+
+    fun removeProductFromOldShoppingList(product: Product)
+
+    fun removeProductFromCurrentShoppingList(product: Product)
 
 }

@@ -78,7 +78,8 @@
                     android:paddingEnd="@dimen/small_text_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/text_recipe_subtitle">
+                    app:layout_constraintTop_toBottomOf="@id/text_recipe_subtitle"
+                    app:layout_constraintBottom_toTopOf="@+id/container_for_floating_button">
 
                     <!-- Recipe Detail Information -->
 
@@ -92,13 +93,50 @@
 
                 </LinearLayout>
 
+                <!-- Custom Floating Button -->
+                <FrameLayout
+                    android:id="@+id/container_for_floating_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintBottom_toTopOf="@+id/recipe_detail_scroll_view_linear_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/card_view_information_container">
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/button_export_ingredients_to_shoppinglist"
+                        android:layout_width="177dp"
+                        android:layout_height="35dp"
+                        android:layout_margin="@dimen/tiny_text_margin"
+                        android:layout_marginStart="@dimen/tiny_text_margin"
+                        android:layout_marginEnd="@dimen/tiny_text_margin"
+                        android:backgroundTint="@color/red_200"
+                        android:clickable="true"
+                        android:elevation="@dimen/medium_card_elevation"
+                        android:src="@android:color/transparent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="@dimen/small_text_margin"
+                        android:elevation="16dp"
+                        android:text="@string/button_share_ingredients"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/text_medium" />
+
+                </FrameLayout>
+
                 <LinearLayout
+                    android:id="@+id/recipe_detail_scroll_view_linear_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/card_view_information_container">
+                    app:layout_constraintTop_toBottomOf="@id/container_for_floating_button">
 
                     <!-- Recipe Detail InformationView -->
 
@@ -113,39 +151,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Custom Floating Button -->
-            <FrameLayout
-                android:id="@+id/container_for_floating_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_marginTop="@dimen/small_text_margin"
-                android:layout_marginBottom="@dimen/small_text_margin">
 
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/button_export_ingredients_to_shoppinglist"
-                    android:layout_width="177dp"
-                    android:layout_height="35dp"
-                    android:layout_margin="@dimen/tiny_text_margin"
-                    android:layout_marginStart="@dimen/tiny_text_margin"
-                    android:layout_marginEnd="@dimen/tiny_text_margin"
-                    android:backgroundTint="@color/red_200"
-                    android:clickable="true"
-                    android:elevation="@dimen/medium_card_elevation"
-                    android:src="@android:color/transparent" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="@dimen/small_text_margin"
-                    android:elevation="16dp"
-                    android:text="@string/button_share_ingredients"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@android:color/white"
-                    android:textSize="@dimen/text_medium" />
-
-            </FrameLayout>
 
         </RelativeLayout>
 

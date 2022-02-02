@@ -2,14 +2,15 @@ package com.mobilesystems.feedme.ui.recipes
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.mobilesystems.feedme.data.repository.InventoryRepositoryImpl
 import com.mobilesystems.feedme.data.repository.RecipeRepositoryImpl
-import com.mobilesystems.feedme.data.repository.ShoppingListRepositoryImpl
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.domain.model.Recipe
+import com.mobilesystems.feedme.domain.model.User
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,8 +24,7 @@ import javax.inject.Inject
 class SharedRecipesViewModel @Inject constructor(
     androidApplication: Application,
     private val recipeRepository: RecipeRepositoryImpl,
-    private val inventoryRepository: InventoryRepositoryImpl,
-    private val shoppingListRepository: ShoppingListRepositoryImpl) :
+    private val inventoryRepository: InventoryRepositoryImpl) :
     BaseViewModel(androidApplication), BaseRecipeViewModel  {
 
     private var _recipeList = MutableLiveData<List<Recipe>?>()
@@ -34,7 +34,8 @@ class SharedRecipesViewModel @Inject constructor(
     private var _selectedRecipeIngredients = MutableLiveData<List<Product>?>()
     private var _availableIngredients = MutableLiveData<List<Product>?>()
     private var _notAvailableIngredients = MutableLiveData<List<Product>?>()
-    private var _currentUser = MutableLiveData<Int?>()
+    private var _loggedInUser = MutableLiveData<User?>()
+    private var _currentUserId = MutableLiveData<Int?>()
 
     val recipeList : LiveData<List<Recipe>?>
         get() = _recipeList
@@ -57,13 +58,17 @@ class SharedRecipesViewModel @Inject constructor(
     val notAvailableIngredients : LiveData<List<Product>?>
         get() = _notAvailableIngredients
 
-    val currentUser : LiveData<Int?>
-        get() = _currentUser
+    val loggedInUser : LiveData<User?>
+        get() = _loggedInUser
+
+    val currentUserId : LiveData<Int?>
+        get() = _currentUserId
+
 
     init {
 
         val context = getApplication<Application>().applicationContext
-        getCurrentUser(context)
+        getLoggedInUserId(context)
 
         if(recipeListHasNoValues()) {
             // preload all values
@@ -100,7 +105,7 @@ class SharedRecipesViewModel @Inject constructor(
     override fun addRecipeToFavorites(recipeId: Int) {
         // For future features
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if(userId != null) {
                 recipeRepository.addRecipeToFavoriteList(userId, recipeId)
             }
@@ -125,30 +130,92 @@ class SharedRecipesViewModel @Inject constructor(
         return availableIngredients
     }
 
+    override fun saveCurrentShoppingState() {
+        viewModelScope.launch {
+            val userId = currentUserId.value
+            if (userId != null) {
+                //recipeRepository.updateCurrentShoppingList(userId, shoppingList.value)
+            }
+        }
+    }
+
     override fun exportUnavailableIngredientsToShoppingList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
-            val currentValues = shoppingList.value
-            val currentNotValues = _notAvailableIngredients.value
-            var tempList: MutableList<Product>? = ArrayList<Product>()
-            tempList = currentValues as MutableList<Product>
-            if (currentNotValues != null) {
-                tempList.addAll(currentNotValues)
+        val userId = currentUserId.value
+        val currentNotValues = _notAvailableIngredients.value
+        val currentValues = shoppingList.value
+        var tempList: MutableList<Product>
+        tempList = currentValues as MutableList<Product>
+            if (userId != null) {
+                // Check if ingredientlist is empty
+                if(currentNotValues != null) {
+                    //check if current shoppinglist ist empty
+                    currentNotValues.forEach {
+                        val duplicateValue = tempList.filter { p -> p.productName == it.productName }
+                        //if ingredient is on shoppinglist, replace with newamount
+                        if (duplicateValue.isNotEmpty()) {
+                            for (i in duplicateValue.indices) {
+                                if (duplicateValue[i].productName == it.productName) {
+                                    val newProduct = calculateNewAmount(
+                                        duplicateValue[i],
+                                        it
+                                    )
+                                    tempList = tempList.replace(
+                                        duplicateValue[i],
+                                        newProduct
+                                    ) as MutableList<Product>// Replace with new product
+                                    recipeRepository.updateSingleProductOnCurrentShoppingList(userId, newProduct)
+                                }
+                            }
+                        } //if ingredient is not on shoppinglist, add
+                        else {
+                            val updatedProduct = recipeRepository.addNewProductToCurrentShoppingList(userId, it)
+                            tempList.add(updatedProduct)
+
+                        }
+                    }
+                }
             }
-            if(userId != null) {
-                shoppingListRepository.updateCurrentShoppingList(userId, tempList)
-            }
+            _shoppingList.value = tempList
         }
+         // TODO: Check logic
+    }
+
+    private fun <Product> List<Product>.replace(old: Product, new: Product) = map { if (it == old) new else it }
+
+    private fun calculateNewAmount(product_one: Product, product_two: Product): Product{
+        val newProduct: Product
+        val amountOne = product_one.quantity.filter { it.isDigit() }
+        val amountTwo = product_two.quantity.filter { it.isDigit() }
+        var amountType = product_one.quantity.filter { it.isLetter() }
+        if (amountType.isEmpty()){
+            amountType = "Stück"
+        }
+
+        val newAmount = amountOne.toInt() + amountTwo.toInt()
+
+        newProduct = product_one.copy(
+            productId = product_one.productId,
+            productName = product_one.productName,
+            expirationDate = product_one.expirationDate,
+            labels = product_one.labels,
+            quantity = "$newAmount $amountType",
+            manufacturer = product_one.manufacturer,
+            nutritionValue = product_one.nutritionValue,
+            productImage = product_one.productImage
+        )
+
+        return newProduct
     }
 
     override fun loadShoppingList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if(userId != null) {
-                shoppingListRepository.loadCurrentShoppingListProducts(userId)
-                _shoppingList = shoppingListRepository.currentShoppingListProducts
+                _shoppingList.value = recipeRepository.loadCurrentShoppingListProducts(userId)
+                Log.d("ShoppinglistfehlerloadShoppinglistnachexport", _shoppingList.value.toString())
             }
         }
     }
@@ -156,10 +223,9 @@ class SharedRecipesViewModel @Inject constructor(
     override fun loadInventoryList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if(userId != null) {
-                inventoryRepository.loadInventoryListProducts(userId)
-                _inventoryList = inventoryRepository.inventoryList
+                _inventoryList.value = inventoryRepository.loadInventoryListProducts(userId)
             }
         }
     }
@@ -167,11 +233,11 @@ class SharedRecipesViewModel @Inject constructor(
     override fun loadMatchingRecipes() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value
+            val userId = currentUserId.value
             if(userId != null) {
-                recipeRepository.loadAllRecipesBasedOnInventory(userId)
-                _recipeList = recipeRepository.recipeList
-                filterListByRating()
+                val result = recipeRepository.loadAllRecipesBasedOnInventory(userId)
+                // filter by rating
+                _recipeList.value = filterListByRating(filterDuplicates(result))
             }
         }
     }
@@ -180,13 +246,12 @@ class SharedRecipesViewModel @Inject constructor(
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
             val currentValues = recipeList.value
-            var tempList: MutableList<Recipe> = ArrayList<Recipe>()
+            var tempList: MutableList<Recipe> = ArrayList()
             if (currentValues != null) {
                 tempList = currentValues as MutableList<Recipe>
                 tempList.removeAt(position)
             }
             _recipeList.value = tempList
-            _recipeList = recipeRepository.recipeList
         }
     }
 
@@ -214,10 +279,9 @@ class SharedRecipesViewModel @Inject constructor(
     }
 
     private fun filterAvailableAndUnavailableIngredients(){
-        // TODO: Discussion needed, Move this app logic to backend? Or to Use Cases?
-        var tempListAvailable = arrayListOf<Product>()
-        var tempListUnAvailable = arrayListOf<Product>()
-        var ingList = selectedRecipeIngredients.value
+        val tempListAvailable = arrayListOf<Product>()
+        val tempListUnAvailable = arrayListOf<Product>()
+        val ingList = selectedRecipeIngredients.value
 
         ingList?.forEach {
             if (isProductAvailable(it)) {
@@ -230,17 +294,34 @@ class SharedRecipesViewModel @Inject constructor(
         }
     }
 
-    private fun filterListByRating(): LiveData<List<Recipe>?>{
-        var tempList = recipeList.value
-        if(tempList != null) {
-            _recipeList.value = tempList.sortedBy { it.rating }
+    private fun filterListByRating(result: List<Recipe>?): List<Recipe>?{
+        var filtered: List<Recipe>? = null
+        if(result != null) {
+            filtered = result.sortedBy { it.cummulativeRating }
         }
-        return recipeList
+        return filtered
     }
 
-    private fun getCurrentUser(context: Context): LiveData<Int?>{
+    private fun filterDuplicates(result: List<Recipe>?): List<Recipe>?{
+        var noDuplicates: List<Recipe>? = null
+        if(result != null) {
+            noDuplicates = result.distinctBy { it.recipeName }
+        }
+        return noDuplicates
+    }
+
+    private fun getLoggedInUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
-        _currentUser.value = result?.userId
-        return  currentUser
+        _currentUserId.value = result?.userId
+        if(result?.userId != null){
+            // get loggedin user from shared preferences
+            _loggedInUser.value = User(
+                userId = result.userId,
+                firstName = result.firstName,
+                lastName = result.lastName,
+                email = result.email,
+                password = "")
+        }
+        return  currentUserId
     }
 }

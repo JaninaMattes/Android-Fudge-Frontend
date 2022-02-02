@@ -11,33 +11,39 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.mobilesystems.feedme.LoginActivity
-import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.domain.model.User
-import com.mobilesystems.feedme.ui.authentication.AuthViewModel
 import androidx.lifecycle.Observer
+import com.mobilesystems.feedme.databinding.LogoutFragmentBinding
+import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 
 
 class LogoutFragment : Fragment() {
 
-    private val sharedViewModel: AuthViewModel by activityViewModels()
+    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
     private lateinit var username: String
     private lateinit var password: String
+
+    //view binding
+    private var _binding: LogoutFragmentBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView =  inflater.inflate(R.layout.logout_fragment, container, false)
+    ): View {
+        _binding =  LogoutFragmentBinding.inflate(inflater, container, false)
 
         //elements
-        val cancelButton: Button = rootView.findViewById(R.id.cancel_logout)
-        val logoutButton: Button = rootView.findViewById(R.id.logout_button)
+        val cancelButton: Button = binding.cancelLogout
+        val logoutButton: Button = binding.logoutButton
 
         val userObserver = Observer<User?>{ user: User? ->
             if(user != null){
                 username = user.firstName
                 password = user.password
                 Log.d("Logout", username)
+            }else {
+                sharedViewModel.loadLoggedInUser()
             }
         }
 
@@ -49,23 +55,13 @@ class LogoutFragment : Fragment() {
         }
 
         logoutButton.setOnClickListener{
-            sharedViewModel.logout(username, password)
+            sharedViewModel.logout()
             val intent = Intent(activity?.applicationContext, LoginActivity::class.java)
             startActivity(intent)
             activity?.finish()
         }
 
-        return rootView
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //    _binding = null
-        // Persist current state
+        return binding.root
     }
 
     companion object {

@@ -40,10 +40,10 @@
     </fragment>
 
     <fragment
-    android:id="@+id/navigation_dashboard"
-    android:name="com.mobilesystems.feedme.ui.dashboard.DashboardFragment"
-    android:label="@string/title_dashboard"
-    tools:layout="@layout/dashboard_fragment" >
+        android:id="@+id/navigation_dashboard"
+        android:name="com.mobilesystems.feedme.ui.dashboard.DashboardFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/dashboard_number_one_recipe_item">
         <action
             android:id="@+id/action_navigation_dashboard_to_userProfileFragment"
             app:destination="@id/userProfileFragment" />
@@ -78,6 +78,9 @@
         <action
             android:id="@+id/action_productFragment_to_navigation_inventorylist2"
             app:destination="@id/navigation_inventorylist" />
+        <argument
+            android:name="product"
+            app:argType="com.mobilesystems.feedme.domain.model.Product" />
     </fragment>
 
     <fragment
@@ -101,6 +104,9 @@
         <action
             android:id="@+id/action_recipeFragment_to_navigation_shoppingList"
             app:destination="@id/navigation_shoppingList" />
+        <argument
+            android:name="recipe"
+            app:argType="com.mobilesystems.feedme.domain.model.Recipe" />
     </fragment>
 
     <fragment

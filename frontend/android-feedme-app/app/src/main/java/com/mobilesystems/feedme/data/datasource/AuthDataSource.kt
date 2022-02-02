@@ -1,11 +1,13 @@
 package com.mobilesystems.feedme.data.datasource
 
-import com.mobilesystems.feedme.common.networkresult.Response
-import com.mobilesystems.feedme.domain.model.User
+import com.mobilesystems.feedme.common.networkresult.Resource
+import com.mobilesystems.feedme.data.request.ChangeLoginStatusRequest
+import com.mobilesystems.feedme.data.response.UserIdResponse
 
 interface AuthDataSource {
 
+    suspend fun logout(request: ChangeLoginStatusRequest): Resource<Int?>
 
-    suspend fun logout(username: String, password: String)
+    suspend fun updateLogin(request: ChangeLoginStatusRequest): Resource<Int?>
 
 }

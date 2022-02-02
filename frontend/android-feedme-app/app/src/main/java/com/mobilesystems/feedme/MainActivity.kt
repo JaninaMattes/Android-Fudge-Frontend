@@ -4,10 +4,10 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.navigation.NavController
@@ -15,6 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mobilesystems.feedme.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //navigation
         val navView: BottomNavigationView = binding.navView
 
         navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -55,12 +57,12 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.top_search_menu, menu)
 
-        val searchItem= menu?.findItem(R.id.action_search)
+        val searchItem= menu.findItem(R.id.action_search)
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchView = searchItem?.actionView as SearchView
 
-        searchView?.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        searchView?.setOnQueryTextListener(this)
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        searchView.setOnQueryTextListener(this)
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -89,12 +91,12 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-
     // Barcode Scanning with ZXing
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // This is important, otherwise the result will not be passed to the fragment
         // TODO: Fix deprecated onActivtiyResult
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d("MainActivity", "onActivityResult is called.")
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

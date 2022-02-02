@@ -1,6 +1,7 @@
 package com.mobilesystems.feedme.ui.shoppinglist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,13 +32,14 @@ class ShoppingListCurrentProductsGridFragment: Fragment() {
     private val listener = object: ShoppingListCurrentProductsGridAdapter.ProductAdapterClickListener {
 
         override fun passData(product: Product, itemView: View) {
-            // pass data and navigate to product detail view
-            sharedViewModel.removeProductFromCurrentShoppingList(product)
+            // pass data and navigate to product detail
+            sharedViewModel.addProductToOldShoppingList(product)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //sharedViewModel.loadAllCurrentShoppingListProducts()
         val context = activity?.applicationContext
         detector = GestureDetectorCompat(context, GestureListener())
     }
@@ -46,15 +48,12 @@ class ShoppingListCurrentProductsGridFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = ShoppingListCurrentFragmentBinding.inflate(inflater, container, false)
         // Setup grid view
         productListGridView = binding.shoppingListCurrentGridView
-
-        //productListGridView.setOnItemLongClickListener { adapterView, view, i, l ->
-        //}
 
         return binding.root
     }
@@ -75,13 +74,24 @@ class ShoppingListCurrentProductsGridFragment: Fragment() {
                 productListGridView.horizontalSpacing = 15
                 productListGridView.verticalSpacing = 15
                 productListGridView.stretchMode = GridView.STRETCH_COLUMN_WIDTH
+                Log.d(TAG, "Shoppinglist observer notified")
             }
         }
         // update adapter after data is loaded
         sharedViewModel.currentShoppingList.observe(viewLifecycleOwner, productListObserver)
     }
 
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
+        const val TAG = "ShoppingListGrid"
         fun newInstance() = ShoppingListCurrentProductsGridFragment()
     }
 }

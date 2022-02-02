@@ -1,10 +1,12 @@
 package com.mobilesystems.feedme.data.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.mobilesystems.feedme.common.networkresult.Response
+import android.util.Log
 import com.mobilesystems.feedme.data.datasource.InventoryDataSourceImpl
-import com.mobilesystems.feedme.data.datasource.ProductDataSourceImpl
+import com.mobilesystems.feedme.data.request.DeleteProductRequest
+import com.mobilesystems.feedme.data.request.InventoryListRequest
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.Product
+import com.mobilesystems.feedme.ui.common.utils.*
 import javax.inject.Inject
 
 /**
@@ -12,48 +14,62 @@ import javax.inject.Inject
  * https://developer.android.com/topic/libraries/architecture/livedata
  */
 class InventoryRepositoryImpl @Inject constructor(
-    private val productDataSource: ProductDataSourceImpl,
-    private val inventoryDataSource: InventoryDataSourceImpl) : InventoryRepository{
+    private val inventoryDataSource: InventoryDataSourceImpl)
+    : InventoryRepository{
 
-    // in-memory cache of the fetched objects
-    var barcodeScanProduct: MutableLiveData<Product?> = MutableLiveData<Product?>()
-    var inventoryList: MutableLiveData<List<Product>?> = MutableLiveData<List<Product>?>()
-        private set
-
-    // TODO: Put together and use ProductDataSource instead
-    override suspend fun loadInventoryListProducts(userId: Int): MutableLiveData<List<Product>?> {
+    override suspend fun loadInventoryListProducts(userId: Int): List<Product> {
         // get all products for current user
         val result = inventoryDataSource.getAllProductsInInventoryList(userId)
-
-        if (result is Response.Success) {
-            inventoryList.postValue(result.data)
-        }
-        return inventoryList
-    }
-
-    override suspend fun removeProductFromInventory(userId: Int, product: Product) {
-        inventoryDataSource.removeProductFromInventoryList(userId, product)
+        return convertInventoryListResponse(result.data)
     }
 
     override suspend fun updateProductOnInventory(userId: Int, product: Product) {
-        // get all products for current user
-        productDataSource.updateProduct(product)
-        loadInventoryListProducts(userId)
+        // update single product for current user
+        val request = convertProductRequest(userId, product)
+        if(request != null){
+            Log.d("InventoryRepository", "Update product.")
+            inventoryDataSource.updateProductOnInventoryList(request)
+        }
+    }
+
+    override suspend fun addProductToInventory(userId: Int, product: Product): Product{
+        val request = convertProductRequest(userId, product)
+        var newProduct: Product = product
+        if(request != null){
+            Log.d("InventoryRepository", "Add product.")
+            val result = inventoryDataSource.addProductToInventory(request)
+            if(result.data != null && result.data.productId != 0) {
+                newProduct = convertProductWithNewProductId(result.data, product)
+            }
+        }
+        return newProduct
+    }
+
+    override suspend fun updateProductImage(userId: Int, image: Image) {
+        // update product image
+        val request = convertUpdateImageRequest(userId, image)
+        if(request != null){
+            Log.d("InventoryRepository", "Update product image.")
+            inventoryDataSource.updateProductImage(request)
+        }
     }
 
     override suspend fun updateProductInventoryList(userId: Int, inventoryList: List<Product>) {
-        inventoryDataSource.updateProductInventoryList(userId, inventoryList)
+        val request = InventoryListRequest(userId, inventoryList)
+        Log.d("InventoryRepository", "Update inventorylist.")
+        inventoryDataSource.updateInventoryList(request)
     }
 
-    override suspend fun getBarcodeScanResult(
-        result: String?
-    ): MutableLiveData<Product?> {
-        // get all products for current user
-        val result = productDataSource.getProductFromBarcodeScanResult(result)
+    override suspend fun removeProductFromInventory(userId: Int, product: Product) {
+        val request = DeleteProductRequest(userId, product.productId)
+        Log.d("InventoryRepository", "Remove product.")
+        //inventoryDataSource.removeProductFromInventoryList(request)
+    }
 
-        if (result is Response.Success) {
-            barcodeScanProduct.postValue(result.data)
-        }
-        return barcodeScanProduct
+    override suspend fun getBarcodeScanResult(result: String): Product? {
+        // get product from scaned barcode
+        val result = inventoryDataSource.getProductFromBarcodeScanResult(result)
+        Log.d("InventoryRepository", "Get product $result from barcode scan.")
+        return convertBarcodeResultToProduct(result.data)
     }
 }

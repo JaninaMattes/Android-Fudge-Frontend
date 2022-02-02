@@ -40,60 +40,38 @@
                     android:id="@+id/recyclerview_inventory_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/medium_cardview_margin"
-                    android:layout_marginTop="@dimen/medium_cardview_margin"
-                    android:layout_marginEnd="@dimen/medium_cardview_margin"
-                    android:padding="@dimen/small_cardview_padding"
+                    android:padding="@dimen/large_cardview_padding"
                     tools:listitem="@layout/inventory_item">
                 </androidx.recyclerview.widget.RecyclerView>
 
             </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/container_for_floating_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_marginStart="@dimen/super_large_text_margin"
-                android:layout_marginEnd="@dimen/super_large_text_margin"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/button_inventory_add_product"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="bottom|center"
-                    android:layout_margin="@dimen/tiny_btn_margin"
-                    android:backgroundTint="@color/salmon_red"
-                    android:contentDescription="@string/create_new_product"
-                    app:srcCompat="@drawable/ic_addproducts" />
-
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/show_more_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:textStyle="bold"
-                android:textColor="@color/bright_grey"
-                android:textSize="@dimen/text_medium"
-                android:text="@string/weitere_anzeigen"
-                android:gravity="center"
-                app:layout_constraintTop_toBottomOf="@id/linear_layout_inventory_list"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         </RelativeLayout>
 
     </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/container_for_floating_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="@dimen/super_large_text_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_inventory_add_product"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="@dimen/tiny_btn_margin"
+            android:backgroundTint="@color/salmon_red"
+            android:contentDescription="@string/create_new_product"
+            app:srcCompat="@drawable/ic_addproducts" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

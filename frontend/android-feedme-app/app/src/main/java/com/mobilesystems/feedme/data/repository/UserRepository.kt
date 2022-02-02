@@ -1,19 +1,26 @@
 package com.mobilesystems.feedme.data.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.mobilesystems.feedme.domain.model.Settings
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.User
 
 interface UserRepository {
 
     suspend fun getLoggedInUser(userId: Int): User?
 
-    suspend fun updateLoggedInUser(user: User): Unit
+    suspend fun updateLoggedInUser(user: User)
 
-    suspend fun persistUserProfile(user: User): Unit
+    suspend fun updateUserImage(userId: Int, image: Image): Int
 
-    suspend fun isUserLoggedIn(userId: Int): MutableLiveData<Boolean?>
+    suspend fun createDietryTag(user: User)
+
+    suspend fun isUserLoggedIn(userId: Int): Boolean
 
     suspend fun deleteUser(userId: Int)
+
+    suspend fun allowPushNotification(userId: Int, allowSetting: Boolean)
+
+    suspend fun allowReminder(userId: Int, allowSetting: Boolean)
+
+    suspend fun allowSuggestion(userId: Int, allowSetting: Boolean)
 
 }

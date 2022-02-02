@@ -14,12 +14,11 @@ import com.mobilesystems.feedme.databinding.ActivityLoginBinding
 import com.mobilesystems.feedme.ui.authentication.AuthViewModel
 import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_login.*
 
 @AndroidEntryPoint
 class LoginActivity: AppCompatActivity() {
 
-    private val authViewModel: AuthViewModel by viewModels()
+    private val loginAuthViewModel: AuthViewModel by viewModels()
 
     private var _binding: ActivityLoginBinding? = null
     private val binding get() = _binding!!
@@ -48,13 +47,13 @@ class LoginActivity: AppCompatActivity() {
         val loadingProgressBar = binding.loading
         loginButton.isEnabled = false
 
-        authViewModel.loginFormState.observe(this,
+        loginAuthViewModel.loginFormState.observe(this,
             Observer { loginFormState ->
                 if (loginFormState == null) {
                     return@Observer
                 }
                 loginButton.isEnabled = loginFormState.isDataValid
-                loginFormState.usernameError?.let {
+                loginFormState.emailError?.let {
                     emailEditText.error = getString(it)
                 }
                 loginFormState.passwordError?.let {
@@ -62,7 +61,7 @@ class LoginActivity: AppCompatActivity() {
                 }
             })
 
-        authViewModel.loginResult.observe(this,
+        loginAuthViewModel.loginResult.observe(this,
             Observer { loginResult ->
                 loginResult ?: return@Observer
                 loadingProgressBar.visibility = View.GONE
@@ -87,7 +86,7 @@ class LoginActivity: AppCompatActivity() {
             }
 
             override fun afterTextChanged(editable: Editable) {
-                authViewModel.observeLoginDataChanged(
+                loginAuthViewModel.observeLoginDataChanged(
                     emailEditText.text.toString(),
                     passwordEditText.text.toString()
                 )
@@ -98,7 +97,7 @@ class LoginActivity: AppCompatActivity() {
         passwordEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                authViewModel.login(
+                loginAuthViewModel.login(
                     emailEditText.text.toString(),
                     passwordEditText.text.toString()
                 )
@@ -108,7 +107,7 @@ class LoginActivity: AppCompatActivity() {
 
         loginButton.setOnClickListener {
             loadingProgressBar.visibility = View.VISIBLE
-            authViewModel.login(
+            loginAuthViewModel.login(
                 emailEditText.text.toString(),
                 passwordEditText.text.toString()
             )

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
@@ -14,23 +15,15 @@
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp" >
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_food_tag_list"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginStart="@dimen/medium_recview_margin"
-                android:layout_marginEnd="@dimen/medium_recview_margin"
-                android:layout_marginTop="@dimen/medium_recview_margin"
+                android:layout_margin="@dimen/small_recview_margin"
+                android:layout_marginEnd="@dimen/small_recview_margin"
                 tools:listitem="@layout/product_detail_tag_item">
             </androidx.recyclerview.widget.RecyclerView>
-
-            </RelativeLayout>
 
         </HorizontalScrollView>
 

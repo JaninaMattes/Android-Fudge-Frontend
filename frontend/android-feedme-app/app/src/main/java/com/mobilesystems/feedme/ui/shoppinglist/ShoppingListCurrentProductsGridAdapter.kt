@@ -12,12 +12,18 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.domain.model.Product
+import android.widget.AdapterView.OnItemLongClickListener
+import com.mobilesystems.feedme.databinding.ShoppingListCurrentItemBinding
 
 class ShoppingListCurrentProductsGridAdapter(
     private val context: Context?,
     private val dataSet: List<Product>?,
-    private val itemClickListener: ShoppingListCurrentProductsGridAdapter.ProductAdapterClickListener
+    private val itemClickListener: ProductAdapterClickListener
 ) : BaseAdapter() {
+
+    //view binding
+    private var _itemBinding: ShoppingListCurrentItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
     interface ProductAdapterClickListener {
         fun passData(product: Product, itemView: View)
@@ -26,13 +32,13 @@ class ShoppingListCurrentProductsGridAdapter(
     override fun getView(position:Int, convertView: View?, parent: ViewGroup?): View{
         // Inflate the custom view
         val inflater = parent?.context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val itemView = inflater.inflate(R.layout.shopping_list_current_item,null)
+        _itemBinding = ShoppingListCurrentItemBinding.inflate(inflater, parent,false)
 
-        val cardView: CardView = itemView.findViewById(R.id.card_view_shopping_list_item)
-        val shoppingListColour: FrameLayout = itemView.findViewById(R.id.shoppinglist_item_colour)
-        val shoppingListIcon: ImageView = itemView.findViewById(R.id.shopping_item_food_icon)
-        val shoppingListItemName: TextView = itemView.findViewById(R.id.shopping_list_item_name)
-        val shoppingListItemQuantity: TextView = itemView.findViewById(R.id.shopping_list_item_quantity)
+        val cardView: CardView = itemBinding.cardViewShoppingListItem
+        val shoppingListColour: FrameLayout = itemBinding.shoppinglistItemColour
+        val shoppingListIcon: ImageView = itemBinding.shoppingItemFoodIcon
+        val shoppingListItemName: TextView = itemBinding.shoppingListItemName
+        val shoppingListItemQuantity: TextView = itemBinding.shoppingListItemQuantity
 
         if(dataSet != null){
             val currentItem = dataSet[position]
@@ -47,20 +53,24 @@ class ShoppingListCurrentProductsGridAdapter(
             shoppingListItemQuantity.text = currentItem.quantity
         }
 
-        // initialize clicklistener and pass clicked product for listitem position
+        // initialize clicklistener, pass clicked product for listitem position
         cardView.setOnClickListener{ v ->
             if (dataSet != null) {
+                if(context != null) {
+                    shoppingListColour.setBackgroundColor(
+                        ContextCompat.getColor(context, R.color.red_200))
+                }
                 itemClickListener.passData(dataSet[position], v)
             }
         }
 
-        return  itemView
+        return itemBinding.root
     }
 
     override fun getItem(position: Int): Any {
         // TODO: Correct this workaround with dummy data
         var currentItem = Product(0, "", "", mutableListOf(),
-            "", "", "", "")
+            "", "", "", null)
         if (dataSet != null) {
             // get selected product
             currentItem = dataSet[position]

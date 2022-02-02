@@ -1,6 +1,10 @@
 package com.mobilesystems.feedme.domain.model
 
+import android.os.Parcelable
+
 abstract class ShoppingList(
+    @Transient
     open val shoppingListId: Int,
-    open val shoppingListProducts: List<Product>? = null
-)
+    @Transient
+    open val shoppingList: List<Product>? = null
+): Parcelable

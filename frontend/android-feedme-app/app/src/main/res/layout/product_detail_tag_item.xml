@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    xmlns:card_view="http://schemas.android.com/tools">
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/product_tag_card_view"
+        android:id="@+id/dietry_tag_card_view"
         android:layout_width="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/small_cardview_padding"
-        android:layout_margin="@dimen/medium_text_margin"
         android:background="@drawable/custom_background_tags"
         android:clickable="true"
         app:cardCornerRadius="@dimen/card_view_corner_radius"
-        card_view:cardUseCompatPadding="true"
         app:cardElevation="@dimen/tiny_card_elevation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/text_product_tag_label"
+            android:id="@+id/text_dietry_tag_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/medium_text_margin"
@@ -32,7 +30,7 @@
             android:textStyle="bold"
             android:textSize="@dimen/text_small"
             android:textColor="@color/black"
-            android:text="Label"/>
+            android:text="@string/dietry_tag_label"/>
 
     </androidx.cardview.widget.CardView>
 

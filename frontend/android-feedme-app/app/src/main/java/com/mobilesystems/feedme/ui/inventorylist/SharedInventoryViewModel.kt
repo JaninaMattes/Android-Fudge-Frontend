@@ -3,13 +3,12 @@ package com.mobilesystems.feedme.ui.inventorylist
 import android.app.Application
 import android.content.Context
 import android.icu.text.SimpleDateFormat
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.mobilesystems.feedme.data.repository.InventoryRepositoryImpl
-import com.mobilesystems.feedme.domain.model.Label
-import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.authentication.LoggedInUser
+import com.mobilesystems.feedme.domain.model.*
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,14 +26,16 @@ import kotlin.collections.ArrayList
 @HiltViewModel
 class SharedInventoryViewModel @Inject constructor(
     androidApplication : Application,
-    private val inventoryRepository: InventoryRepositoryImpl) : BaseViewModel(androidApplication), BaseInventoryViewModel {
+    private val inventoryRepository: InventoryRepositoryImpl) :
+    BaseViewModel(androidApplication), BaseInventoryViewModel {
 
     private var _inventoryList = MutableLiveData<List<Product>?>()
     private var _barcodeScanProduct = MutableLiveData<Product?>()
     private var _selectedProduct = MutableLiveData<Product?>()
     private var _selectedTagList = MutableLiveData<List<Label>?>()
     private var _allProductLabels = MutableLiveData<List<String>>()
-    private var _currentUser = MutableLiveData<LoggedInUser?>()
+    private var _loggedInUser = MutableLiveData<User?>()
+    private var _currentUserId = MutableLiveData<Int?>()
 
     val inventoryList : LiveData<List<Product>?>
         get() = _inventoryList
@@ -51,19 +52,19 @@ class SharedInventoryViewModel @Inject constructor(
     val allProductLabels : LiveData<List<String>>
         get() = _allProductLabels
 
-    val currentUser : LiveData<LoggedInUser?>
-        get() = _currentUser
+    val loggedInUser : LiveData<User?>
+        get() = _loggedInUser
+
+    val currentUserId : LiveData<Int?>
+        get() = _currentUserId
 
     init {
-
         val context = getApplication<Application>().applicationContext
-        getCurrentUser(context)
+        getLoggedInUserId(context)
 
         if (inventoryHasNoValues()) {
             // preload all values
             loadAllProductsOfInventoryList()
-
-            filterListByExpirationDate()
         }
     }
 
@@ -73,25 +74,26 @@ class SharedInventoryViewModel @Inject constructor(
         loadSelectedProductTagList()
     }
 
-    override fun deleteProductByPosition(position: Int) {
+    override fun deleteProductByPosition(position: Int): Product? {
+        // This is a coroutine scope with the lifecycle of the ViewModel
+        var product: Product? = null
         val currentValues = inventoryList.value
-        var tempList: MutableList<Product> = ArrayList<Product>()
         if (currentValues != null) {
-            tempList = currentValues as MutableList<Product>
+            val tempList = currentValues.toMutableList()
+            product = tempList[position]
             tempList.removeAt(position)
+            _inventoryList.postValue(tempList)
         }
-        _inventoryList.value = tempList
-        _inventoryList = inventoryRepository.inventoryList
-
-        updateInventoryList()
+        return product
     }
 
-    override fun getProductFromBarcodeScanResult(barcodeScanRes: String?) {
+    override fun getProductFromBarcodeScanResult(barcodeScanRes: String): Product? {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            inventoryRepository.getBarcodeScanResult(barcodeScanRes)
-            _barcodeScanProduct = inventoryRepository.barcodeScanProduct
+            val result = inventoryRepository.getBarcodeScanResult(barcodeScanRes)
+            _barcodeScanProduct.value = result
         }
+        return _barcodeScanProduct.value
     }
 
     override fun addProductFromBarcodeScanResultToInventory(product: Product) {
@@ -99,71 +101,70 @@ class SharedInventoryViewModel @Inject constructor(
         addProductToInventoryList(product)
     }
 
-    override fun updateProductInInventoryList(product: Product) {
+    override fun updateProductOnInventory(product: Product) {
         // Update the values of a product that already exists in inventory
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value?.userId
+            val userId = loggedInUser.value?.userId
             val currentValues = inventoryList.value
             var tempList: MutableList<Product> = ArrayList<Product>()
-            if (currentValues != null) {
-                tempList = currentValues as MutableList<Product>
-                tempList.forEachIndexed { index, oldProduct ->
-                    if (oldProduct.productId == product.productId) {
-                        tempList[index] = product
+            if(userId != null) {
+                if (currentValues != null) {
+                    tempList = currentValues.toMutableList()
+                    tempList.forEachIndexed { index, oldProduct ->
+                        if (oldProduct.productId == product.productId) {
+                            tempList[index] = product
+                            inventoryRepository.updateProductOnInventory(userId, product)
+                        }
                     }
                 }
-            }
-            _inventoryList.value = tempList
-            // update backend
-            if(userId != null) {
-                inventoryRepository.updateProductOnInventory(userId, product)
+                updateInventoryList(tempList)
             }
         }
+        loadAllProductsOfInventoryList()
     }
 
     override fun addProductToInventoryList(product: Product) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value?.userId
-            val tempList = findDuplicateProducts(product)
-            _inventoryList.value = tempList
-            // Network call
-            if(userId != null) {
-                inventoryRepository.updateProductInventoryList(userId, tempList)
-            }
-        }
-    }
+            val userId = loggedInUser.value?.userId
+            val currentItems = inventoryList.value
 
-    private fun findDuplicateProducts(product: Product): MutableList<Product> {
-        val currentItems = inventoryList.value
-        var tempList: MutableList<Product> = ArrayList<Product>()
-        // Check if currentlist is empty
-        if (currentItems != null) {
-            tempList = currentItems as MutableList<Product>
-            // find duplicate items
-            val duplicateValue = tempList.filter { p -> p.productName == product.productName }
-            // iterate over duplicate values (best case only 1)
-            if (duplicateValue.isNotEmpty()) {
-                for (i in duplicateValue.indices) {
-                    if (duplicateValue[i].productName == product.productName) {
-                        val newProduct = calculateNewAmount(duplicateValue[i], product)
-                        tempList = tempList.replace(duplicateValue[i], newProduct) as MutableList<Product>// Replace with new product
+            // Network call
+            if(userId != null && userId != 0) {
+                var tempList: MutableList<Product> = mutableListOf()
+                // Check if currentlist is empty
+                if (currentItems != null) {
+                    tempList = currentItems.toMutableList()
+                    // find duplicate items
+                    val duplicateValue = tempList.filter { p -> p.productName == product.productName }
+                    // iterate over duplicate values (best case only 1)
+                    if (duplicateValue.isNotEmpty()) {
+                        for (i in duplicateValue.indices) {
+                            if (duplicateValue[i].productName == product.productName) {
+                                val newProduct = calculateNewAmount(duplicateValue[i], product)
+                                tempList = tempList.replace(duplicateValue[i], newProduct).toMutableList()
+                                inventoryRepository.updateProductOnInventory(userId, newProduct)
+                            }
+                        }
+                        // no duplicate values
+                    } else {
+                        val newProduct = inventoryRepository.addProductToInventory(userId, product)
+                        tempList.add(newProduct)
                     }
+                    // empty list
+                } else {
+                    val newProduct = inventoryRepository.addProductToInventory(userId, product)
+                    tempList.add(newProduct)
                 }
-                // no duplicate values
-            } else {
-                tempList.add(product)
+                updateInventoryList(tempList)
             }
-            // empty list
-        } else {
-            tempList.add(product)
         }
-        return tempList
+        loadAllProductsOfInventoryList()
     }
 
     private fun calculateNewAmount(product_one: Product, product_two: Product): Product{
-        var newProduct: Product
+        val newProduct: Product
         val amountOne = product_one.quantity.filter { it.isDigit() }
         val amountTwo = product_two.quantity.filter { it.isDigit() }
         var amountType = product_one.quantity.filter { it.isLetter() }
@@ -181,7 +182,7 @@ class SharedInventoryViewModel @Inject constructor(
             quantity = "$newAmount $amountType",
             manufacturer = product_one.manufacturer,
             nutritionValue = product_one.nutritionValue,
-            imageUrl = product_one.imageUrl
+            productImage = product_one.productImage
         )
 
         return newProduct
@@ -190,17 +191,10 @@ class SharedInventoryViewModel @Inject constructor(
     override fun deleteProductInInventoryList(product: Product) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value?.userId
-            val currentValues = inventoryList.value
-            var tempList: MutableList<Product> = ArrayList<Product>()
-            if (currentValues != null) {
-                tempList = currentValues as MutableList<Product>
-                tempList.remove(product)
-            }
-            _inventoryList.value = tempList
-            // Network call
-            if(userId != null) {
-                inventoryRepository.removeProductFromInventory(userId, product)
+            val userId = loggedInUser.value?.userId
+            if(userId != null && userId != 0) {
+                    // TODO: Network call
+                    // inventoryRepository.removeProductFromInventory(userId, product)
             }
         }
     }
@@ -208,49 +202,73 @@ class SharedInventoryViewModel @Inject constructor(
     override fun loadAllProductsOfInventoryList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value?.userId
+            val userId = loggedInUser.value?.userId
             if(userId != null) {
-                inventoryRepository.loadInventoryListProducts(userId)
-                _inventoryList = inventoryRepository.inventoryList
+                val result = inventoryRepository.loadInventoryListProducts(userId)
+                Log.d("SharedInventoryViewModle", "Loaded inventorylist.")
+                filterListByExpirationDate(result)
             }
         }
     }
 
     override fun loadSelectedProductTagList(): LiveData<List<Label>?> {
         // Helper function to load all tags from a product
-        val labels = selectedProduct.value?.labels
-        _selectedTagList.value = labels
+        _selectedTagList.postValue(selectedProduct.value?.labels)
         return selectedProductTagList
     }
 
     override fun updateInventoryList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUser.value?.userId
+            val userId = loggedInUser.value?.userId
             val currentValues = inventoryList.value
-            var tempList: MutableList<Product> = ArrayList<Product>()
-            if (currentValues != null) {
-                tempList = currentValues as MutableList<Product>
+            val tempList = currentValues?.toMutableList()
+            if (userId != null && userId != 0) {
+                _inventoryList.value = tempList
+                //inventoryRepository.updateProductInventoryList(userId, tempList)
             }
-            if (userId != null) {
-                inventoryRepository.updateProductInventoryList(userId, tempList)
+        }
+    }
+
+    override fun updateImage(image: Image) {
+        viewModelScope.launch {
+            val context = getApplication<Application>().applicationContext
+            val userId = getLoggedInUserId(context).value
+            if(userId != null && userId != 0) {
+                inventoryRepository.updateProductImage(userId, image)
+                Log.d("SharedInventoryViewModel", "Update product image.")
             }
         }
     }
 
     // Only for the dropdown menu
-    fun loadAllProductLabels(): LiveData<List<String>> {
+    fun loadAllProductLabels(): List<String> {
         val labels = Label.values()
         val tempList: MutableList<String> = mutableListOf()
         labels.forEach {
             tempList.add(it.label)
         }
-        _allProductLabels.value = tempList.sortedBy { it }
-        return allProductLabels
+        // filter drop down values
+        val sorted = tempList.sortedBy { it }
+        _allProductLabels.postValue(sorted)
+        return sorted
+    }
+
+    // filter products by expiration date
+    private fun filterListByExpirationDate(result: List<Product>?): LiveData<List<Product>?>{
+        if(result != null) {
+            val tempList = result.toMutableList()
+            val cmp = compareBy<Product> { convertStringToDate(it.expirationDate) }
+            _inventoryList.value = tempList.sortedWith(cmp) // ascending
+            Log.d("SharedInventoryViewModel", "List sorted by expiration date.")
+        }else{
+            Log.d("SharedInventoryViewModel", "Inventorylist is empty.")
+        }
+        return inventoryList
     }
 
     private fun inventoryHasNoValues(): Boolean{
-        return _inventoryList.value.isNullOrEmpty()
+        return inventoryList.value.isNullOrEmpty()
     }
 
     private fun isProductInInventory(product: Product): Boolean {
@@ -262,27 +280,32 @@ class SharedInventoryViewModel @Inject constructor(
         return false
     }
 
-    private fun <Product> List<Product>.replace(old: Product, new: Product) = map { if (it == old) new else it }
-
-    private fun filterListByExpirationDate(): LiveData<List<Product>?>{
-        val currentValues = inventoryList.value
-        var tempList: MutableList<Product> = ArrayList<Product>()
-        if(currentValues != null) {
-            tempList = currentValues as MutableList<Product>
-            tempList.sortedBy { convertStringToDate(it.expirationDate) }
-            _inventoryList.value = tempList
-        }
-        return inventoryList
+    private fun updateInventoryList(inventoryList: List<Product>){
+        _inventoryList.value = inventoryList
     }
+
+    private fun <Product> List<Product>.replace(old: Product, new: Product) = map { if (it == old) new else it }
 
     private fun convertStringToDate(dateStr: String): Date {
         val sdf = SimpleDateFormat("dd.MM.yyyy")
-        return sdf.parse(dateStr)
+        val date = sdf.parse(dateStr)
+        Log.d("SharedInventoryViewModel", "Current date $date")
+        return date
     }
 
-    private fun getCurrentUser(context: Context): LiveData<LoggedInUser?>{
+    private fun getLoggedInUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
-        _currentUser.value = result
-        return  currentUser
+        _currentUserId.value = result?.userId
+        if(result?.userId != null){
+            // get loggedin user from shared preferences
+            // tloaded from backend
+            _loggedInUser.value = User(
+                userId = result.userId,
+                firstName = result.firstName,
+                lastName = result.lastName,
+                email = result.email,
+                password = "-")
+        }
+        return  currentUserId
     }
 }

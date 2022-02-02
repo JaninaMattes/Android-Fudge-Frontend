@@ -44,7 +44,6 @@
                 app:layout_constraintTop_toBottomOf="@id/user_profile_card_view_one"
                 layout="@layout/user_profile_recipe_settings"/>
 
-
             <include
                 android:id="@+id/user_profile_card_view_three"
                 android:layout_width="match_parent"
@@ -58,7 +57,7 @@
                 android:id="@+id/container_for_user_edit_floating_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_text_margin"
+                android:layout_marginTop="@dimen/large_text_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_profile_card_view_three"

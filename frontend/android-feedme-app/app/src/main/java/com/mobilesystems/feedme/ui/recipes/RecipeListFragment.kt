@@ -9,11 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.mobilesystems.feedme.databinding.RecipeListFragmentBinding
 import com.mobilesystems.feedme.domain.model.Recipe
-import com.mobilesystems.feedme.ui.dashboard.SharedDashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -23,7 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class RecipeListFragment : Fragment() {
 
     // delegate to main activity so that ViewModel is preserved
-    private val sharedViewModel: SharedDashboardViewModel by activityViewModels()
+    private val sharedViewModel: SharedRecipesViewModel by activityViewModels()
 
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var recipeRecyclerView: RecyclerView
@@ -38,8 +37,8 @@ class RecipeListFragment : Fragment() {
         override fun passData(recipe: Recipe, itemView: View) {
             // pass data and navigate to recipe detail view
             sharedViewModel.selectedRecipe(recipe)
-            val action = RecipeListFragmentDirections.actionNavigationRecipesToRecipeFragment()
-            findNavController().navigate(action)
+            val action = RecipeListFragmentDirections.actionNavigationRecipesToRecipeFragment(recipe)
+            Navigation.findNavController(itemView).navigate(action)
         }
     }
 
@@ -69,7 +68,7 @@ class RecipeListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         // Inflate layout for this fragment
         _binding = RecipeListFragmentBinding.inflate(inflater, container, false)
@@ -101,6 +100,11 @@ class RecipeListFragment : Fragment() {
         // update adapter after data is loaded
         sharedViewModel.recipeList.observe(viewLifecycleOwner, recipeListObserver)
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

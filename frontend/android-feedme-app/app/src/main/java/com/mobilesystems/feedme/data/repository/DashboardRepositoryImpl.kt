@@ -1,32 +1,22 @@
 package com.mobilesystems.feedme.data.repository
 
-import android.location.Location
-import androidx.lifecycle.MutableLiveData
-import com.mobilesystems.feedme.common.networkresult.Response
+import android.util.Log
 import com.mobilesystems.feedme.data.datasource.InventoryDataSourceImpl
 import com.mobilesystems.feedme.data.datasource.RecipeDataSourceImpl
 import com.mobilesystems.feedme.data.datasource.UserDataSourceImpl
-import com.mobilesystems.feedme.data.response.UserResponse
-import com.mobilesystems.feedme.domain.model.FoodType
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.domain.model.Recipe
 import com.mobilesystems.feedme.domain.model.User
-import com.mobilesystems.feedme.ui.common.utils.convertUserResponse
+import com.mobilesystems.feedme.ui.common.utils.*
 import javax.inject.Inject
 
 class DashboardRepositoryImpl @Inject constructor(
     private val inventoryDataSource: InventoryDataSourceImpl,
     private val recipeDataSourceImpl: RecipeDataSourceImpl,
-    private val userDataSourceImpl: UserDataSourceImpl) : DashboardRepository {
+    private val userDataSourceImpl: UserDataSourceImpl)
+    : DashboardRepository {
 
-    // in-memory cache of the fetched objects
-    var expiringProductList: MutableLiveData<List<Product>?> = MutableLiveData<List<Product>?>()
-        private set
-    var noOneRecipeList: MutableLiveData<List<Recipe>?> = MutableLiveData<List<Recipe>?>()
-        private set
-    var loggedInUser: MutableLiveData<User?> = MutableLiveData<User?>()
-
-    override suspend fun getCurrentLoggedInUser(userId: Int): MutableLiveData<User?> {
+    override suspend fun getCurrentLoggedInUser(userId: Int): User? {
         // get currently logged in user
         var user: User? = null
         val result = userDataSourceImpl.getUserById(userId)
@@ -34,33 +24,42 @@ class DashboardRepositoryImpl @Inject constructor(
         if(userResponse != null) {
             user = convertUserResponse(userResponse)
         }
-        loggedInUser.postValue(user)
-        return loggedInUser
+        return user
     }
 
-    override suspend fun getNumberOneRecipes(userId: Int): MutableLiveData<List<Recipe>?> {
-        // TODO get only number one Recipes
+    override suspend fun getNumberOneRecipes(userId: Int): List<Recipe> {
         val result = recipeDataSourceImpl.getAllRecipesByUserId(userId)
-
-        if (result is Response.Success) {
-            noOneRecipeList.postValue(result.data)
-        }
-        return noOneRecipeList
+        val recipes = convertRecipeResponse(result.data)
+        Log.d("Dashboard", "Get best rated recipe result $result")
+        return recipes
     }
 
-    override suspend fun getAllExpiringProducts(userId: Int): MutableLiveData<List<Product>?> {
+    override suspend fun getAllExpiringProducts(userId: Int): List<Product> {
         // get all products for current user
-        // TODO get expiring Products
-        val result = inventoryDataSource.getAllProductsInInventoryList(userId)
+        val result = inventoryDataSource.getAllExpiringProductsByUserId(userId)
+        Log.d("Dashboard", "Get expiring products $result")
+        //val products = filterByExpDate(tempList)
+        return convertExpiringProductList(result.data)
+    }
 
-        if (result is Response.Success) {
-            expiringProductList.postValue(result.data)
+    /*private fun filterByExpDate(productList: List<Product>?) : List<Product> {
+        val tempList= mutableListOf<Product>()
+        if(productList != null){
+            Log.d("Dashboard", "Filter products by expiration date.")
+            productList.forEach{ p->
+                val expDate = getTimeDiff(p.expirationDate)
+                if(expDate <= 3){
+                    tempList.add(p)
+                    tempList.sortedBy{expDate}
+                }
+            }
+        } else {
+            Log.d("Dashboard", "Productlist is null.")
         }
-        return expiringProductList
-    }
+        return tempList
+    }*/
 
-    override suspend fun getProductsAroundMe(usrId: Int): MutableLiveData<Map<Location, Product>?> {
-        // For future features
-        TODO("Not yet implemented")
-    }
+    /*//for further features: Future integration of a map to bring in social component
+    override suspend fun getProductsAroundMe(usrId: Int): Map<Location, Product>? {
+    }*/
 }

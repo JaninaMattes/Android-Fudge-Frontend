@@ -1,9 +1,5 @@
 package com.mobilesystems.feedme.ui.dashboard
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,12 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.databinding.DashboardFragmentBinding
 import com.mobilesystems.feedme.domain.model.User
@@ -31,16 +24,13 @@ class DashboardFragment : Fragment() {
     private var _binding: DashboardFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private val CHANNEL_ID = "Expiring_notification_channel"
-    private val NOTIFICATION_ID = 1
-
     // This property is only valid between onCreateView and onDestroyView.
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //inflate layout for the fragment
         _binding = DashboardFragmentBinding.inflate(inflater, container, false)
@@ -48,10 +38,8 @@ class DashboardFragment : Fragment() {
         val userProfileName: TextView = binding.dashboardUserProfileName
         val moreButtonOne: TextView = binding.dashboardMoreButtonOne
         val moreButtonTwo: TextView = binding.dashboardMoreButtonTwo
-        val pushButton: ExtendedFloatingActionButton = binding.btnPush
 
 
-        // TODO: Check if user is not logged in
         // Create the observer which updates the UI.
         val userObserver = Observer<User?> { user : User? ->
             if (user != null) {
@@ -76,11 +64,6 @@ class DashboardFragment : Fragment() {
             Log.d(TAG, "Show more is clicked.")
         }
 
-        //TODO set expiringdate to showNotification
-        pushButton.setOnClickListener{
-            showNotification()
-        }
-
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         sharedViewModel.loggedInUser.observe(viewLifecycleOwner, userObserver)
 
@@ -89,6 +72,7 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Add ingredient list as child fragment
 
         Log.d(TAG, "Called onViewCreated.")
@@ -100,9 +84,21 @@ class DashboardFragment : Fragment() {
         addChildFragment(R.id.expiring_products_list_fragment, productListFragment)
     }
 
+    override fun onCreate(savedInstance: Bundle?){
+        super.onCreate(savedInstance)
+        sharedViewModel.refresh()
+        Log.d(TAG, "On create called.")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "On pause called.")
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "Called onDestroyView.")
+        _binding = null
+        Log.d(TAG, "On destroy called.")
     }
 
     private fun addChildFragment(viewId: Int, childFragment: Fragment){
@@ -117,36 +113,6 @@ class DashboardFragment : Fragment() {
                 commit()
             }
         }
-    }
-
-    //push-notifikation für ablaufende Produkte
-    fun showNotification(){
-        // TODO: Daten abrufen aus der Expiring Liste und 3-5 aktuell ablaufende Produkte anzeigen
-        var context = activity?.applicationContext
-        var builder = context?.let {
-            NotificationCompat.Builder(it, CHANNEL_ID).apply{
-                setSmallIcon(R.drawable.ic_fridgeicon)
-                setContentTitle("Ablaufende Produkte im Inventar")
-                setContentText("Du hast ablaufende Produkte in Deinem Inventar!")
-                setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            }
-        }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val channelName = "Expiring_Channel"
-            val channelDescription = "ExpiringProduct_Channel for expiring products"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, channelName, importance).apply {
-                description = channelDescription
-            }
-            val notifyManager = activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notifyManager.createNotificationChannel(channel)
-        }
-
-        with(context?.let { NotificationManagerCompat.from(it) })
-        {
-            builder?.let { this?.notify(NOTIFICATION_ID, it.build() ) }
-        }
-
     }
 
     companion object {

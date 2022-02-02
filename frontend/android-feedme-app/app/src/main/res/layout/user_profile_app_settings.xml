@@ -11,7 +11,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_background"
-            android:padding="@dimen/large_text_margin"
+            android:padding="@dimen/small_text_margin"
             android:clickable="false"
             app:cardCornerRadius="@dimen/card_view_corner_radius"
             card_view:cardUseCompatPadding="true"

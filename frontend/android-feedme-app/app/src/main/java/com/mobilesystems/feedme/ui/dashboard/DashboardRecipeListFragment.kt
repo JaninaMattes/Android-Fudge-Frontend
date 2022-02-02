@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.DashboardNumberOneRecipesFragmentBinding
@@ -34,8 +34,8 @@ class DashboardRecipeListFragment: Fragment() {
             // pass data and navigate to product detail view
             Log.d(TAG, "Recipe ${recipe.recipeName} selected.")
             sharedViewModel.selectedRecipe(recipe)
-            val action = DashboardFragmentDirections.actionNavigationDashboardToRecipeFragment()
-            findNavController().navigate(action)
+            val action = DashboardFragmentDirections.actionNavigationDashboardToRecipeFragment(recipe)
+            Navigation.findNavController(itemView).navigate(action)
         }
     }
 
@@ -43,9 +43,8 @@ class DashboardRecipeListFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
-        // TODO use ViewBinding
         // Inflate layout for this fragment
         _binding = DashboardNumberOneRecipesFragmentBinding.inflate(inflater, container, false)
 
@@ -75,10 +74,15 @@ class DashboardRecipeListFragment: Fragment() {
         // update adapter after data is loaded
         sharedViewModel.noOneRecipesList.observe(viewLifecycleOwner, recipeListObserver)
     }
+    override fun onCreate(savedInstance: Bundle?){
+        super.onCreate(savedInstance)
+        Log.d(TAG, "On create called.")
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "Called onDestroyView.")
+        _binding = null
+        Log.d(TAG, "On destroy called.")
     }
 
     companion object {

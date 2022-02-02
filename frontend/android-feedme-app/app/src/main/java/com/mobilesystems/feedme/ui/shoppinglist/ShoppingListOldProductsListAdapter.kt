@@ -1,6 +1,5 @@
 package com.mobilesystems.feedme.ui.shoppinglist
 
-
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -10,38 +9,34 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.ShoppingListOldItemBinding
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.ui.shoppinglist.ShoppingListOldProductsListAdapter.ShoppingListOldProductsViewHolder
 
 class ShoppingListOldProductsListAdapter(
     private val context: Context?,
     private val dataSet: List<Product>?,
-    private val itemClickListener: ShoppingListOldProductsListAdapter.ProductAdapterClickListener
+    private val itemClickListener: ProductAdapterClickListener
 ) : RecyclerView.Adapter<ShoppingListOldProductsViewHolder>() {
 
+    //view binding
+    private var _itemBinding: ShoppingListOldItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
-    inner class ShoppingListOldProductsViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+    inner class ShoppingListOldProductsViewHolder(itemBinding: ShoppingListOldItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 
-        private var view: View = v
-
-        val cardView: CardView
-        val shoppingListColour: FrameLayout
-        val shoppingListIcon: ImageView
-        val shoppingListItemName: TextView
+        val cardView: CardView = itemBinding.cardViewOldShoppingListItem
+        val shoppingListColour: FrameLayout = itemBinding.frameLayoutOldShoppingListItemColour
+        val shoppingListIcon: ImageView = itemBinding.oldShoppingItemFoodIcon
+        val shoppingListItemName: TextView = itemBinding.oldShoppingListItemName
 
         init {
-            cardView = view.findViewById(R.id.card_view_old_shopping_list_item)
-            // bind views by view id
-            shoppingListColour = itemView.findViewById(R.id.frame_layout_old_shopping_list_item_colour)
-            shoppingListIcon= itemView.findViewById(R.id.old_shopping_item_food_icon)
-            shoppingListItemName = itemView.findViewById(R.id.old_shopping_list_item_name)
-
             // initialize clicklistener and pass clicked product for listitem position
             cardView.setOnClickListener{ v ->
                 if (dataSet != null) {
                     if(context != null) {
                         shoppingListColour.setBackgroundColor(
-                            ContextCompat.getColor(context, R.color.bright_red_200))
+                            ContextCompat.getColor(context, R.color.red_200))
                     }
                     itemClickListener.passData(dataSet[position], v)
                 }
@@ -56,9 +51,8 @@ class ShoppingListOldProductsListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShoppingListOldProductsViewHolder {
         // Create a view which defines the UI of the list item
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.shopping_list_old_item, parent, false)
-        return ShoppingListOldProductsViewHolder(itemView)
+        _itemBinding = ShoppingListOldItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ShoppingListOldProductsViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(shoppingListViewHolder: ShoppingListOldProductsViewHolder, position: Int) {

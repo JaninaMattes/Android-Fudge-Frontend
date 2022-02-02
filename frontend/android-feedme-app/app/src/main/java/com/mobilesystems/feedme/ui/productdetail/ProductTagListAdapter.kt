@@ -1,11 +1,11 @@
 package com.mobilesystems.feedme.ui.productdetail
 
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.ProductDetailTagItemBinding
 import com.mobilesystems.feedme.domain.model.Label
 
 class ProductTagListAdapter(
@@ -16,27 +16,28 @@ class ProductTagListAdapter(
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    inner class ProductTagViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        private var view: View = v
 
-        val productTagLabelTextView: TextView
+    //view binding
+    private var _itemBinding: ProductDetailTagItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
-        init{
-            productTagLabelTextView = view.findViewById(R.id.text_product_tag_label)
-        }
+    inner class ProductTagViewHolder(itemBinding: ProductDetailTagItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+
+        val productTagLabelTextView: TextView = itemBinding.textDietryTagLabel
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductTagViewHolder {
         // Create a view which defines the UI of the list item
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.product_detail_tag_item, parent, false)
-        return ProductTagViewHolder(itemView)
+        _itemBinding = ProductDetailTagItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ProductTagViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(tagViewHolder: ProductTagViewHolder, position: Int) {
         if (dataSet != null) {
             // get selected product
             val currentItem = dataSet[position]
+            Log.d("ProductTagAdapter", "Tag ${currentItem.label}")
             // pass values to view items
             tagViewHolder.productTagLabelTextView.text = currentItem.label
         }

@@ -1,49 +1,79 @@
 package com.mobilesystems.feedme.data.repository
 
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import com.mobilesystems.feedme.data.datasource.UserDataSourceImpl
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.User
-import com.mobilesystems.feedme.ui.common.utils.convertUserResponse
+import com.mobilesystems.feedme.ui.common.utils.*
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val dataSourceImpl: UserDataSourceImpl) : UserRepository {
-
-    // in-memory cache of the fetched objects
-    var currentLoggedInUser: MutableLiveData<User?> = MutableLiveData<User?>()
-        private set
-    var isUserLoggedIn: MutableLiveData<Boolean?> = MutableLiveData<Boolean?>()
-        private set
+    private val dataSourceImpl: UserDataSourceImpl)
+    : UserRepository {
 
     override suspend fun getLoggedInUser(userId: Int): User? {
         // get currently logged in user
         val result = dataSourceImpl.getUserById(userId)
         // convert userResponse object to user object
+        Log.d("User Repository", "Load user $result")
         val user = convertUserResponse(result.data)
-        currentLoggedInUser.postValue(user)
+        Log.d("User Repository", "Konvertierter User $user")
         return user
     }
 
     override suspend fun updateLoggedInUser(user: User) {
-        // get all products for current user
-        dataSourceImpl.updateUserById(user)
-        getLoggedInUser(user.userId.toInt())
-    }
-
-    override suspend fun persistUserProfile(user: User): Unit {
-        dataSourceImpl.updateUserById(user)
-    }
-
-    override suspend fun isUserLoggedIn(userId: Int): MutableLiveData<Boolean?> {
-        val result = dataSourceImpl.isUserLoggedIn(userId)
-
-        if (result.data != null) {
-            isUserLoggedIn.postValue(result.data)
+        val request = convertUpdateUserRequest(user)
+        if(request != null){
+            // update current user
+            val result = dataSourceImpl.updateUserById(request)
+            Log.d("User Repository", "Update user $result")
         }
-        return isUserLoggedIn
+    }
+
+    override suspend fun updateUserImage(userId: Int, image: Image): Int {
+        var result = 0
+        val request = convertUpdateImageRequest(userId, image)
+        if(request != null){
+            // update current user
+            Log.d("UserRepository", "Update image $image.")
+            val res = dataSourceImpl.updateUserImageById(request)
+            if(res.data != null) {
+                result = res.data.imageId
+            }
+            Log.d("User Repository", "Update user image $result")
+        }
+        return result
+    }
+
+    override suspend fun isUserLoggedIn(userId: Int): Boolean {
+        val result = dataSourceImpl.isUserLoggedIn(userId)
+        Log.d("User Repository", "Get is user logged in, $result")
+        return result.data ?: false
     }
 
     override suspend fun deleteUser(userId: Int) {
         dataSourceImpl.deleteUserById(userId)
+    }
+
+    override suspend fun allowPushNotification(userId: Int, allowSetting: Boolean){
+        val request = convertAllowSettingRequest(userId, allowSetting)
+        dataSourceImpl.allowPushNotification(request)
+    }
+
+    override suspend fun allowReminder(userId: Int, allowSetting: Boolean){
+        val request = convertAllowSettingRequest(userId, allowSetting)
+        dataSourceImpl.allowReminder(request)
+    }
+
+    override suspend fun allowSuggestion(userId: Int, allowSetting: Boolean){
+        val request = convertAllowSettingRequest(userId, allowSetting)
+        dataSourceImpl.allowSuggestion(request)
+    }
+
+    override suspend fun createDietryTag(user: User){
+        val request = convertUserDietryTagRequest(user)
+        if(request != null){
+            dataSourceImpl.createDietryTag(request)
+        }
     }
 }

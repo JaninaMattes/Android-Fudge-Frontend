@@ -6,8 +6,8 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class CurrentShoppingList(
     override val shoppingListId: Int,
-    override val shoppingListProducts: List<Product>? = null,
-) : ShoppingList(shoppingListId, shoppingListProducts), Parcelable{
+    override val shoppingList: List<Product>? = null,
+) : ShoppingList(shoppingListId, shoppingList), Parcelable{
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -16,19 +16,19 @@ data class CurrentShoppingList(
         other as CurrentShoppingList
 
         if (shoppingListId != other.shoppingListId) return false
-        if (shoppingListProducts != other.shoppingListProducts) return false
+        if (shoppingList != other.shoppingList) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = shoppingListId
-        result = 31 * result + (shoppingListProducts?.hashCode() ?: 0)
+        result = 31 * result + (shoppingList?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "CurrentShoppingList(shoppingListId=$shoppingListId, shoppingListProducts=$shoppingListProducts)"
+        return "CurrentShoppingList(shoppingListId=$shoppingListId, shoppingListProducts=$shoppingList)"
     }
 
 }

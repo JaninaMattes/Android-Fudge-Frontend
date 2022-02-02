@@ -1,9 +1,6 @@
 package com.mobilesystems.feedme.ui.search
 
-import android.app.SearchManager
-import android.content.Intent
 import android.os.Bundle
-import android.provider.SearchRecentSuggestions
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.databinding.FragmentSearchListBinding
-import com.mobilesystems.feedme.ui.inventorylist.InventoryListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 /**
  * A simple [Fragment] subclass.
@@ -41,7 +36,7 @@ class SearchListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         _binding = FragmentSearchListBinding.inflate(inflater, container, false)
 
@@ -53,6 +48,11 @@ class SearchListFragment : Fragment() {
         //searchRecyclerView.adapter = adapter
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

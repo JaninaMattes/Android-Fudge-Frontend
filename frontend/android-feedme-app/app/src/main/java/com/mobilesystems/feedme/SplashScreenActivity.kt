@@ -3,6 +3,7 @@ package com.mobilesystems.feedme
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.*
 
 /**
  * The purpose of a Splash Screen is to display a screen while the application
@@ -13,29 +14,28 @@ import androidx.appcompat.app.AppCompatActivity
 
 class SplashScreenActivity : AppCompatActivity() {
 
+    val activityScope = CoroutineScope(Dispatchers.Main)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val timer: Thread = object : Thread() {
-            override fun run() {
-                try {
-                    //Display for 3 seconds
-                    sleep(3000)
-                } catch (e: InterruptedException) {
-                    // TODO: handle exception
-                    e.printStackTrace()
-                } finally {
-                    val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
-                    startActivity(intent)
-                }
-            }
+        activityScope.launch {
+            // show splash screen for 3 seconds
+            delay(3000)
+
+            // load all data ...
+
+            // navigate to login
+            val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
         }
-        timer.start()
     }
+
 
     override fun onPause() {
         // Destroy splash screen, when it goes to main activity
         super.onPause()
-        finish()
+        activityScope.cancel()
     }
 }

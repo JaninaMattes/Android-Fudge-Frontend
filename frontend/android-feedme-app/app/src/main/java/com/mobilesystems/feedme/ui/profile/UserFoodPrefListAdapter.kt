@@ -1,48 +1,44 @@
 package com.mobilesystems.feedme.ui.profile
 
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.mobilesystems.feedme.R
+import com.mobilesystems.feedme.databinding.ProductDetailTagItemBinding
 import com.mobilesystems.feedme.domain.model.FoodType
 
 class UserFoodPrefListAdapter(private val dataSet: List<FoodType>?
 ) : RecyclerView.Adapter<UserFoodPrefListAdapter.UserTagListViewHolder>() {
 
-    private lateinit var imageUrl: String
-
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    inner class UserTagListViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
-        private var view: View = v
+    //view binding
+    private var _itemBinding: ProductDetailTagItemBinding? = null
+    private val itemBinding get() = _itemBinding!!
 
-        val cardView: CardView
-        val tagNameTextView: TextView
+    inner class UserTagListViewHolder(itemBinding: ProductDetailTagItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 
-        init {
-            // bind views by view id
-            cardView = view.findViewById(R.id.product_tag_card_view)
-            tagNameTextView = view.findViewWithTag(R.id.text_product_tag_label)
-        }
+        val cardView: CardView = itemBinding.dietryTagCardView
+        val tagNameTextView: TextView = itemBinding.textDietryTagLabel
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserTagListViewHolder {
         // Create a view which defines the UI of the list item
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.product_detail_tag_item, parent, false)
-        return UserTagListViewHolder(itemView)
+        _itemBinding = ProductDetailTagItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return UserTagListViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(userTagViewHolder: UserTagListViewHolder, position: Int) {
         if (dataSet != null) {
             // get selected product
             val currentItem = dataSet[position]
+            Log.d("FoodTypeAdapter", "FoodType ${currentItem.label}")
             // pass values to view items
             userTagViewHolder.tagNameTextView.text = currentItem.label
         }

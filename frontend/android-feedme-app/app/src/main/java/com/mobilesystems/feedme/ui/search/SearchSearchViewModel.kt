@@ -27,6 +27,7 @@ class SearchSearchViewModel@Inject constructor(
     private var _inventoryList = MutableLiveData<List<Product>?>()
     private var _searchResultRecipeList = MutableLiveData<List<Recipe>?>()
     private var _searchResultInventoryList = MutableLiveData<List<Product>?>()
+    private var _searchResult = MutableLiveData<List<Any>?>()
     private var _currentUser = MutableLiveData<Int?>()
 
     val recipeList : LiveData<List<Recipe>?>
@@ -40,6 +41,9 @@ class SearchSearchViewModel@Inject constructor(
 
     val searchResultInventoryList : LiveData<List<Product>?>
         get() = _searchResultInventoryList
+
+    val searchResult: LiveData<List<Any>?>
+        get() = _searchResult
 
     val currentUser : LiveData<Int?>
         get() = _currentUser
@@ -57,8 +61,7 @@ class SearchSearchViewModel@Inject constructor(
         viewModelScope.launch {
             val userId = currentUser.value
             if(userId != null) {
-                recipeRepository.loadAllRecipesBasedOnInventory(userId)
-                _recipeList = recipeRepository.recipeList
+                _recipeList.value = recipeRepository.loadAllRecipesBasedOnInventory(userId)
             }
         }
     }
@@ -68,20 +71,22 @@ class SearchSearchViewModel@Inject constructor(
         viewModelScope.launch {
             val userId = currentUser.value
             if(userId != null) {
-                inventoryRepository.loadInventoryListProducts(userId)
-                _inventoryList = inventoryRepository.inventoryList
+                _inventoryList.value = inventoryRepository.loadInventoryListProducts(userId)
             }
         }
     }
 
     override fun searchGlobal(searchText: String): LiveData<List<Any>?> {
-        TODO("Not yet implemented")
+        val tempProductList = searchProduct(searchText)
+        val tempRecipeList = searchRecipe(searchText)
+
+        return _searchResult
     }
 
     override fun searchProduct(searchText: String): LiveData<List<Product>?> {
         // Helper function search product
-        var result: List<Product>?
-        var tempList = inventoryList.value
+        val result: List<Product>?
+        val tempList = inventoryList.value
         if(tempList != null) {
             result = tempList.filter { it.productName == searchText }
             _searchResultInventoryList.value = result
@@ -91,8 +96,8 @@ class SearchSearchViewModel@Inject constructor(
 
     override fun searchRecipe(searchText: String): LiveData<List<Recipe>?> {
         // Helper functino search recipe
-        var result: List<Recipe>?
-        var tempList = recipeList.value
+        val result: List<Recipe>?
+        val tempList = recipeList.value
         if(tempList != null) {
             result = tempList.filter { it.recipeName == searchText }
             _searchResultRecipeList.value = result

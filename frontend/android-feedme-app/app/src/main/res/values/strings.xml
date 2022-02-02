@@ -22,7 +22,7 @@
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Dies ist kein valider Nutzername.</string>
+    <string name="invalid_username">Dies ist keine valide Email.</string>
     <string name="invalid_password">Das Passwort sollte >5 Charakter enthalten.</string>
     <string name="invalid_passwords">Passwörter stimmen nicht überein</string>
     <string name="login_failed">"Der Login ist fehlgeschlagen."</string>
@@ -189,5 +189,20 @@
     <string name="dummy_text_email">max.mustermann@test.com</string>
     <string name="dummy_text_lastname">Mustermann</string>
     <string name="dummy_text_firstname">Max</string>
+    <string name="add_product_image_text">Möchtest du ein Produktbild hinzufügen?</string>
+    <string name="dietry_tag_label">Label</string>
+    <string name="notificationTitle">Ablaufende Produkte im Inventar</string>
+    <string name="notificationText">Du hast ablaufende Produkte im Inventar!</string>
+    <string name="edit_text_error_productname_not_empty">Produktname darf nicht leer sein!</string>
+    <string name="edit_text_error_product_quantity_not_empty">Produktanzahl darf nicht leer sein!</string>
+    <string name="button_add_image_to_product">Bild Hinizufügen</string>
+    <string name="vegan_pizza">Vegan Pizza</string>
+    <string name="_1_piece">1 piece</string>
+    <string name="vegan">Vegan</string>
+    <string name="buddha_bowl">Buddha Bowl</string>
+    <string name="_4_5">4.5</string>
+    <string name="dropDownProductTypeText">Bitte wähle einen Produkttyp aus der Dropdownlist aus.</string>
+    <string name="Available">vorhanden</string>
+    <string name="NotAvailable">nicht vorhanden</string>
 
 </resources>

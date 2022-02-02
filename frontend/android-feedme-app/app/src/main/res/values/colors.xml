@@ -27,11 +27,11 @@
     <color name="zxing_result_view">@color/black</color>
     <color name="zxing_status_text">@color/white</color>
     <color name="zxing_transparent">@color/black</color>
-    <color name="zxing_viewfinder_mask">@color/colorAccent</color>
+    <color name="zxing_viewfinder_mask">@color/colorPrimary</color>
 
     <!-- Primary Colours -->
     <color name="colorPrimary">@color/theme_creme_50</color>
     <color name="colorPrimaryDark">@color/light_grey</color>
-    <color name="colorAccent">@color/green_200</color>
+    <color name="colorAccent">@color/red_200</color>
 
 </resources>

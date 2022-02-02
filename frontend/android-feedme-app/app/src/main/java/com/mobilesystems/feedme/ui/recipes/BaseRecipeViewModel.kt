@@ -1,6 +1,7 @@
 package com.mobilesystems.feedme.ui.recipes
 
 import androidx.lifecycle.LiveData
+import com.mobilesystems.feedme.data.response.IngredientResponse
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.domain.model.Recipe
 
@@ -17,6 +18,8 @@ interface BaseRecipeViewModel {
     fun loadMatchingRecipes()
 
     fun loadShoppingList()
+
+    fun saveCurrentShoppingState()
 
     fun exportUnavailableIngredientsToShoppingList()
 

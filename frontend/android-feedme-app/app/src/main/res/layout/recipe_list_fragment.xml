@@ -16,12 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp" >
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -41,33 +35,13 @@
                     android:id="@+id/recyclerview_recipe_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/medium_cardview_margin"
-                    android:layout_marginTop="@dimen/medium_cardview_margin"
-                    android:layout_marginEnd="@dimen/medium_cardview_margin"
-                    android:padding="@dimen/small_cardview_padding"
+                    android:padding="@dimen/large_cardview_padding"
                     tools:listitem="@layout/recipe_item">
                 </androidx.recyclerview.widget.RecyclerView>
 
             </LinearLayout>
 
-        <TextView
-            android:id="@+id/show_more_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:textStyle="bold"
-            android:textColor="@color/bright_grey"
-            android:textSize="@dimen/text_medium"
-            android:text="Weitere anzeigen"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/linear_layout_recipe_list_container"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </RelativeLayout>
 
     </ScrollView>
 

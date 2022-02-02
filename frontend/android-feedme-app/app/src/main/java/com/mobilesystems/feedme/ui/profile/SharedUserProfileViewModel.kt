@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.mobilesystems.feedme.data.repository.UserRepositoryImpl
 import com.mobilesystems.feedme.domain.model.FoodType
+import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.Settings
 import com.mobilesystems.feedme.domain.model.User
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
@@ -36,53 +37,76 @@ class SharedUserProfileViewModel @Inject constructor(
         get() = _currentUserId
 
     init {
-        Log.d("UserViewModel", "Loading all data.")
-        val context = getApplication<Application>().applicationContext
-        // pre-fetch user from sharedPreferences
-        getCurrentUserId(context)
+
+        if(currentUserId.value == null || currentUserId.value == 0){
+            val context = getApplication<Application>().applicationContext
+            // pre-fetch user from sharedPreferences
+            getCurrentUserId(context)
+        }
         // load user from backend
-        loadLoggedIndUser()
+        if(loggedInUser.value == null){
+            loadLoggedInUser()
+            loadLoggedInUserFoodTypeList()
+            Log.d("UserViewModel", "Loading all data.")
+        }
     }
 
-    override fun loadLoggedIndUser() {
+    override fun loadLoggedInUser() {
         viewModelScope.launch {
             // This is a coroutine scope with the lifecycle of the ViewModel
             val userId = currentUserId.value
-            if(userId != null) {
+            if(userId != null && userId != 0) {
                 val result = userRepository.getLoggedInUser(userId)
-                _loggedInUser.postValue(result)
-                Log.d("UserViewModel", "Loaded User Id ${loggedInUser.value?.userId}, " +
-                        "Name ${loggedInUser.value?.firstName}")
+                _loggedInUser.value = result
+                Log.d("UserViewModel", "Loaded User ${loggedInUser.value?.firstName} with Id ${loggedInUser.value?.userId}")
             }else{
-                Log.e("UserViewModel", "No user id found.")
-                // TODO: If not user, then log user out
+                Log.e("UserViewModel", "No user found.")
+                // TODO: If no user, then log user out
             }
         }
-        loadLoggedInUserFoodTypeList()
     }
 
     override fun updateLoggedInUser(user: User) {
         viewModelScope.launch {
             // Update user profile information
             userRepository.updateLoggedInUser(user)
-            _loggedInUser = userRepository.currentLoggedInUser
+            _loggedInUser.value = user
+            Log.d("UserViewModel", "Update user profile.")
+        }
+    }
+
+    override fun updateUserImage(image: Image) {
+        viewModelScope.launch {
+            // Update user profile information
+            val userId = currentUserId.value
+            if(userId != null && userId != 0){
+                userRepository.updateUserImage(userId, image)
+                Log.d("UserViewModel", "Update user image.")
+            }else{
+                Log.d("UserViewModel", "No user found.")
+            }
         }
     }
 
     override fun deleteLoggedInUser() {
         viewModelScope.launch {
             val userId = currentUserId.value
-            if(userId != null) {
+            if(userId != null && userId != 0) {
                 userRepository.deleteUser(userId)
+                _loggedInUser.value = null
+                Log.d("UserViewModel", "Delete user.")
+            }else{
+                Log.d("UserViewModel", "No user found.")
             }
         }
     }
 
     override fun loadLoggedInUserFoodTypeList(): LiveData<List<FoodType>?> {
         // Helper function
-        var tempUser = loggedInUser.value
+        val tempUser = loggedInUser.value
         if(tempUser != null) {
             _loggedInUserFoodTypeList.value = tempUser.dietaryPreferences
+            Log.e("UserViewModel", "Load dietary preferences ${tempUser.dietaryPreferences}.")
         }else{
             Log.d("UserViewModel", "User is null.")
         }
@@ -91,57 +115,49 @@ class SharedUserProfileViewModel @Inject constructor(
 
     override fun updateExpirationReminderSetting(remindMe: Boolean) {
         viewModelScope.launch {
-            var tempUser = loggedInUser.value
+            val tempUser = loggedInUser.value
             if (tempUser != null) {
-                var settings = Settings(
+                val settings = Settings(
                     remindMe,
                     tempUser.userSettings?.allowPushNotifications,
                     tempUser.userSettings?.suggestRecipes
                 )
                 tempUser.userSettings = settings
-                userRepository.updateLoggedInUser(tempUser)
-                _loggedInUser = userRepository.currentLoggedInUser
+                userRepository.allowReminder(tempUser.userId, remindMe)
+                Log.d("UserViewModel", "Update expiration reminder settings.")
             }
         }
     }
 
     override fun updatePushNotficicationsSetting(remindMe: Boolean) {
         viewModelScope.launch {
-            var tempUser = loggedInUser.value
+            val tempUser = loggedInUser.value
             if (tempUser != null) {
-                var settings = Settings(
+                val settings = Settings(
                     tempUser.userSettings?.reminderProductExp,
-                    remindMe, tempUser.userSettings?.suggestRecipes
+                    remindMe,
+                    tempUser.userSettings?.suggestRecipes
                 )
                 tempUser.userSettings = settings
-                userRepository.updateLoggedInUser(tempUser)
-                _loggedInUser = userRepository.currentLoggedInUser
+                userRepository.allowPushNotification(tempUser.userId, remindMe)
+                Log.d("UserViewModel", "Update push notification settings.")
             }
         }
     }
 
+    // Future feature to get recommendations for shoppinglist
     override fun updateRecommendShopplingListSetting(remindMe: Boolean) {
         viewModelScope.launch {
-            var tempUser = loggedInUser.value
+            val tempUser = loggedInUser.value
             if (tempUser != null) {
-                var settings = Settings(
+                val settings = Settings(
                     tempUser.userSettings?.reminderProductExp,
                     tempUser.userSettings?.allowPushNotifications,
                     remindMe
                 )
-                // TODO fix setter and getter for user
                 tempUser.userSettings = settings
-                userRepository.updateLoggedInUser(tempUser)
-                _loggedInUser = userRepository.currentLoggedInUser
-            }
-        }
-    }
-
-    override fun updateUserProfile() {
-        viewModelScope.launch {
-            val user = loggedInUser.value
-            if (user != null) {
-                userRepository.persistUserProfile(user)
+                userRepository.allowSuggestion(tempUser.userId, remindMe)
+                Log.d("UserViewModel", "Update recommend for shoppinglist settings.")
             }
         }
     }
