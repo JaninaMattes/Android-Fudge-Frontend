@@ -125,7 +125,7 @@
             android:backgroundTint="@color/salmon_red"
             android:layout_margin="@dimen/tiny_btn_margin"
             android:layout_gravity="bottom|center"
-            android:contentDescription="@string/neues_produkt_zum_inventar_hinzuf_gen"
+            android:contentDescription="@string/add_new_product_to_inventory"
             app:srcCompat="@drawable/ic_addproducts" />
     </FrameLayout>
 

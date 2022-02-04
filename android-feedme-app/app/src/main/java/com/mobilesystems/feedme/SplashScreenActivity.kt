@@ -13,11 +13,11 @@ import com.mobilesystems.feedme.ui.splash.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * The purpose of a Splash Screen is to display a screen while the application
+ * The purpose of the Splash Screen is to display a screen while the application
  * fetches the relevant content if any (from network calls/database).
  *
- * https://medium.com/geekculture/implementing-the-perfect-splash-screen-in-android-295de045a8dc
- * https://developer.android.com/guide/topics/ui/splash-screen
+ * Tutorials: https://medium.com/geekculture/implementing-the-perfect-splash-screen-in-android-295de045a8dc
+ *            https://developer.android.com/guide/topics/ui/splash-screen
  */
 
 @AndroidEntryPoint
@@ -45,13 +45,14 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private fun observeSplashLiveData() {
         splashViewModel.loadIsUserLoggedIn()
-        val loginObserver = Observer<Boolean?>{ isLoggedIn: Boolean? ->
-            if(isLoggedIn != null && isLoggedIn){
+
+        val loginObserver = Observer<Boolean?>{ isLoggedIn ->
+            if (isLoggedIn) {
                 // navigate to main
                 val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
                 startActivity(intent)
                 finish()
-            }else{
+            } else {
                 // navigate to login
                 val intent = Intent(this@SplashScreenActivity, LoginActivity::class.java)
                 startActivity(intent)

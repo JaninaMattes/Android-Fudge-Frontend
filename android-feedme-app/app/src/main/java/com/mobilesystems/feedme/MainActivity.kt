@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
     // Barcode Scanning with ZXing
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // This is important, otherwise the result will not be passed to the fragment
-        // TODO: Fix deprecated onActivtiyResult
         super.onActivityResult(requestCode, resultCode, data)
         Log.d("MainActivity", "onActivityResult is called.")
     }
@@ -103,16 +102,13 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener{
         searchView?.clearFocus()
         searchView?.setQuery("", false)
         searchItem?.collapseActionView()
-
-        // TODO Add global search for new query
         // This method can be used when a query is submitted eg. creating search history using SQLite DB
         Toast.makeText(this@MainActivity, "Looking for $query", Toast.LENGTH_SHORT).show()
         return true
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        // TODO Add global search for new query
-        //Filter for text in Fragment Adapter
+        // Filter for text
         // adapter.filter(query)
         return false
     }

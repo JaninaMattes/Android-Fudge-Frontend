@@ -45,4 +45,8 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="fragment_horizontal_margin">16dp</dimen>
     <dimen name="fragment_vertical_margin">16dp</dimen>
+    <dimen name="intermediate_text_margin">7dp</dimen>
+    <dimen name="button_export_ingredient">288dp</dimen>
+    <dimen name="button_export_ingredient_height">48dp</dimen>
+    <dimen name="button_text_elevation">16dp</dimen>
 </resources>

@@ -79,8 +79,10 @@ class SearchSearchViewModel@Inject constructor(
     override fun searchGlobal(searchText: String): LiveData<List<Any>?> {
         val tempProductList = searchProduct(searchText)
         val tempRecipeList = searchRecipe(searchText)
+        _searchResult.value = _searchResult.value?.plus(listOf(tempProductList))
+        _searchResult.value = _searchResult.value?.plus(listOf(tempRecipeList))
 
-        return _searchResult
+        return searchResult
     }
 
     override fun searchProduct(searchText: String): LiveData<List<Product>?> {

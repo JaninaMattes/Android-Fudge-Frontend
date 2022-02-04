@@ -47,7 +47,7 @@
                         android:layout_marginTop="@dimen/medium_text_margin"
                         android:layout_marginEnd="@dimen/tiny_text_margin"
                         android:layout_marginBottom="@dimen/small_text_margin"
-                        android:text="@string/greetings"
+                        android:text="@string/dashboard_greeting_user"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_extra_large"
                         android:textStyle="bold" />
@@ -60,7 +60,7 @@
                         android:layout_marginTop="@dimen/medium_text_margin"
                         android:layout_marginEnd="@dimen/small_text_margin"
                         android:layout_marginBottom="@dimen/small_text_margin"
-                        android:text="@string/user_name"
+                        android:text="@string/dashboard_user_name"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_extra_large"
                         android:textStyle="bold" />
@@ -178,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/extra_large_text_margin"
                     android:layout_marginEnd="8dp"
-                    android:text="@string/aktuelle_rezeptvorschl_ge"
+                    android:text="@string/best_voted_recipes"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textSize="@dimen/text_large"
                     app:layout_constraintEnd_toEndOf="@+id/expiring_products_list_title"

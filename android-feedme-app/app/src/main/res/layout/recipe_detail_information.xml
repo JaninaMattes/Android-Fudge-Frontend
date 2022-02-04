@@ -8,13 +8,14 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/recipe_card_view_rating"
-            android:layout_width="123dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/small_text_margin"
             android:layout_marginStart="@dimen/small_text_margin"
             android:layout_marginEnd="@dimen/small_text_margin"
             android:background="@drawable/custom_background_round_corners"
             android:clickable="false"
+            android:foregroundGravity="center"
             app:cardCornerRadius="@dimen/card_view_corner_radius"
             card_view:cardUseCompatPadding="true"
             card_view:cardElevation="@dimen/medium_card_elevation"
@@ -57,11 +58,12 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/recipe_card_view_nutrition"
-            android:layout_width="123dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/small_text_margin"
             android:background="@drawable/custom_background_round_corners"
             android:clickable="true"
+            android:foregroundGravity="center"
             app:cardCornerRadius="@dimen/card_view_corner_radius"
             card_view:cardUseCompatPadding="true"
             card_view:cardElevation="@dimen/medium_card_elevation"
@@ -104,10 +106,11 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/recipe_card_view_cooking_time"
-            android:layout_width="123dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_background_round_corners"
             android:clickable="false"
+            android:foregroundGravity="center"
             app:cardCornerRadius="@dimen/card_view_corner_radius"
             card_view:cardUseCompatPadding="true"
             card_view:cardElevation="@dimen/medium_card_elevation"

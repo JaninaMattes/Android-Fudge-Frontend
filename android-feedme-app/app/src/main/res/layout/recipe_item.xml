@@ -83,7 +83,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
                             android:layout_marginEnd="7dp"
-                            android:text="@string/_4_5"
+                            android:text="@string/inventory_product_rating_amount"
                             android:textColor="@color/black"
                             android:textSize="13sp"
                             android:textStyle="normal" />

@@ -11,6 +11,7 @@ import com.mobilesystems.feedme.data.repository.RecipeRepositoryImpl
 import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.domain.model.Recipe
 import com.mobilesystems.feedme.domain.model.User
+import com.mobilesystems.feedme.ui.common.utils.containsSubstring
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -214,7 +215,6 @@ class SharedRecipesViewModel @Inject constructor(
             val userId = currentUserId.value
             if(userId != null) {
                 _shoppingList.value = recipeRepository.loadCurrentShoppingListProducts(userId)
-                Log.d("ShoppinglistfehlerloadShoppinglistnachexport", _shoppingList.value.toString())
             }
         }
     }
@@ -254,6 +254,18 @@ class SharedRecipesViewModel @Inject constructor(
         }
     }
 
+    fun isProductAvailable(productList: List<Product>?, product: Product): Boolean {
+        var available = false
+        viewModelScope.launch {
+            if (productList != null) {
+                if (containsSubstring(productList, product)) {
+                    available = true
+                }
+            }
+        }
+        return available
+    }
+
     private fun recipeListHasNoValues(): Boolean{
         return _recipeList.value.isNullOrEmpty()
     }
@@ -266,24 +278,13 @@ class SharedRecipesViewModel @Inject constructor(
         return _shoppingList.value.isNullOrEmpty()
     }
 
-    private fun isProductAvailable(product: Product): Boolean {
-        val tempList = inventoryList.value
-        var available = false
-        if(tempList != null){
-            if(tempList.any { it.productName == product.productName }){
-                available = true
-            }
-        }
-        return available
-    }
-
     private fun filterAvailableAndUnavailableIngredients(){
         val tempListAvailable = arrayListOf<Product>()
         val tempListUnAvailable = arrayListOf<Product>()
         val ingList = selectedRecipeIngredients.value
 
         ingList?.forEach {
-            if (isProductAvailable(it)) {
+            if (isProductAvailable(inventoryList.value, it)) {
                 tempListAvailable.add(it)
             } else {
                 tempListUnAvailable.add(it)
