@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:layout_constraintEnd_toEndOf="@+id/password"
-        android:text="Passwort vergessen?"
+        android:text="@string/profile_forgot_password"
         app:layout_constraintTop_toBottomOf="@+id/password"
         android:layout_marginTop="16dp"/>
 
@@ -93,7 +93,7 @@
         app:layout_constraintEnd_toEndOf="@+id/password"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:text="Login"
+        android:text="@string/profile_login"
         app:layout_constraintTop_toBottomOf="@+id/forgotPassword"
         android:layout_marginTop="24dp"/>
 

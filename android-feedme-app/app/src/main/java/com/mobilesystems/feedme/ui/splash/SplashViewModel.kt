@@ -2,6 +2,7 @@ package com.mobilesystems.feedme.ui.splash
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -41,6 +42,8 @@ class SplashViewModel @Inject constructor(
             if(userId != null && userId != 0) {
                 val result = loginRepository.isUserLoggedIn(userId)
                 _isUserLoggedInResult.value = result
+            }else{
+                _isUserLoggedInResult.value = false
             }
         }
     }

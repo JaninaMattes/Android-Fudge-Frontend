@@ -70,7 +70,7 @@
                 android:layout_marginLeft="@dimen/small_text_margin"
                 android:layout_marginRight="@dimen/small_text_margin"
                 android:layout_marginBottom="@dimen/small_text_margin"
-                android:textColor="@color/salmon_red"
+                android:textColor="@color/red_200"
                 android:textSize="@dimen/text_medium"
                 android:gravity="center_horizontal"
                 android:text="@string/expiration_dummy_value"/>

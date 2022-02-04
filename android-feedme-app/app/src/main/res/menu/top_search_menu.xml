@@ -2,12 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.mobilesystems.feedme.MainActivity">
+    tools:context="com.mobilesystems.feedme.MainActivity"
+    android:iconTint="@color/white">
 
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_24"
         android:title="@string/search"
+        android:iconTint="@color/white"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:contentDescription="@string/content_description_search"
         app:showAsAction="always|collapseActionView" />
@@ -15,6 +17,7 @@
     <item
         android:id="@+id/user_profile"
         android:icon="@drawable/ic_baseline_person_24"
+        android:iconTint="@color/white"
         android:title="@string/user_profile"
         android:contentDescription="@string/content_description_user_profile"
         app:showAsAction="ifRoom" />
@@ -35,7 +38,7 @@
 
     <item
         android:id="@+id/more"
-        android:title="@string/more"
+        android:title="@string/dashboard_show_more"
         android:contentDescription="@string/content_description_more"
         app:showAsAction="never" />
 

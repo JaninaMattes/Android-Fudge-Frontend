@@ -45,6 +45,7 @@ class RecipeIngredientListFragment : Fragment() {
         ingredientRecyclerView = binding.recyclerviewIngredientList
         linearLayoutManager = LinearLayoutManager(context)
         ingredientRecyclerView.layoutManager = linearLayoutManager
+        ingredientRecyclerView.isNestedScrollingEnabled = false // no scrolling of list
         ingredientRecyclerView.setHasFixedSize(true)
 
         return binding.root

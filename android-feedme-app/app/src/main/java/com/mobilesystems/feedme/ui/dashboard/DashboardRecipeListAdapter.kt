@@ -77,7 +77,12 @@ class DashboardRecipeListAdapter (
             recipeViewHolder.recipeCookingDifficulty.text = currentItem.difficulty
             recipeViewHolder.recipeRatingBar.rating = currentItem.cummulativeRating
             recipeViewHolder.recipeNameTextView.text = currentItem.recipeName
-            recipeViewHolder.recipeTypeLabelTextView.text = currentItem.recipeLabel
+
+            var recipeLabel = ""
+            if(currentItem.recipeLabel.trim().length <= 20){
+                recipeLabel = currentItem.recipeLabel
+            }
+            recipeViewHolder.recipeTypeLabelTextView.text = recipeLabel
         }
     }
 

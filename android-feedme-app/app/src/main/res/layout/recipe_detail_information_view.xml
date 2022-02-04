@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
+    android:layout_gravity="fill_vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools">
 
@@ -19,10 +19,7 @@
             android:id="@+id/ingredient_list_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/medium_cardview_margin"
-            android:layout_marginEnd="@dimen/medium_cardview_margin"
-            android:layout_marginBottom="@dimen/tiny_cardview_margin"
-            android:layout_marginTop="@dimen/small_cardview_margin"
+            android:layout_marginBottom="@dimen/medium_cardview_margin"
             android:background="@drawable/custom_background_round_corners"
             android:clickable="false"
             app:cardCornerRadius="@dimen/card_view_corner_radius"
@@ -44,29 +41,26 @@
                     android:textColor="@color/black"
                     android:layout_marginTop="@dimen/large_text_margin"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginBottom="@dimen/small_text_margin"
+                    android:layout_marginBottom="@dimen/medium_text_margin"
                     android:layout_marginEnd="@dimen/super_large_text_margin"
-                    android:textSize="@dimen/text_large"
+                    android:textSize="@dimen/text_medium"
                     android:textStyle="bold"
                     android:text="@string/needed_ingredients_title"/>
 
                 <!-- IngredientList Child Fragment -->
+
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/ingredient_list_fragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/small_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
+                    android:layout_marginEnd="@dimen/small_text_margin">
                 </androidx.fragment.app.FragmentContainerView>
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
-
-        <RelativeLayout
-            android:id="@+id/relative_layout_content_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="@dimen/small_text_margin"/>
 
         <!-- Recipe Preparation Instruction -->
 
@@ -74,10 +68,8 @@
             android:id="@+id/preparation_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/medium_cardview_margin"
-            android:layout_marginEnd="@dimen/medium_cardview_margin"
-            android:layout_marginBottom="@dimen/small_cardview_margin"
-            android:layout_marginTop="@dimen/tiny_cardview_margin"
+            android:layout_marginBottom="@dimen/medium_cardview_margin"
+            android:layout_marginTop="@dimen/medium_cardview_margin"
             android:background="@drawable/custom_background_round_corners"
             android:clickable="false"
             app:cardCornerRadius="@dimen/card_view_corner_radius"
@@ -99,9 +91,9 @@
                     android:textColor="@color/black"
                     android:layout_marginTop="@dimen/large_text_margin"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginBottom="@dimen/small_text_margin"
+                    android:layout_marginBottom="@dimen/medium_text_margin"
                     android:layout_marginEnd="@dimen/super_large_text_margin"
-                    android:textSize="@dimen/text_large"
+                    android:textSize="@dimen/text_medium"
                     android:textStyle="bold"
                     android:text="@string/cooking_instructions"/>
 
@@ -111,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginBottom="@dimen/super_large_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
                     android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:textSize="@dimen/text_small"
                     android:textStyle="normal"
@@ -130,14 +122,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/preparation_card_view">
 
-
             <TextView
                 android:id="@+id/text_recipe_detail_rating_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="7dp"
-                android:text="@string/rate_recipe"
+                android:layout_marginEnd="@dimen/intermediate_text_margin"
+                android:text="@string/recipe_detail_rating"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_small"
                 android:textStyle="normal" />
@@ -146,8 +136,7 @@
                 android:id="@+id/text_recipe_detail_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="7dp"
+                android:layout_marginEnd="@dimen/intermediate_text_margin"
                 android:text="@string/rating_value"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_small"
@@ -157,11 +146,29 @@
                 android:id="@+id/recipe_detail_rating_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginEnd="@dimen/medium_text_margin"
                 android:stepSize="0.5"
                 style="?android:attr/ratingBarStyleSmall"
                 android:theme="@style/Widget.AppCompat.RatingBar"
                 android:numStars="5"/>
+
+            <TextView
+                android:id="@+id/text_recipe_detail_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/intermediate_text_margin"
+                android:text="102"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_small"
+                android:textStyle="normal" />
+
+            <ImageView
+                android:id="@+id/recipe_person_icon"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_baseline_person_24"/>
 
         </LinearLayout>
 

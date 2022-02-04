@@ -10,7 +10,10 @@ import androidx.core.content.ContextCompat
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.databinding.RecipeIngredientItemBinding
 import com.mobilesystems.feedme.domain.model.Product
+import com.mobilesystems.feedme.ui.common.utils.capitalizeWords
+import com.mobilesystems.feedme.ui.common.utils.containsSubstring
 import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
+import java.util.*
 
 /**
  * Tutorial: https://developer.android.com/guide/topics/ui/layout/recyclerview
@@ -22,21 +25,18 @@ class RecipeIngredientListAdapter(
     private val dataSet: List<Product>?
 ) : RecyclerView.Adapter<RecipeIngredientListAdapter.IngredientViewHolder>() {
 
-    /**
-     * Provide a reference to the type of views that you are using
-     * (custom ViewHolder).
-     */
-
     private var _itemBinding: RecipeIngredientItemBinding? = null
     private val itemBinding get() = _itemBinding!!
 
+    /**
+     * Provide a reference to the type of views that are used
+     * (custom ViewHolder).
+     */
     inner class IngredientViewHolder(itemBinding: RecipeIngredientItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
-
         val ingredientNameTextView: TextView = itemBinding.textIngredientName
         val ingredientQuantityTextView: TextView = itemBinding.textIngredientQuantity
         val ingredientAvailableIcon: ImageView = itemBinding.ingredientAvailableIcon
         val ingredientAvailableTextView: TextView = itemBinding.textIngredientAvailability
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IngredientViewHolder {
@@ -50,7 +50,7 @@ class RecipeIngredientListAdapter(
         if (dataSet != null) {
             // get selected product
             val currentItem = dataSet[position]
-            if(sharedViewModel.availableIngredients.value?.contains(currentItem) == true){
+            if(sharedViewModel.isProductAvailable(sharedViewModel.availableIngredients.value, currentItem)){
                 val color = ContextCompat.getColor(context, R.color.red_200)
                 viewHolder.ingredientAvailableIcon.setImageResource(R.mipmap.ic_available_icon)
                 viewHolder.ingredientAvailableIcon.visibility = ImageView.VISIBLE
@@ -65,13 +65,10 @@ class RecipeIngredientListAdapter(
             // pass values to view items
             viewHolder.ingredientNameTextView.text = currentItem.productName
             viewHolder.ingredientQuantityTextView.text = currentItem.quantity
-
-            // TODO define availablilty and exchange icons + colour
         }
     }
 
     override fun getItemCount(): Int {
         return dataSet?.size ?: 0
     }
-
 }

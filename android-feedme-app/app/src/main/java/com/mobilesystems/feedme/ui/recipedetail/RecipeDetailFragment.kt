@@ -49,6 +49,7 @@ class RecipeDetailFragment : Fragment() {
         val recipeNameTextView: TextView = rootView.findViewById(R.id.text_recipe_name)
         val recipeSubtitleTextView: TextView = rootView.findViewById(R.id.text_recipe_subtitle)
         val recipeCardRating: TextView = rootView.findViewById(R.id.text_recipe_card_rating)
+        val recipeRatingAmount: TextView = rootView.findViewById(R.id.text_recipe_detail_amount)
         val recipeCardNutritionTextView: TextView = rootView.findViewById(R.id.text_recipe_card_nutrition)
         val recipeCardCookingTime: TextView = rootView.findViewById(R.id.text_recipe_card_cooking_time)
 
@@ -74,31 +75,9 @@ class RecipeDetailFragment : Fragment() {
         recipePreparationTextView.text = recipe.instructions
         recipeRatingTextView.text = "${recipe.cummulativeRating}"
         recipeRatingBar.rating = recipe.cummulativeRating
+        recipeRatingAmount.text = "${recipe.amountOfRatings}"
 
         sharedViewModel.selectedRecipe(recipe)
-
-        /*
-        // Create the observer which updates the UI.
-        val productObserver = Observer<Recipe?> { recipe : Recipe? ->
-            if (recipe != null) {
-                // retrieve id
-                recipeId = recipe.recipeId
-                recipeImg = recipe.imageUrl
-                // use picasso to locally store image
-                Picasso.get().load(recipeImg).into(recipeImageview)
-                recipeNameTextView.text = recipe.recipeName
-                recipeSubtitleTextView.text = recipe.recipeLabel
-                recipeCardNutritionTextView.text = recipe.recipeNutrition
-                recipeCardCookingTime.text = recipe.cookingTime
-                recipeCardRating.text = "${recipe.rating}"
-                recipePreparationTextView.text = recipe.instruction
-                recipeRatingTextView.text = "${recipe.rating}"
-                recipeRatingBar.rating = recipe.rating
-            }
-        }
-
-        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
-        sharedViewModel.selectedRecipe.observe(viewLifecycleOwner, productObserver)*/
 
         buttonExport.setOnClickListener{
             val unavIng = sharedViewModel.notAvailableIngredients

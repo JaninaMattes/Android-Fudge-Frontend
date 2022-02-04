@@ -100,7 +100,7 @@
                         android:layout_marginStart="@dimen/small_text_margin"
                         android:layout_marginEnd="@dimen/small_text_margin"
                         android:layout_gravity="center|start"
-                        android:text="@string/pushbenachrichtigungen_erlauben"
+                        android:text="@string/allow_pushNotifications"
                         android:textSize="@dimen/text_small"
                         android:textStyle="normal"
                         android:textColor="@color/black"/>
