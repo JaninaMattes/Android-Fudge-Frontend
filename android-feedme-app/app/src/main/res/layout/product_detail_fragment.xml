@@ -11,8 +11,8 @@
 
    <ScrollView
        android:id="@+id/user_profile_scroll_view"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
        android:fillViewport="true"
        app:layout_constraintEnd_toEndOf="parent"
        app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
             <ImageView
                 android:id="@+id/product_detail_image"
                 android:layout_width="match_parent"
-                android:layout_height="155dp"
+                android:layout_height="@dimen/product_image_height"
                 android:scaleType="centerCrop"
                 android:src="@drawable/pizza"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -38,14 +38,12 @@
 
             <LinearLayout
                 android:id="@+id/linear_layout_product_container"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/extra_large_text_margin"
                 android:layout_marginTop="@dimen/large_text_margin"
-                android:layout_marginEnd="@dimen/large_text_margin"
-                android:layout_marginBottom="@dimen/tiny_text_margin"
-                android:gravity="center"
-                android:orientation="vertical"
+                android:layout_marginStart="@dimen/super_large_text_margin"
+                android:layout_marginEnd="@dimen/super_large_text_margin"
+                android:gravity="center_horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/product_detail_image">
@@ -56,6 +54,7 @@
                    android:layout_height="wrap_content"
                    android:layout_marginBottom="@dimen/large_text_margin"
                    android:text="Vegane Italienische Pizza"
+                   android:fontFamily="@font/roboto_bold"
                    android:textColor="@color/black"
                    android:textSize="@dimen/text_large"
                    android:textStyle="bold" />
@@ -90,9 +89,9 @@
                 android:id="@+id/product_details_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/large_text_margin"
-                android:layout_marginTop="@dimen/large_text_margin"
-                android:layout_marginEnd="@dimen/large_text_margin"
+                android:layout_marginTop="@dimen/medium_text_margin"
+                android:layout_marginStart="@dimen/super_large_text_margin"
+                android:layout_marginEnd="@dimen/super_large_text_margin"
                 android:layout_marginBottom="@dimen/large_text_margin"
                 android:background="@drawable/custom_background"
                 android:padding="@dimen/large_text_margin"
@@ -108,9 +107,9 @@
                    android:layout_height="wrap_content"
                    android:layout_gravity="center_horizontal"
                    android:orientation="vertical"
-                   android:paddingLeft="25dp"
-                   android:paddingTop="10dp"
-                   android:paddingBottom="10dp">
+                   android:layout_marginStart="@dimen/extra_large_text_margin"
+                   android:layout_marginTop="@dimen/extra_large_text_margin"
+                   android:layout_marginBottom="@dimen/small_text_margin">
 
                   <TextView
                       android:id="@+id/title_product_details"

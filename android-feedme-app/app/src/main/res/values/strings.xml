@@ -132,7 +132,7 @@
     <string name="recipe_ingredient_text">Frischer Bienenhonig</string>
     <string name="recipe_ingredient_amount">5 Teelöffel</string>
     <string name="recipe_ingredient_available">vorhanden</string>
-    <string name="button_share_ingredients">Zutaten Exportieren</string>
+    <string name="button_share_ingredients">Zutaten zu Einkaufsliste hinzufügen</string>
     <string name="add_to_shoppinglist_title">Möchtest Du fehlende Zutaten deiner Einkaufsliste hinzufügen?</string>
     <string name="Available">vorhanden</string>
     <string name="NotAvailable">nicht vorhanden</string>
@@ -238,4 +238,7 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="profile_login">Login</string>
+    <string name="profile_forgot_password">Passwort vergessen?</string>
+    <string name="dashboard_recipe_simple">einfach</string>
 </resources>

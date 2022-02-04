@@ -8,18 +8,21 @@
     android:background="@drawable/bg_gradient"
     tools:context=".ui.inventorylist.InventoryListFragment">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/inventory_list_scroll_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
+        android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -39,7 +42,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview_inventory_list"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:padding="@dimen/large_cardview_padding"
                     tools:listitem="@layout/inventory_item">
                 </androidx.recyclerview.widget.RecyclerView>
@@ -50,17 +53,17 @@
 
         </RelativeLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <FrameLayout
         android:id="@+id/container_for_floating_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_marginTop="14dp"
+        android:layout_marginBottom="@dimen/super_duper_large_button_margin"
         android:layout_marginEnd="@dimen/super_large_text_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/button_inventory_add_product"
@@ -68,7 +71,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="bottom|center"
             android:layout_margin="@dimen/tiny_btn_margin"
-            android:backgroundTint="@color/salmon_red"
+            android:backgroundTint="@color/colorAccent"
             android:contentDescription="@string/create_new_product"
             app:srcCompat="@drawable/ic_addproducts" />
 

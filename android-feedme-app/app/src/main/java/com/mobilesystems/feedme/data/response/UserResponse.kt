@@ -1,8 +1,5 @@
 package com.mobilesystems.feedme.data.response
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-
 /**
  * Map response jsonObject to UserResponse data class.
  */

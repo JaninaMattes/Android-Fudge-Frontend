@@ -8,34 +8,38 @@
     android:background="@drawable/bg_gradient"
     tools:context=".ui.dashboard.DashboardFragment">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/user_profile_scroll_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <!-- User Greeting -->
+
                 <LinearLayout
                     android:id="@+id/dashboard_user_title_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/small_text_margin"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="@dimen/small_text_margin"
+                    android:layout_marginStart="@dimen/extra_large_text_margin"
+                    android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginEnd="@dimen/extra_large_text_margin"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -50,6 +54,7 @@
                         android:text="@string/dashboard_greeting_user"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_extra_large"
+                        android:fontFamily="@font/roboto_bold"
                         android:textStyle="bold" />
 
                     <TextView
@@ -63,9 +68,27 @@
                         android:text="@string/dashboard_user_name"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_extra_large"
+                        android:fontFamily="@font/roboto_bold"
                         android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <!-- Expiring Products Overview -->
+
+                <TextView
+                    android:id="@+id/expiring_products_list_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginStart="@dimen/extra_large_text_margin"
+                    android:text="@string/expiring_product_list_title"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="@dimen/text_large"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintTop_toBottomOf="@+id/dashboard_user_title_container"
+                    app:layout_constraintBottom_toTopOf="@+id/more_button_container_one"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <LinearLayout
                     android:id="@+id/more_button_container_one"
@@ -73,9 +96,10 @@
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="@+id/expiring_products_list_title"
-                    app:layout_constraintStart_toStartOf="@+id/expiring_products_list_title"
-                    app:layout_constraintTop_toBottomOf="@+id/expiring_products_list_title">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/expiring_products_list_title"
+                    app:layout_constraintBottom_toTopOf="@+id/expiring_product_container">
 
                     <TextView
                         android:id="@+id/dashboard_more_button_one"
@@ -99,8 +123,8 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="@dimen/small_cardview_margin"
                     android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="@+id/more_button_container_one"
-                    app:layout_constraintStart_toStartOf="@+id/more_button_container_one"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/more_button_container_one">
 
                     <!-- IngredientList Child Fragment -->
@@ -113,15 +137,33 @@
 
                 </LinearLayout>
 
+                <!-- Current No One Recipes -->
+
+                <TextView
+                    android:id="@+id/current_recipe_suggestions_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/extra_large_text_margin"
+                    android:layout_marginStart="@dimen/extra_large_text_margin"
+                    android:text="@string/best_voted_recipes"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textSize="@dimen/text_large"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/expiring_product_container"
+                    app:layout_constraintBottom_toTopOf="@id/more_button_container_two"/>
+
                 <LinearLayout
                     android:id="@+id/more_button_container_two"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="@+id/expiring_product_container"
-                    app:layout_constraintStart_toStartOf="@+id/expiring_product_container"
-                    app:layout_constraintTop_toBottomOf="@+id/current_recipe_suggestions_title">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/current_recipe_suggestions_title"
+                    app:layout_constraintBottom_toTopOf="@+id/no_one_recipe_fragment_container">
 
                     <TextView
                         android:id="@+id/dashboard_more_button_two"
@@ -138,15 +180,14 @@
 
                 </LinearLayout>
 
-
                 <LinearLayout
-                    android:id="@+id/recipe_detail_fragment_container"
+                    android:id="@+id/no_one_recipe_fragment_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/tiny_text_margin"
                     android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="@+id/expiring_product_container"
-                    app:layout_constraintStart_toStartOf="@+id/expiring_product_container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/more_button_container_two">
 
                     <!-- Number Once Recipes Child Fragment -->
@@ -159,37 +200,10 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/expiring_products_list_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/extra_large_text_margin"
-                    android:text="@string/expiring_product_list_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="@dimen/text_large"
-                    app:layout_constraintEnd_toEndOf="@+id/dashboard_user_title_container"
-                    app:layout_constraintHorizontal_bias="0.051"
-                    app:layout_constraintStart_toStartOf="@+id/dashboard_user_title_container"
-                    app:layout_constraintTop_toBottomOf="@id/dashboard_user_title_container" />
-
-                <TextView
-                    android:id="@+id/current_recipe_suggestions_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/extra_large_text_margin"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/best_voted_recipes"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="@dimen/text_large"
-                    app:layout_constraintEnd_toEndOf="@+id/expiring_products_list_title"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@+id/expiring_products_list_title"
-                    app:layout_constraintTop_toBottomOf="@id/expiring_product_container" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </RelativeLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
