@@ -119,7 +119,7 @@
                 <LinearLayout
                     android:id="@+id/expiring_product_container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="155dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="@dimen/large_text_margin"
                     android:layout_marginBottom="@dimen/large_text_margin"

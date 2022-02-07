@@ -122,16 +122,14 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             // code for crop image
             i.putExtra("crop", "true")
-            i.putExtra("aspectX", 100)
-            i.putExtra("aspectY", 100)
-            i.putExtra("outputX", 256)
-            i.putExtra("outputY", 356)
+            i.putExtra("aspectX", 80)
+            i.putExtra("aspectY", 80)
+            i.putExtra("outputX", 156)
+            i.putExtra("outputY", 256)
 
             try {
                 i.putExtra("return-data", true)
                 startActivityForResult(Intent.createChooser(i, "Select Picture"), IMAGE_REQUEST_CODE)
-                val context = activity?.applicationContext
-                Toast.makeText(context,"Image is loaded!", Toast.LENGTH_LONG).show()
             } catch (ex: ActivityNotFoundException) {
                 ex.printStackTrace()
                 val context = activity?.applicationContext
@@ -166,7 +164,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
                 if(productLabel.isNotEmpty()) {
                     newLabel = Label.from(productLabel)
                     if (newLabel != null) {
-                        productLabelList.add(newLabel)
+                        // productLabelList.add(newLabel)
                         if(productExpirationDate.isEmpty()){
                             // calculate expiration
                             productExpirationDate = calculateExpDate(newLabel)
@@ -321,6 +319,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             if(uri != null) {
                 val inputStream: InputStream? = activity?.contentResolver?.openInputStream(uri)
                 newProductImage = BitmapFactory.decodeStream(inputStream)
+                Toast.makeText(context,"Picture is loaded!", Toast.LENGTH_SHORT).show()
             } else {
                 Log.d(TAG, "URI is null.")
             }

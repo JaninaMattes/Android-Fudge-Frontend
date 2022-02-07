@@ -181,6 +181,7 @@ class SharedShoppingListViewModel @Inject constructor(
                     Log.d("Shoppinglist", "Error occured $e")
                     e.stackTrace
                 }
+                loadAllCurrentShoppingListProducts()
             }
         }
     }
