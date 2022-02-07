@@ -20,6 +20,9 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * SharedViewModel to propagate shared Data between Fragments.
+ */
 @HiltViewModel
 class SharedDashboardViewModel @Inject constructor(
     androidApplication : Application,
@@ -146,13 +149,6 @@ class SharedDashboardViewModel @Inject constructor(
                 Log.d("Update Login", "User $userId")
             }
         }
-    }
-
-    fun refresh(){
-        loadLoggedInUser()
-        loadExpiringProducts()
-        loadNumberOneRecipes()
-        updateLogin()
     }
 
     private fun productsHasNoValues(): Boolean{

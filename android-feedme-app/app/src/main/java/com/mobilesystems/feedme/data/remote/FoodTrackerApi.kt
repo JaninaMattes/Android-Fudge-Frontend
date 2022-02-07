@@ -20,7 +20,6 @@ import retrofit2.http.*
  *
  * @author Janina Mattes, Patricia Maier
  */
-
 interface FoodTrackerApi {
 
     /******************************************
@@ -106,7 +105,7 @@ interface FoodTrackerApi {
     @PUT("/api/products/all/update")
     suspend fun updateInventoryList(@Body request: InventoryListRequest) : Response<Int>
 
-    @DELETE("/api/products/delete")
+    @HTTP(method = "DELETE", path = "/api/products/delete", hasBody = true)
     suspend fun deleteProductFromInventory(@Body request: DeleteProductRequest) : Response<Int>
 
 
@@ -149,9 +148,9 @@ interface FoodTrackerApi {
     @PUT("/api/shoppinglist/old/update/single")
     suspend fun updateSingleProductOnOldShoppingList(@Body request: ProductRequest): Response<Int>
 
-    @DELETE("/api/shoppinglist/current/single")
+    @HTTP(method = "DELETE", path = "/api/shoppinglist/current/delete/single", hasBody = true)
     suspend fun removeProductFromCurrentShoppingList(@Body IDRequest: ShoppingListProductIDRequest): Response<Int>
 
-    @DELETE("/api/shoppinglist/old/single")
+    @HTTP(method = "DELETE", path = "/api/shoppinglist/old/delete/single", hasBody = true)
     suspend fun removeProductFromOldShoppingList(@Body IDRequest: ShoppingListProductIDRequest): Response<Int>
 }

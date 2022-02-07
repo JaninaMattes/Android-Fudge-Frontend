@@ -71,7 +71,6 @@ class DashboardExpiringProductListFragment : Fragment() {
             if (productList != null) {
                 val context = activity?.applicationContext
                 if(context != null) {
-                    Log.d("DashboardExpiringProductList", "Expiring products $productList ")
                     adapter = DashboardExpiringProductListAdapter(context, productList, listener)
                     expiringListRecyclerView.adapter = adapter
                 }else{
@@ -88,7 +87,7 @@ class DashboardExpiringProductListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d(TAG, "Called onDestroyView.")
+        _binding = null
     }
 
     companion object {

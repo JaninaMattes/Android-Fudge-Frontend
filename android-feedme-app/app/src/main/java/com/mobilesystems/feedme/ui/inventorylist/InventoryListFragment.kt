@@ -20,12 +20,12 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * A fragment representing a list of Items.
  */
-
 @AndroidEntryPoint
 class InventoryListFragment : Fragment() {
 
     // delegate to main activity so that ViewModel is preserved
     private val sharedViewModel: SharedInventoryViewModel by activityViewModels()
+
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var inventoryRecyclerView: RecyclerView
     private lateinit var adapter: InventoryListAdapter
@@ -63,7 +63,6 @@ class InventoryListFragment : Fragment() {
                     sharedViewModel.deleteProductInInventoryList(product)
                 }
             }
-
         }
 
     override fun onCreateView(
@@ -107,14 +106,8 @@ class InventoryListFragment : Fragment() {
                 }
             }
         }
-
         // update adapter after data is loaded
         sharedViewModel.inventoryList.observe(viewLifecycleOwner, inventoryListObserver)
-    }
-
-    override fun onCreate(savedInstance: Bundle?){
-        super.onCreate(savedInstance)
-        sharedViewModel.loadAllProductsOfInventoryList()
     }
 
     override fun onDestroyView() {

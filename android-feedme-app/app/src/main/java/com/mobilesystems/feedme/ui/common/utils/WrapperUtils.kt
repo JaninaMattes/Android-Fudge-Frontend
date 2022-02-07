@@ -6,7 +6,6 @@ import com.mobilesystems.feedme.data.request.*
 import com.mobilesystems.feedme.data.response.*
 import com.mobilesystems.feedme.domain.model.*
 
-
 fun convertAllowSettingRequest(userId: Int, allow: Boolean): UserAllowSettingsRequest {
     var allowed = 0
     if (allow) {
@@ -243,7 +242,7 @@ fun convertBarcodeResultToProduct(product: BarcodeProductResponse?): Product? {
         // create new image th
         val productImage = Image(
             imageId = 0,
-            imageName = "Produktbild",
+            imageName = "product image",
             imageUrl = "",
             bitmap = null
         )
@@ -251,11 +250,11 @@ fun convertBarcodeResultToProduct(product: BarcodeProductResponse?): Product? {
         val labels: MutableList<Label> = arrayListOf()
         nProduct = Product(
             productId = 0,
-            productName = product?.label ?: "Bitte Namen eingeben.",
-            expirationDate = "Bitte Datum eingeben.",
+            productName = product?.label ?: "Please insert name.",
+            expirationDate = "Please insert date.",
             labels = labels,
-            quantity = "1 Stück",
-            manufacturer = product?.brand ?: "Bitte Namen eingeben.",
+            quantity = "1 piece",
+            manufacturer = product?.brand ?: "Please insert manufacturer.",
             nutritionValue = product?.nutrients ?: " kcal",
             productImage = productImage
         )
@@ -384,6 +383,8 @@ fun convertProductRequest(userId: Int, product: Product): ProductRequest?{
 
         if(expirationDate.isEmpty()){
             expirationDate = "2022-02-02"
+        }else{
+            expirationDate = reconvertDateFormat(product.expirationDate)
         }
 
         if(image != null){
@@ -398,7 +399,7 @@ fun convertProductRequest(userId: Int, product: Product): ProductRequest?{
             }
             productImage = ImageRequest(newImageId, newImageName, newImageUrl, newImageBase64Str)
         }else{
-            productImage = ImageRequest(productId, "Produktbild", "", null)
+            productImage = ImageRequest(productId, "product image", "", null)
         }
 
         if(labels != null) {
@@ -444,4 +445,27 @@ fun convertProductWithNewProductId(productIdResult: ProductIdResponse, product: 
 
 fun convertShoppingListProductIDRequest(userId: Int, product: Product): ShoppingListProductIDRequest {
     return ShoppingListProductIDRequest(userId, product.productId)
+}
+
+// extract needed user information and omit password
+fun extractNecessaryUserData(user: UserResponse): UserResponse {
+    return UserResponse(
+        userId = user.userId,
+        firstName = user.firstName,
+        lastName = user.lastName,
+        email = user.email,
+        password = "",
+        userSettings = user.userSettings,
+        userImage = user.userImage
+    )
+}
+
+fun convertUserDataToUser(user: UserResponse): User?{
+    var result: User? = null
+    try{
+        result = convertUserResponse(user)
+    }catch (e: Exception){
+        e.printStackTrace()
+    }
+    return result
 }

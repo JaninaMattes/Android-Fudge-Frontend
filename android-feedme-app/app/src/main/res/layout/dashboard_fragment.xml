@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
     tools:context=".ui.dashboard.DashboardFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -33,9 +32,8 @@
                     android:id="@+id/dashboard_user_title_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/extra_large_text_margin"
                     android:layout_marginTop="@dimen/large_text_margin"
-                    android:layout_marginEnd="@dimen/extra_large_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
                     app:layout_constraintHorizontal_bias="1.0"
@@ -75,53 +73,56 @@
 
                 <!-- Expiring Products Overview -->
 
-                <TextView
-                    android:id="@+id/expiring_products_list_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/large_text_margin"
-                    android:layout_marginStart="@dimen/extra_large_text_margin"
-                    android:text="@string/expiring_product_list_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="@dimen/text_large"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintTop_toBottomOf="@+id/dashboard_user_title_container"
-                    app:layout_constraintBottom_toTopOf="@+id/more_button_container_one"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/more_button_container_one"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/expiring_products_list_title"
+                    app:layout_constraintTop_toBottomOf="@+id/dashboard_user_title_container"
                     app:layout_constraintBottom_toTopOf="@+id/expiring_product_container">
+
+                    <TextView
+                        android:id="@+id/expiring_products_list_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/super_large_text_margin"
+                        android:gravity="center_vertical"
+                        android:text="@string/expiring_product_list_title"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textSize="@dimen/text_large"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
                     <TextView
                         android:id="@+id/dashboard_more_button_one"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/tiny_text_margin"
                         android:layout_marginEnd="@dimen/super_large_text_margin"
+                        android:layout_marginTop="@dimen/small_text_margin"
+                        android:layout_marginBottom="@dimen/small_text_margin"
                         android:clickable="true"
                         android:gravity="center_vertical"
                         android:text="@string/show_more"
                         android:textColor="@color/red_200"
                         android:textSize="@dimen/text_small"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
                     android:id="@+id/expiring_product_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginTop="@dimen/small_cardview_margin"
+                    android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
                     android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -139,52 +140,57 @@
 
                 <!-- Current No One Recipes -->
 
-                <TextView
-                    android:id="@+id/current_recipe_suggestions_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/extra_large_text_margin"
-                    android:layout_marginStart="@dimen/extra_large_text_margin"
-                    android:text="@string/best_voted_recipes"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textSize="@dimen/text_large"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/expiring_product_container"
-                    app:layout_constraintBottom_toTopOf="@id/more_button_container_two"/>
 
-                <LinearLayout
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/more_button_container_two"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/current_recipe_suggestions_title"
+                    app:layout_constraintTop_toBottomOf="@+id/expiring_product_container"
                     app:layout_constraintBottom_toTopOf="@+id/no_one_recipe_fragment_container">
+
+                    <TextView
+                        android:id="@+id/current_recipe_suggestions_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/super_large_text_margin"
+                        android:gravity="center_vertical"
+                        android:text="@string/best_voted_recipes"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textSize="@dimen/text_large"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
                     <TextView
                         android:id="@+id/dashboard_more_button_two"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/tiny_text_margin"
                         android:layout_marginEnd="@dimen/super_large_text_margin"
+                        android:layout_marginTop="@dimen/small_text_margin"
+                        android:layout_marginBottom="@dimen/small_text_margin"
                         android:clickable="true"
                         android:gravity="center_vertical"
                         android:text="@string/show_more"
                         android:textColor="@color/red_200"
                         android:textSize="@dimen/text_small"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
                     android:id="@+id/no_one_recipe_fragment_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/tiny_text_margin"
+                    android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginBottom="@dimen/large_text_margin"
                     android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

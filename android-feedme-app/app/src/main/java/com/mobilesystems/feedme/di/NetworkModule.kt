@@ -5,9 +5,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 
 /**
- * Use basic auth for all except for Login.
+ * Future: For better structuring of AppModule
  */
-
 @Module
 @InstallIn(ActivityComponent::class)
 object NetworkModule {

@@ -32,7 +32,6 @@ class DashboardRecipeListFragment: Fragment() {
     private val listener = object: DashboardRecipeListAdapter.RecipeAdapterClickListener {
         override fun passData(recipe: Recipe, itemView: View) {
             // pass data and navigate to product detail view
-            Log.d(TAG, "Recipe ${recipe.recipeName} selected.")
             sharedViewModel.selectedRecipe(recipe)
             val action = DashboardFragmentDirections.actionNavigationDashboardToRecipeFragment(recipe)
             Navigation.findNavController(itemView).navigate(action)
@@ -65,7 +64,6 @@ class DashboardRecipeListFragment: Fragment() {
             if (recipeList != null) {
                 adapter = DashboardRecipeListAdapter(recipeList, listener)
                 recipeListRecyclerView.adapter = adapter
-                Log.d(TAG, "Recyclerview adapter added.")
             }else{
                 Log.d(TAG, "Recipe list is empty.")
             }
@@ -74,15 +72,10 @@ class DashboardRecipeListFragment: Fragment() {
         // update adapter after data is loaded
         sharedViewModel.noOneRecipesList.observe(viewLifecycleOwner, recipeListObserver)
     }
-    override fun onCreate(savedInstance: Bundle?){
-        super.onCreate(savedInstance)
-        Log.d(TAG, "On create called.")
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        Log.d(TAG, "On destroy called.")
     }
 
     companion object {

@@ -11,9 +11,13 @@ import com.mobilesystems.feedme.domain.model.Product
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * SharedViewModel to propagate shared Data between Fragments.
+ */
 @HiltViewModel
 class SharedShoppingListViewModel @Inject constructor(
     androidApplication: Application,
@@ -58,10 +62,16 @@ class SharedShoppingListViewModel @Inject constructor(
         }
     }
 
-    fun refresh() {
-        // Make a call to the server after some delay for better user experience.
-        loadAllCurrentShoppingListProducts()
-        loadAllOldShoppingListProducts()
+    fun refresh(){
+        // refresh after certain time for better user experience
+        viewModelScope.launch {
+            delay(3500)
+            val userId = currentUserId.value
+            if (userId != null && userId != 0) {
+                val result = shoppingListRepository.loadCurrentShoppingListProducts(userId)
+                _currentShoppingList.value = result
+            }
+        }
     }
 
     override fun loadAllCurrentShoppingListProducts() {
@@ -291,6 +301,19 @@ class SharedShoppingListViewModel @Inject constructor(
         }
     }
 
+    override fun deleteCurrentProductByPosition(position: Int): Product? {
+        // This is a coroutine scope with the lifecycle of the ViewModel
+        var product: Product? = null
+        val currentValues = currentShoppingList.value
+        if (currentValues != null) {
+            val tempList = currentValues.toMutableList()
+            product = tempList[position]
+            tempList.removeAt(position)
+            _currentShoppingList.postValue(tempList)
+        }
+        return product
+    }
+
     override fun removeProductFromCurrentShoppingList(product: Product) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
@@ -307,6 +330,19 @@ class SharedShoppingListViewModel @Inject constructor(
                 Log.d("SharedShoppingListViewModel", "Remove product from current shoppinglist.")
             }
         }
+    }
+
+    override fun deleteOldProductByPosition(position: Int): Product? {
+        // This is a coroutine scope with the lifecycle of the ViewModel
+        var product: Product? = null
+        val currentValues = oldShoppingList.value
+        if (currentValues != null) {
+            val tempList = currentValues.toMutableList()
+            product = tempList[position]
+            tempList.removeAt(position)
+            _oldShoppingList.postValue(tempList)
+        }
+        return product
     }
 
     override fun removeProductFromOldShoppingList(product: Product) {
@@ -339,7 +375,7 @@ class SharedShoppingListViewModel @Inject constructor(
         val newProduct: Product
         var amountType = product_one.quantity.filter { it.isLetter() }
         if (amountType.isEmpty()) {
-            amountType = "Stück"
+            amountType = "piece"
         }
 
         if(currentShoppingList) {
@@ -376,7 +412,7 @@ class SharedShoppingListViewModel @Inject constructor(
         val newProduct: Product
         var amountType = product.quantity.filter { it.isLetter() }
         if (amountType.isEmpty()) {
-            amountType = "Stück"
+            amountType = "piece"
         }
         newProduct = product.copy(
             productId = product.productId,

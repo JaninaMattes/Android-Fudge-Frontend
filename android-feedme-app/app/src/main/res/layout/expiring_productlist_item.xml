@@ -22,7 +22,6 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginStart="@dimen/small_text_margin"
-            android:layout_marginLeft="@dimen/medium_text_margin"
             android:layout_marginEnd="@dimen/small_text_margin"
             android:orientation="vertical">
 
@@ -38,7 +37,7 @@
                 android:layout_marginTop="@dimen/small_text_margin"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:text="Brokkoli"/>
+                android:text="@string/dummy_product"/>
 
             <TextView
                 android:id="@+id/expiringproductdate"
@@ -49,9 +48,9 @@
                 android:layout_marginRight="@dimen/small_text_margin"
                 android:layout_marginBottom="@dimen/small_text_margin"
                 android:textColor="@color/light_grey"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:gravity="center"
-                android:text="22.02.2022"/>
+                android:text="@string/exp_date"/>
         </LinearLayout>
 
 </androidx.cardview.widget.CardView>

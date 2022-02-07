@@ -127,12 +127,12 @@ class AuthViewModel @Inject constructor(
         password: String,
         passwordConfirm: String
     ) {
-        if (!isUserEmailValid(firstname)) {
+        if (!isUserNameValid(firstname)) {
             _registerForm.value = AuthFormState(usernameError = R.string.invalid_username)
-        } else if (!isUserEmailValid(lastname)) {
+        } else if (!isUserNameValid(lastname)) {
             _registerForm.value = AuthFormState(usernameError = R.string.invalid_username)
         } else if (!isUserEmailValid(email)) {
-            _registerForm.value = AuthFormState(emailError = R.string.invalid_username)
+            _registerForm.value = AuthFormState(emailError = R.string.invalid_email)
         } else if (!isPasswordValid(password)) {
             _registerForm.value = AuthFormState(passwordError = R.string.invalid_password)
         } else if (!isPasswordConfirmed(password, passwordConfirm)) {
@@ -142,7 +142,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // A placeholder username validation check
+    // A placeholder email validation check
     private fun isUserEmailValid(username: String): Boolean {
         if (username.isEmpty()) {
             return false
@@ -152,6 +152,10 @@ class AuthViewModel @Inject constructor(
         } else {
             return username.isNotBlank()
         }
+    }
+
+    private fun isUserNameValid(username: String): Boolean {
+        return username.isNotEmpty()
     }
 
     // A placeholder password validation check

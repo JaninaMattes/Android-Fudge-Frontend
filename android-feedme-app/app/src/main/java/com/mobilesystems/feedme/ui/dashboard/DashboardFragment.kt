@@ -10,9 +10,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.databinding.DashboardFragmentBinding
 import com.mobilesystems.feedme.domain.model.User
+import com.mobilesystems.feedme.ui.shoppinglist.AddProductToShoppingListFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,28 +47,25 @@ class DashboardFragment : Fragment() {
             if (user != null) {
                 // use picasso to locally store image
                 userProfileName.text = user.firstName
-                Log.d(TAG, "User ${user.firstName} is logged in.")
             } else {
-                // TODO: Log User out
                 Log.d(TAG, "No user is logged in.")
             }
         }
 
         moreButtonOne.setOnClickListener {
-            val context = activity?.applicationContext
-            Toast.makeText(context,"Not yet implemented!!", Toast.LENGTH_SHORT).show()
-            Log.d(TAG, "Show more is clicked.")
+            //navigate to inventory list
+            val action = DashboardFragmentDirections.actionNavigationDashboardToNavigationInventorylist()
+            findNavController().navigate(action)
         }
 
         moreButtonTwo.setOnClickListener {
-            val context = activity?.applicationContext
-            Toast.makeText(context,"Not yet implemented!!", Toast.LENGTH_SHORT).show()
-            Log.d(TAG, "Show more is clicked.")
+            //navigate to recipe list
+            val action = DashboardFragmentDirections.actionNavigationDashboardToNavigationRecipes()
+            findNavController().navigate(action)
         }
 
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         sharedViewModel.loggedInUser.observe(viewLifecycleOwner, userObserver)
-
         return binding.root
     }
 
@@ -74,9 +73,6 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Add ingredient list as child fragment
-
-        Log.d(TAG, "Called onViewCreated.")
-
         val recipeListFragment = DashboardRecipeListFragment()
         val productListFragment = DashboardExpiringProductListFragment()
 
@@ -84,21 +80,9 @@ class DashboardFragment : Fragment() {
         addChildFragment(R.id.expiring_products_list_fragment, productListFragment)
     }
 
-    override fun onCreate(savedInstance: Bundle?){
-        super.onCreate(savedInstance)
-        sharedViewModel.refresh()
-        Log.d(TAG, "On create called.")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "On pause called.")
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        Log.d(TAG, "On destroy called.")
     }
 
     private fun addChildFragment(viewId: Int, childFragment: Fragment){

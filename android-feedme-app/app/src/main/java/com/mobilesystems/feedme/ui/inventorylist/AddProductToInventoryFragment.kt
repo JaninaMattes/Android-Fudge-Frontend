@@ -96,12 +96,14 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
 
             addExpirationDate.setText(dateFormat.format(calendar.time))
         }
+
         // open on click to editText
         addExpirationDate.setOnClickListener {
             val acitivtyContext = activity
             if (acitivtyContext != null) {
                 DatePickerDialog(
                     acitivtyContext,
+                    R.style.DialogTheme,
                     date,
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
@@ -128,10 +130,12 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             try {
                 i.putExtra("return-data", true)
                 startActivityForResult(Intent.createChooser(i, "Select Picture"), IMAGE_REQUEST_CODE)
+                val context = activity?.applicationContext
+                Toast.makeText(context,"Image is loaded!", Toast.LENGTH_LONG).show()
             } catch (ex: ActivityNotFoundException) {
                 ex.printStackTrace()
                 val context = activity?.applicationContext
-                Toast.makeText(context,"Gallery picker failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,"Gallery picker failed!", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -144,7 +148,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             intentIntegrator.setOrientationLocked(false)
             intentIntegrator.setBeepEnabled(false)
             intentIntegrator.setCameraId(0)
-            intentIntegrator.setPrompt("Bitte scanne einen Barcode.")
+            intentIntegrator.setPrompt("Please scan a product barcode.")
             intentIntegrator.setBarcodeImageEnabled(true)
             intentIntegrator.initiateScan()
         }
@@ -181,10 +185,10 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
 
                 // Check product quantity
                 if(productquantity.isEmpty()){
-                    productquantity = "1 Stück"
+                    productquantity = "1 Piece"
                 }else if (productquantity.isDigitsOnly()){
                     val quantity = productquantity.filter { it.isDigit() }
-                    productquantity = "$quantity Stück"
+                    productquantity = "$quantity Piece"
                 }
                 // Check product manufacturer
                 if(productManufacturer.isEmpty()){
@@ -230,7 +234,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             errorIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_error_24)
         }
         return if(binding.editTextAddnewproducttitleInventory.text.toString().trim().isEmpty()){
-            binding.editTextAddnewproducttitleInventory.setError("Produktname darf nicht leer sein!", errorIcon)
+            binding.editTextAddnewproducttitleInventory.setError("Product name cannot be empty!", errorIcon)
             false
 
         }else {
@@ -317,7 +321,6 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             if(uri != null) {
                 val inputStream: InputStream? = activity?.contentResolver?.openInputStream(uri)
                 newProductImage = BitmapFactory.decodeStream(inputStream)
-                Log.d(TAG, "Set image from gallery.")
             } else {
                 Log.d(TAG, "URI is null.")
             }

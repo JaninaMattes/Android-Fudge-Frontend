@@ -8,7 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import com.mobilesystems.feedme.data.repository.AuthRepositoryImpl
-import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
+import com.mobilesystems.feedme.data.repository.UserRepositoryImpl
+import com.mobilesystems.feedme.ui.common.utils.*
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
                       androidApplication : Application,
-                      private val loginRepository: AuthRepositoryImpl):
+                      private val loginRepository: AuthRepositoryImpl,
+                      private val userRepository: UserRepositoryImpl):
     BaseViewModel(androidApplication), BaseSplashViewModel {
 
     private val _isUserLoggedInResult = MutableLiveData<Boolean?>()
@@ -48,9 +50,29 @@ class SplashViewModel @Inject constructor(
         }
     }
 
+    override fun loadLoggedInUserData() {
+        viewModelScope.launch {
+            // check if entry in preference already exists
+            if(!doesPreferenceExist(context, "mPreference", "userData")){
+                val userId = currentUserId.value
+                if(userId != null && userId != 0) {
+                    // load user data
+                    val result = userRepository.preFetchLoggedInUser(userId)
+                    if(result != null) {
+                        // store only necessary pre-fetched data, omit password
+                        val context = getApplication<Application>().applicationContext
+                        saveUserDataToSharedPreference(context, extractNecessaryUserData(result))
+                    }
+                }
+            }else{
+                Log.d("SplashViewModel", "Preference already exists!")
+            }
+        }
+    }
+
     private fun getCurrentUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
         _currentUserId.value = result?.userId
-        return  currentUserId
+        return currentUserId
     }
 }

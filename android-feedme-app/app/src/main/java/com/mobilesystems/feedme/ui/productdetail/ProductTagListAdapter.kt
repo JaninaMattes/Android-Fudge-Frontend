@@ -37,7 +37,6 @@ class ProductTagListAdapter(
         if (dataSet != null) {
             // get selected product
             val currentItem = dataSet[position]
-            Log.d("ProductTagAdapter", "Tag ${currentItem.label}")
             // pass values to view items
             tagViewHolder.productTagLabelTextView.text = currentItem.label
         }

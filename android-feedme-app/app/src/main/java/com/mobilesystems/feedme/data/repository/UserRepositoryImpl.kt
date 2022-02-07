@@ -2,6 +2,7 @@ package com.mobilesystems.feedme.data.repository
 
 import android.util.Log
 import com.mobilesystems.feedme.data.datasource.UserDataSourceImpl
+import com.mobilesystems.feedme.data.response.UserResponse
 import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.User
 import com.mobilesystems.feedme.ui.common.utils.*
@@ -10,6 +11,11 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val dataSourceImpl: UserDataSourceImpl)
     : UserRepository {
+
+    override suspend fun preFetchLoggedInUser(userId: Int): UserResponse?{
+        // get currently logged in user
+        return dataSourceImpl.getUserById(userId).data
+    }
 
     override suspend fun getLoggedInUser(userId: Int): User? {
         // get currently logged in user

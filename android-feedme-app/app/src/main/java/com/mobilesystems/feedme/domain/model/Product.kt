@@ -45,10 +45,9 @@ data class Product(
     }
 
     override fun toString(): String {
-        return "Product(productId=$productId, productName='$productName', " +
-                "expirationDate='$expirationDate', labels=$labels, quantity='$quantity', " +
-                "manufacturer='$manufacturer', nutritionValue='$nutritionValue', imageUrl=$productImage)"
+        return "Product(productId=$productId, productName='$productName', expirationDate='$expirationDate', " +
+                "labels=$labels, quantity='$quantity', manufacturer='$manufacturer', " +
+                "nutritionValue='$nutritionValue', productImage=$productImage)"
     }
-
 
 }

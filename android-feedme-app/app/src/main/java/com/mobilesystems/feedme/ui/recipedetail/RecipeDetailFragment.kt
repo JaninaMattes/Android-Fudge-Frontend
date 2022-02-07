@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.mobilesystems.feedme.domain.model.Recipe
 import com.squareup.picasso.Picasso
 import android.widget.*
@@ -60,16 +59,18 @@ class RecipeDetailFragment : Fragment() {
         val recipePreparationTextView: TextView = rootView.findViewById(R.id.text_recipe_preparation)
 
         // Button
-        val buttonExport: ExtendedFloatingActionButton = rootView.findViewById(R.id.button_export_ingredients_to_shoppinglist)
+        val buttonExport: Button = rootView.findViewById(R.id.button_export_ingredients_to_shoppinglist)
 
         //safeargs updates the UI
         val recipe: Recipe = args.recipe
+        var nutritionVal: String = recipe.recipeNutrition
+        if(nutritionVal.isEmpty()) nutritionVal = " kcal"
         recipeId = recipe.recipeId
         recipeImg = recipe.imageUrl
         Picasso.get().load(recipeImg).into(recipeImageview)
         recipeNameTextView.text = recipe.recipeName
         recipeSubtitleTextView.text = recipe.recipeLabel
-        recipeCardNutritionTextView.text = recipe.recipeNutrition
+        recipeCardNutritionTextView.text = nutritionVal
         recipeCardCookingTime.text = recipe.cookingTime
         recipeCardRating.text = "${recipe.cummulativeRating}"
         recipePreparationTextView.text = recipe.instructions
@@ -122,7 +123,7 @@ class RecipeDetailFragment : Fragment() {
         val okButton = dialogView.findViewById<View>(R.id.dialog_button_export) as Button
         val cancelButton = dialogView.findViewById<View>(R.id.dialog_button_cancel) as Button
 
-        editText.text = "Möchtest Du $amount Zutaten zu deiner Shoppingliste hinzufügen?"
+        editText.text = "Want to add $amount ingredients to your shopping list?"
         // confirm and cancel button
         builder.setCancelable(true)
 

@@ -16,12 +16,13 @@
 
     <item
         android:id="@+id/user_profile"
-        android:icon="@drawable/ic_baseline_person_24"
+        android:icon="@drawable/ic_baseline_person_24_white"
         android:iconTint="@color/white"
         android:title="@string/user_profile"
         android:contentDescription="@string/content_description_user_profile"
         app:showAsAction="ifRoom" />
 
+    <!-- Future functionality -->
     <item
         android:id="@+id/favorite_recipes"
         android:icon="@drawable/ic_baseline_favorite_24"

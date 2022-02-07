@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import com.mobilesystems.feedme.databinding.RecipeItemBinding
 import com.mobilesystems.feedme.domain.model.Recipe
+import com.mobilesystems.feedme.ui.common.utils.abbreviateString
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
@@ -65,9 +66,10 @@ class RecipeListAdapter(
         if (dataSet != null) {
             // get selected product
             val currentItem = dataSet[position]
-            Picasso.get().load(currentItem.imageUrl).into(viewHolder.recipeImageView)
-            viewHolder.recipeName.text = currentItem.recipeName
-            viewHolder.recipeLabel.text = currentItem.recipeLabel
+            // center crop and fit images
+            Picasso.get().load(currentItem.imageUrl).fit().centerCrop().into(viewHolder.recipeImageView)
+            viewHolder.recipeName.text = abbreviateString(currentItem.recipeName, 30)
+            viewHolder.recipeLabel.text = abbreviateString(currentItem.recipeLabel, 20)
             viewHolder.cookingDifficulty.text = currentItem.difficulty
             viewHolder.ratingBar.rating = currentItem.cummulativeRating
             viewHolder.recipeRating.text = "${currentItem.cummulativeRating}"

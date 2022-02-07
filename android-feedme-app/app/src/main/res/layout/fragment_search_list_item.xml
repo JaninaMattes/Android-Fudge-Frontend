@@ -13,7 +13,7 @@
         android:layout_gravity="start"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="@dimen/large_text_margin"
-        android:text="Vegane Pizza"
+        android:text="@string/vegan_pizza"
         android:textColor="@color/black"
         android:textSize="14sp"
         android:textStyle="bold" />
@@ -25,8 +25,7 @@
         android:layout_gravity="start"
         android:layout_marginStart="28dp"
         android:layout_toEndOf="@+id/search_title"
-        android:layout_toRightOf="@+id/search_title"
-        android:text="Inventarliste"
+        android:text="@string/title_inventory"
         android:textColor="@color/black"
         android:textSize="14sp"
         android:textStyle="italic" />

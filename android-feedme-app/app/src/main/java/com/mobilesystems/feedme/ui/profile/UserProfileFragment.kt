@@ -27,7 +27,6 @@ import android.graphics.BitmapFactory
 import com.mobilesystems.feedme.domain.model.Image
 import java.io.InputStream
 
-
 @AndroidEntryPoint
 class UserProfileFragment : Fragment() {
 
@@ -39,14 +38,9 @@ class UserProfileFragment : Fragment() {
     private lateinit var  profileFirstName: TextView
     private lateinit var profileLastName: TextView
     private lateinit var profileEmail: TextView
+
     // additional
-    private var userId: Int = 0
-    private lateinit var userPassword: String
-    private var userImage: Image? = null
     private var userImageBitmap: Bitmap? = null
-    private var userImageUrl: String? = null
-    private var userSettings: Settings? = null
-    private var userTags: List<FoodType>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,20 +78,17 @@ class UserProfileFragment : Fragment() {
         // Create the observer which updates the UI.
         val userObserver = Observer<User?> { user : User? ->
             if (user != null) {
-                userId = user.userId
                 setUserImage(user)
 
                 profileFirstName.text = user.firstName
                 profileLastName.text = user.lastName
                 profileEmail.text = user.email
-                userPassword = user.password
 
-                userSettings = user.userSettings
-                userTags = user.dietaryPreferences
                 // Setup buttons toggled
                 btnExpirationReminder.isChecked = user.userSettings?.reminderProductExp == true
                 btnPushNotification.isChecked = user.userSettings?.allowPushNotifications == true
                 btnSuggestionsShopping.isChecked = user.userSettings?.suggestRecipes == true
+
                 Log.d(TAG, "Observer called.")
             } else {
                 Log.d(TAG, "User is null.")
@@ -107,8 +98,8 @@ class UserProfileFragment : Fragment() {
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         sharedViewModel.loggedInUser.observe(viewLifecycleOwner, userObserver)
 
+        // Add image from gallery picker
         profileImageView.setOnClickListener {
-            // TODO: Implement image picking from Gallery/Photo
             val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             // code for crop image
             i.putExtra("crop", "true")
@@ -128,7 +119,7 @@ class UserProfileFragment : Fragment() {
         }
 
         btnAddRecipeLabel.setOnClickListener{
-            // TODO: Implement shared view model for products behind button
+            // Future functionality
             //sharedViewModel.createNewLabel()
         }
 
@@ -172,8 +163,46 @@ class UserProfileFragment : Fragment() {
         }
 
         btnSaveUser.setOnClickListener {
-            val user = updateUser()
-            sharedViewModel.updateLoggedInUser(user)
+
+            // Text values
+            val firstName = profileFirstName.text.toString()
+            val lastName = profileLastName.text.toString()
+            val email = profileEmail.text.toString()
+
+            var user: User? = null
+
+            val loggedInUser = sharedViewModel.loggedInUser.value
+            if(loggedInUser?.userImage != null) {
+                // Image values
+                val userImage = Image(
+                    imageId = loggedInUser.userImage.imageId,
+                    imageName = loggedInUser.userImage.imageName,
+                    imageUrl = loggedInUser.userImage.imageUrl,
+                    bitmap = loggedInUser.userImage.bitmap
+                )
+                val settings = Settings(
+                    btnExpirationReminder.isChecked,
+                    btnPushNotification.isChecked,
+                    btnSuggestionsShopping.isChecked
+                )
+                // generate new user object
+                user = User(
+                    userId = loggedInUser.userId,
+                    firstName = firstName,
+                    lastName = lastName,
+                    email = email,
+                    password = loggedInUser.password,
+                    userSettings = settings,
+                    dietaryPreferences = loggedInUser.dietaryPreferences,
+                    userImage = userImage
+                )
+            }
+
+            if(user != null) {
+                // make network call
+                sharedViewModel.updateLoggedInUser(user)
+                sharedViewModel.refresh()
+            }
             //set editbutton visibility visible
             btnEditUserProfile.visibility = View.VISIBLE
 
@@ -209,6 +238,7 @@ class UserProfileFragment : Fragment() {
                         if(userImage != null){
                             // update image
                             sharedViewModel.updateUserImage(userImage)
+                            sharedViewModel.refresh()
                         }
                         Log.d(TAG, "Set image from gallery.")
                     }
@@ -226,12 +256,7 @@ class UserProfileFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         // free memory on native heap
-        //userImageBitmap?.recycle()
         userImageBitmap = null
-        userImage = null
-        userImageUrl = null
-        userSettings = null
-        userTags = null
     }
 
     private fun addChildFragment(){
@@ -251,14 +276,14 @@ class UserProfileFragment : Fragment() {
 
     private fun setUserImage(user: User?){
         // get bipmap if user took photo from gallery
-        userImage = user?.userImage
+        val userImage = user?.userImage
         userImageBitmap = user?.userImage?.bitmap
         if(userImageBitmap != null){
             Log.d(TAG, "Set bitmap as profile image")
             profileImageView.setImageBitmap(userImageBitmap)
         }else {
             // take default url
-            userImageUrl = user?.userImage?.imageUrl
+            val userImageUrl = user?.userImage?.imageUrl
             if (userImageUrl.isNullOrEmpty()) {
                 // set default image
                 profileImageView.setImageDrawable(
@@ -277,37 +302,13 @@ class UserProfileFragment : Fragment() {
         val img = user?.userImage
         var newImg: Image? = null
         if(img != null) {
-            newImg = Image(imageId = img.imageId, imageName = img.imageName, imageUrl = img.imageUrl, bitmap = bitmap)
+            newImg = Image(imageId = img.imageId,
+                imageName = img.imageName,
+                imageUrl = img.imageUrl,
+                bitmap = bitmap)
             Log.d(TAG, "Update user profile image.")
         }
         return newImg
-    }
-
-    private fun updateUser() : User {
-        // Text values
-        val firstName = profileFirstName.text.toString().trim()
-        val lastName = profileLastName.text.toString().trim()
-        val email = profileEmail.text.toString().trim()
-        // Image values
-        val userImage = Image(
-            imageId = userImage?.imageId ?: 0,
-            imageName = userImage?.imageName ?: "Profilbild",
-            imageUrl = userImageUrl ?: "",
-            bitmap = userImageBitmap
-        )
-        // generate new user object
-        user = User(
-            userId = userId,
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            password = userPassword,
-            userSettings = userSettings,
-            dietaryPreferences = userTags,
-            userImage = userImage
-        )
-        Log.d(TAG, "Update user profile $user.")
-        return user
     }
 
     private fun setTextEditable(boolean: Boolean){

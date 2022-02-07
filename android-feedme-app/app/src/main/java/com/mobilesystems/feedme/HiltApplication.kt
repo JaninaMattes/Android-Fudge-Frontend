@@ -74,15 +74,13 @@ class HiltApplication : Application(), Configuration.Provider{
         val currentDate = Calendar.getInstance()
         val dueDate = Calendar.getInstance()
         // Set Execution time
-        dueDate.set(Calendar.HOUR_OF_DAY, 13)
+        dueDate.set(Calendar.HOUR_OF_DAY, 7)
         dueDate.set(Calendar.MINUTE, 3)
         dueDate.set(Calendar.SECOND, 0)
         if (dueDate.before(currentDate)) {
             dueDate.add(Calendar.HOUR_OF_DAY, 24)
         }
         val timeDiff = dueDate.timeInMillis - currentDate.timeInMillis
-        Log.d("RecipeWorker", "TimeDiff: $timeDiff")
-
         val recipeWorkRequest =
             OneTimeWorkRequestBuilder<RecipeWorker>()
                 .setConstraints(constraints)
@@ -92,8 +90,6 @@ class HiltApplication : Application(), Configuration.Provider{
         WorkManager
             .getInstance(context)
             .enqueueUniqueWork("recipeWork", ExistingWorkPolicy.KEEP, recipeWorkRequest)
-
-        Log.d("BackgroundService", "Started background task!")
     }
 
 }

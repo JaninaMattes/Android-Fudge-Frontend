@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
     tools:context=".ui.inventorylist.InventoryListFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -60,8 +59,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_marginBottom="@dimen/super_duper_large_button_margin"
-        android:layout_marginEnd="@dimen/super_large_text_margin"
+        android:layout_marginBottom="@dimen/super_large_button_margin"
+        android:layout_marginEnd="@dimen/super_large_button_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -73,7 +72,7 @@
             android:layout_margin="@dimen/tiny_btn_margin"
             android:backgroundTint="@color/colorAccent"
             android:contentDescription="@string/create_new_product"
-            app:srcCompat="@drawable/ic_addproducts" />
+            app:srcCompat="@drawable/ic_baseline_add_24" />
 
     </FrameLayout>
 

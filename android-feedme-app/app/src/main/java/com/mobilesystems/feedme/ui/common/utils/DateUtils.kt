@@ -44,6 +44,18 @@ fun convertDateFormat(dateStr: String): String {
     return outputFormat.format(inputDate) ?: dateStr
 }
 
+fun reconvertDateFormat(dateStr: String): String{
+    val inputFormat: DateFormat =SimpleDateFormat("dd.MM.yyyy")
+    val outputFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+    var inputDate = Date()
+    try {
+        inputDate = inputFormat.parse(dateStr)
+    } catch (e: ParseException) {
+        e.printStackTrace()
+    }
+    return outputFormat.format(inputDate) ?: dateStr
+}
+
 fun convertStringToDate(dateStr: String): Date {
     val sdf = SimpleDateFormat("dd.MM.yyyy")
     val date = sdf.parse(dateStr)

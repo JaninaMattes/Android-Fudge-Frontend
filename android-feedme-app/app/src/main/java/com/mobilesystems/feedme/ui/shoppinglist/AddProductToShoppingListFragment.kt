@@ -47,14 +47,13 @@ class AddProductToShoppingListFragment : Fragment(R.layout.shopping_list_add_pro
                 var productquantity = binding.editTextAddnewproductquantity.text.toString()
                 if (productquantity.isDigitsOnly()){
                     val quantity = productquantity.filter { it.isDigit() }
-                    productquantity = "$quantity Stück"
+                    productquantity = "$quantity Package"
                 }
 
                 val labels : MutableList<Label> = arrayListOf() // empty placeholder list add correct labels later in inventory list
                 sharedViewModel.addNewProductToCurrentShoppingList(Product(0, productname,
-                    "", labels, productquantity, "", "", null))
+                    "2022-02-02", labels, productquantity, "", "", null))
                 Log.d(TAG, "Add product to current shopping list.")
-
                 //navigate to shoppinglist
                 val action = AddProductToShoppingListFragmentDirections.actionAddProductToShoppingListFragmentToNavigationShoppingList()
                 findNavController().navigate(action)
@@ -85,7 +84,6 @@ class AddProductToShoppingListFragment : Fragment(R.layout.shopping_list_add_pro
 
     override fun onPause() {
         super.onPause()
-        sharedViewModel.loadAllCurrentShoppingListProducts()
     }
 
     override fun onDestroyView() {
