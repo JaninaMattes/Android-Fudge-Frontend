@@ -12,6 +12,7 @@ import com.mobilesystems.feedme.domain.model.*
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -22,7 +23,6 @@ import kotlin.collections.ArrayList
  *
  * https://developer.android.com/codelabs/basic-android-kotlin-training-shared-viewmodel#4
  */
-
 @HiltViewModel
 class SharedInventoryViewModel @Inject constructor(
     androidApplication : Application,
@@ -115,13 +115,12 @@ class SharedInventoryViewModel @Inject constructor(
                         if (oldProduct.productId == product.productId) {
                             tempList[index] = product
                             inventoryRepository.updateProductOnInventory(userId, product)
+                            updateInventoryList(tempList)
                         }
                     }
                 }
-                updateInventoryList(tempList)
             }
         }
-        loadAllProductsOfInventoryList()
     }
 
     override fun addProductToInventoryList(product: Product) {
@@ -152,7 +151,7 @@ class SharedInventoryViewModel @Inject constructor(
                         val newProduct = inventoryRepository.addProductToInventory(userId, product)
                         tempList.add(newProduct)
                     }
-                    // empty list
+                // empty list
                 } else {
                     val newProduct = inventoryRepository.addProductToInventory(userId, product)
                     tempList.add(newProduct)
@@ -160,7 +159,6 @@ class SharedInventoryViewModel @Inject constructor(
                 updateInventoryList(tempList)
             }
         }
-        loadAllProductsOfInventoryList()
     }
 
     private fun calculateNewAmount(product_one: Product, product_two: Product): Product{
@@ -169,7 +167,7 @@ class SharedInventoryViewModel @Inject constructor(
         val amountTwo = product_two.quantity.filter { it.isDigit() }
         var amountType = product_one.quantity.filter { it.isLetter() }
         if (amountType.isEmpty()){
-            amountType = "Stück"
+            amountType = "Pieces"
         }
 
         val newAmount = amountOne.toInt() + amountTwo.toInt()
@@ -184,7 +182,6 @@ class SharedInventoryViewModel @Inject constructor(
             nutritionValue = product_one.nutritionValue,
             productImage = product_one.productImage
         )
-
         return newProduct
     }
 
@@ -193,8 +190,7 @@ class SharedInventoryViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = loggedInUser.value?.userId
             if(userId != null && userId != 0) {
-                    // TODO: Network call
-                    // inventoryRepository.removeProductFromInventory(userId, product)
+                inventoryRepository.removeProductFromInventory(userId, product)
             }
         }
     }
@@ -205,7 +201,6 @@ class SharedInventoryViewModel @Inject constructor(
             val userId = loggedInUser.value?.userId
             if(userId != null) {
                 val result = inventoryRepository.loadInventoryListProducts(userId)
-                Log.d("SharedInventoryViewModle", "Loaded inventorylist.")
                 filterListByExpirationDate(result)
             }
         }
@@ -221,11 +216,11 @@ class SharedInventoryViewModel @Inject constructor(
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
             val userId = loggedInUser.value?.userId
-            val currentValues = inventoryList.value
-            val tempList = currentValues?.toMutableList()
             if (userId != null && userId != 0) {
-                _inventoryList.value = tempList
-                //inventoryRepository.updateProductInventoryList(userId, tempList)
+                val currentValues = inventoryList.value
+                if(currentValues != null) {
+                    inventoryRepository.updateProductInventoryList(userId, currentValues)
+                }
             }
         }
     }
@@ -236,7 +231,6 @@ class SharedInventoryViewModel @Inject constructor(
             val userId = getLoggedInUserId(context).value
             if(userId != null && userId != 0) {
                 inventoryRepository.updateProductImage(userId, image)
-                Log.d("SharedInventoryViewModel", "Update product image.")
             }
         }
     }
@@ -254,13 +248,24 @@ class SharedInventoryViewModel @Inject constructor(
         return sorted
     }
 
+    fun refresh(){
+        // refresh after certain time for better user experience
+        viewModelScope.launch {
+            delay(3500)
+            val userId = loggedInUser.value?.userId
+            if(userId != null) {
+                val result = inventoryRepository.loadInventoryListProducts(userId)
+                filterListByExpirationDate(result)
+            }
+        }
+    }
+
     // filter products by expiration date
     private fun filterListByExpirationDate(result: List<Product>?): LiveData<List<Product>?>{
         if(result != null) {
             val tempList = result.toMutableList()
             val cmp = compareBy<Product> { convertStringToDate(it.expirationDate) }
             _inventoryList.value = tempList.sortedWith(cmp) // ascending
-            Log.d("SharedInventoryViewModel", "List sorted by expiration date.")
         }else{
             Log.d("SharedInventoryViewModel", "Inventorylist is empty.")
         }

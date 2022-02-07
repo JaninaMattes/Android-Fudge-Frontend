@@ -62,8 +62,8 @@ class PushWorker @AssistedInject constructor(
         val builder = context.let {
             NotificationCompat.Builder(it, CHANNEL_ID).apply {
                 setSmallIcon(R.drawable.ic_fridgeicon)
-                setContentTitle("Ablaufende Produkte im Inventar")
-                setContentText("Du hast $result ablaufende Produkte in Deinem Inventar!")
+                setContentTitle("Expiring products in inventory")
+                setContentText("You have $result expiring products in your inventory!")
                 priority = NotificationCompat.PRIORITY_DEFAULT
             }
         }

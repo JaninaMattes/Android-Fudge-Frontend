@@ -14,6 +14,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * SharedViewModel to propagate shared Data between Fragments.
+ */
 @HiltViewModel
 class SearchSearchViewModel@Inject constructor(
     androidApplication: Application,

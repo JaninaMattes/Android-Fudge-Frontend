@@ -12,6 +12,8 @@
     <color name="theme_orange_100">#FB9300</color>
     <color name="theme_creme_100">#F5E6CA</color>
     <color name="theme_creme_50">#F3DCD4</color>
+    <color name="theme_creme_dark">#BEF3D9CF</color>
+    <color name="theme_creme_500">#F3D2D4</color>
     <color name="blue_700">#8EB3F7</color>
     <color name="theme_dark_blue_100">#343F56</color>
     <color name="black">#FF000000</color>
@@ -31,6 +33,7 @@
 
     <!-- Primary Colours -->
     <color name="colorPrimary">@color/theme_creme_50</color>
+    <color name="colorPrimaryLight">@color/theme_creme_500</color>
     <color name="colorPrimaryDark">@color/light_grey</color>
     <color name="colorAccent">@color/red_200</color>
 

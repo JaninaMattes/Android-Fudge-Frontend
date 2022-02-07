@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="@dimen/medium_cardview_padding">
 
-        <TextView
-            android:id="@+id/dialog_alert_title"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/large_text_margin"
-            android:textColor="@color/black"
-            android:textSize="@dimen/text_large"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:text="Zutaten Exportieren"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/dialog_alert_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/large_text_margin"
+        android:gravity="center"
+        android:text="@string/export_ingredients"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_large"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -25,52 +25,55 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/large_text_margin"
+        android:gravity="center"
+        android:text="@string/add_to_shoppinglist_title"
         android:textColor="@color/black"
         android:textSize="@dimen/text_large"
         android:textStyle="normal"
-        android:gravity="center"
-        android:text="@string/add_to_shoppinglist_title"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_alert_title"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_alert_title" />
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_marginTop="@dimen/medium_text_margin"
         android:layout_marginBottom="@dimen/medium_text_margin"
-        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_alert_text">
 
 
         <Button
             android:id="@+id/dialog_button_export"
+            style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
             android:layout_margin="@dimen/small_text_margin"
-            android:clickable="true"
-            android:textColor="@color/white"
-            android:background="@color/red_200"
+            android:layout_weight="0.5"
+            android:background="@drawable/btn_bg"
             android:backgroundTint="@color/red_200"
-            android:text="OK" />
+            android:clickable="true"
+            android:text="@string/ok"
+            android:theme="@style/ButtonTheme" />
 
 
         <Button
             android:id="@+id/dialog_button_cancel"
+            style="@style/unimportantButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
             android:layout_margin="@dimen/small_text_margin"
-            android:clickable="true"
-            android:textColor="@color/white"
-            android:background="@color/salmon_red"
+            android:layout_weight="0.5"
+            android:background="@drawable/btn_bg"
             android:backgroundTint="@color/salmon_red"
-            android:text="Abbrechen" />
+            android:clickable="true"
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:theme="@style/unimportantButtonTheme" />
 
     </LinearLayout>
 

@@ -34,6 +34,7 @@ class SplashScreenActivity : AppCompatActivity() {
         activityScope.launch {
             // load if user is logged in ...
             observeSplashLiveData()
+            preFetchUserData()
         }
     }
 
@@ -41,6 +42,10 @@ class SplashScreenActivity : AppCompatActivity() {
         // Destroy splash screen
         super.onPause()
         activityScope.cancel()
+    }
+
+    private fun preFetchUserData(){
+        splashViewModel.loadLoggedInUserData()
     }
 
     private fun observeSplashLiveData() {

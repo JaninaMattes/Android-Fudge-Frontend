@@ -12,13 +12,13 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.domain.model.Product
-import android.widget.AdapterView.OnItemLongClickListener
 import com.mobilesystems.feedme.databinding.ShoppingListCurrentItemBinding
 
 class ShoppingListCurrentProductsGridAdapter(
     private val context: Context?,
     private val dataSet: List<Product>?,
-    private val itemClickListener: ProductAdapterClickListener
+    private val itemClickListener: ProductAdapterClickListener,
+    private val itemLongClickListener: ProductAdapterLongClickListener
 ) : BaseAdapter() {
 
     //view binding
@@ -27,6 +27,10 @@ class ShoppingListCurrentProductsGridAdapter(
 
     interface ProductAdapterClickListener {
         fun passData(product: Product, itemView: View)
+    }
+
+    interface ProductAdapterLongClickListener {
+        fun passData(product: Product, itemView: View):Boolean?
     }
 
     override fun getView(position:Int, convertView: View?, parent: ViewGroup?): View{
@@ -54,7 +58,7 @@ class ShoppingListCurrentProductsGridAdapter(
         }
 
         // initialize clicklistener, pass clicked product for listitem position
-        cardView.setOnClickListener{ v ->
+        cardView.setOnClickListener { v ->
             if (dataSet != null) {
                 if(context != null) {
                     shoppingListColour.setBackgroundColor(
@@ -64,6 +68,13 @@ class ShoppingListCurrentProductsGridAdapter(
             }
         }
 
+        // use longclick for delete
+        cardView.setOnLongClickListener { v ->
+            if (dataSet != null) {
+                itemLongClickListener.passData(dataSet[position], v)
+            }
+            true
+        }
         return itemBinding.root
     }
 

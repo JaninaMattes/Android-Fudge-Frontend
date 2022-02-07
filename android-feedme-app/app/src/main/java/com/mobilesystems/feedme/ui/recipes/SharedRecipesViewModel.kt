@@ -19,7 +19,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Tutorial Context in MVVM: https://stackoverflow.com/questions/51451819/how-to-get-context-in-android-mvvm-viewmodel/51452435
+ * Sharedviewmodel to propagate data between fragments
+ *
+ * Documentations for usage of Context in MVVM:
+ *  https://stackoverflow.com/questions/51451819/how-to-get-context-in-android-mvvm-viewmodel/51452435
  */
 @HiltViewModel
 class SharedRecipesViewModel @Inject constructor(
@@ -191,7 +194,7 @@ class SharedRecipesViewModel @Inject constructor(
         val amountTwo = product_two.quantity.filter { it.isDigit() }
         var amountType = product_one.quantity.filter { it.isLetter() }
         if (amountType.isEmpty()){
-            amountType = "Stück"
+            amountType = "piece"
         }
 
         val newAmount = amountOne.toInt() + amountTwo.toInt()

@@ -2,18 +2,20 @@ package com.mobilesystems.feedme.ui.recipedetail
 
 import android.content.Context
 import android.view.LayoutInflater
-import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.R
 import com.mobilesystems.feedme.databinding.RecipeIngredientItemBinding
 import com.mobilesystems.feedme.domain.model.Product
-import com.mobilesystems.feedme.ui.common.utils.capitalizeWords
-import com.mobilesystems.feedme.ui.common.utils.containsSubstring
+import com.mobilesystems.feedme.ui.common.utils.abbreviateUnitString
 import com.mobilesystems.feedme.ui.recipes.SharedRecipesViewModel
 import java.util.*
+
 
 /**
  * Tutorial: https://developer.android.com/guide/topics/ui/layout/recyclerview
@@ -51,20 +53,25 @@ class RecipeIngredientListAdapter(
             // get selected product
             val currentItem = dataSet[position]
             if(sharedViewModel.isProductAvailable(sharedViewModel.availableIngredients.value, currentItem)){
-                val color = ContextCompat.getColor(context, R.color.red_200)
-                viewHolder.ingredientAvailableIcon.setImageResource(R.mipmap.ic_available_icon)
+
+                // set colour for fridge icon
+                val colorGreen = ContextCompat.getColor(context, R.color.green_500)
+                viewHolder.ingredientAvailableIcon.setImageResource(R.drawable.ic_fridgeicon)
+                viewHolder.ingredientAvailableIcon.setColorFilter(colorGreen)
                 viewHolder.ingredientAvailableIcon.visibility = ImageView.VISIBLE
-                viewHolder.ingredientAvailableTextView.setTextColor(color)
-                viewHolder.ingredientAvailableTextView.text = context.getString(R.string.Available)
+                viewHolder.ingredientAvailableTextView.setTextColor(colorGreen)
+                viewHolder.ingredientAvailableTextView.text = "" //context.getString(R.string.Available)
             }else{
-                val color = ContextCompat.getColor(context, R.color.light_grey)
-                viewHolder.ingredientAvailableIcon.visibility = ImageView.GONE
-                viewHolder.ingredientAvailableTextView.setTextColor(color)
-                viewHolder.ingredientAvailableTextView.text = context.getString(R.string.NotAvailable)
+                val colorRed = ContextCompat.getColor(context, R.color.red_200)
+                viewHolder.ingredientAvailableIcon.setImageResource(R.drawable.ic_baseline_shopping_bag_24)
+                viewHolder.ingredientAvailableIcon.setColorFilter(colorRed)
+                viewHolder.ingredientAvailableTextView.setTextColor(colorRed)
+                viewHolder.ingredientAvailableTextView.text = "" //context.getString(R.string.NotAvailable)
             }
             // pass values to view items
+            val abbrUnit = abbreviateUnitString(currentItem.quantity)
             viewHolder.ingredientNameTextView.text = currentItem.productName
-            viewHolder.ingredientQuantityTextView.text = currentItem.quantity
+            viewHolder.ingredientQuantityTextView.text = abbrUnit
         }
     }
 

@@ -29,8 +29,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/small_text_margin"
                 android:layout_marginBottom="@dimen/small_text_margin"
-                android:layout_marginStart="@dimen/super_large_text_margin"
-                android:layout_marginEnd="@dimen/super_large_text_margin"
+                android:layout_marginStart="@dimen/large_text_margin"
+                android:layout_marginEnd="@dimen/large_text_margin"
                 android:orientation="horizontal"
                 android:layout_gravity="center_horizontal">
 
@@ -40,7 +40,8 @@
                     android:layout_height="22dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_star_icon"/>
+                    android:src="@mipmap/ic_star_icon"
+                    android:contentDescription="@string/content_description_star_icon" />
 
                 <TextView
                     android:id="@+id/text_recipe_card_rating"
@@ -93,7 +94,8 @@
                     android:layout_height="22dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_flame_icon"/>
+                    android:src="@mipmap/ic_flame_icon"
+                    android:contentDescription="@string/content_description_nutrition_icon" />
 
                 <TextView
                     android:id="@+id/text_recipe_card_nutrition"
@@ -144,7 +146,8 @@
                     android:layout_height="22dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_time_icon"/>
+                    android:src="@mipmap/ic_time_icon"
+                    android:contentDescription="@string/content_description_cooking_time" />
 
                 <TextView
                     android:id="@+id/text_recipe_card_cooking_time"

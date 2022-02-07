@@ -11,7 +11,10 @@
         android:layout_height="wrap_content"
         android:background="@drawable/custom_background"
         android:clickable="true"
-        android:padding="@dimen/small_text_margin"
+        android:paddingTop="@dimen/medium_text_margin"
+        android:paddingStart="@dimen/small_text_margin"
+        android:paddingEnd="@dimen/small_text_margin"
+        android:paddingBottom="@dimen/small_text_margin"
         app:cardCornerRadius="@dimen/card_view_corner_radius"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +24,7 @@
 
         <LinearLayout
             android:id="@+id/user_profile_container"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
@@ -31,10 +34,10 @@
                 android:id="@+id/user_profile_image"
                 android:layout_width="88dp"
                 android:layout_height="88dp"
-                android:layout_marginStart="@dimen/small_cardview_margin"
-                android:layout_marginTop="@dimen/large_cardview_margin"
-                android:layout_marginEnd="@dimen/small_cardview_margin"
-                android:layout_marginBottom="@dimen/large_cardview_margin"
+                android:layout_marginStart="@dimen/medium_cardview_margin"
+                android:layout_marginTop="@dimen/medium_cardview_margin"
+                android:layout_marginEnd="@dimen/medium_cardview_margin"
+                android:layout_marginBottom="@dimen/medium_cardview_margin"
                 android:layout_gravity="center_vertical"
                 app:civ_border_width="2dp"
                 app:civ_border_color="@color/light_grey"
@@ -49,68 +52,72 @@
                     android:id="@+id/user_profile_name_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/small_text_margin"
                     android:layout_marginTop="@dimen/small_text_margin"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="@dimen/medium_text_margin"
+                    android:layout_marginEnd="@dimen/medium_text_margin"
                     android:layout_marginBottom="@dimen/small_text_margin"
-                    android:gravity="start"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toTopOf="@+id/user_profile_email_container"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="parent">
-
-                    <TextView
-                        android:id="@+id/user_profile_name_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Name: "
-                        android:gravity="center_vertical"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/text_small"
-                        android:textStyle="normal" />
 
                     <EditText
                         android:id="@+id/user_profile_firstname"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/small_text_margin"
+                        android:layout_marginEnd="@dimen/tiny_text_margin"
                         android:text="@string/dummy_text_firstname"
                         android:textColor="@color/black"
-                        android:textSize="@dimen/text_small"
-                        android:textStyle="normal" />
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold"
+                        android:autofillHints="@string/dummy_text_firstname"
+                        android:inputType="text"
+                        android:background="@android:color/transparent"/>
 
                     <EditText
                         android:id="@+id/user_profile_lastname"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/small_text_margin"
+                        android:layout_marginEnd="@dimen/small_text_margin"
                         android:text="@string/dummy_text_lastname"
                         android:textColor="@color/black"
-                        android:textSize="@dimen/text_small"
-                        android:textStyle="normal" />
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold"
+                        android:autofillHints="@string/dummy_text_lastname"
+                        android:inputType="text"
+                        android:background="@android:color/transparent"/>
 
                 </LinearLayout>
 
+                <!-- Email -->
 
                 <LinearLayout
                     android:id="@+id/user_profile_email_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_text_margin"
+                    android:layout_marginStart="@dimen/medium_text_margin"
+                    android:layout_marginEnd="@dimen/medium_text_margin"
                     android:layout_marginBottom="@dimen/small_text_margin"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:gravity="start"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/user_profile_name_container"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/user_profile_name_container">
 
                     <TextView
                         android:id="@+id/user_profile_email_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:text="E-Mail: "
+                        android:layout_marginStart="@dimen/small_text_margin"
+                        android:layout_marginEnd="@dimen/small_text_margin"
+                        android:layout_marginBottom="@dimen/tiny_text_margin"
+                        android:text="@string/user_email"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_small"
                         android:textStyle="normal" />
@@ -119,10 +126,15 @@
                         android:id="@+id/user_profile_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/small_text_margin"
+                        android:layout_marginEnd="@dimen/small_text_margin"
                         android:text="@string/dummy_text_email"
                         android:textColor="@color/black"
                         android:textSize="@dimen/text_small"
-                        android:textStyle="normal" />
+                        android:textStyle="normal"
+                        android:autofillHints="@string/dummy_text_email"
+                        android:inputType="textEmailAddress"
+                        android:background="@android:color/transparent"/>
 
                 </LinearLayout>
 

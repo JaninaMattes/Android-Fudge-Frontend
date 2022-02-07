@@ -3,6 +3,9 @@ package com.mobilesystems.feedme.ui.common.listener
 import android.view.GestureDetector
 import android.view.MotionEvent
 
+/**
+ * Future usage.
+ */
 class GestureListener: GestureDetector.SimpleOnGestureListener() {
 
     private val SWIPE_THRESHOLD = 100

@@ -66,14 +66,20 @@ class DashboardExpiringProductListAdapter (
             // Calculate difference between current date to expiration date
             val expDays = getTimeDiff(currentItem.expirationDate)
             if(expDays <= 3){
-                productViewHolder.productExpirationDate.setTextColor(ContextCompat.getColor(context, R.color.bright_red_200))
+                productViewHolder.productExpirationDate.setTextColor(ContextCompat.getColor(context, R.color.red_200))
             } else {
                 productViewHolder.productExpirationDate.setTextColor(ContextCompat.getColor(context, R.color.black))
             }
-            val expText: String = if(expDays <= 0){
-                "Heute"
-            }else{
-                "$expDays Tagen"
+            val expText: String = when {
+                expDays <= 0 -> {
+                    "Today"
+                }
+                expDays == 1L -> {
+                    "$expDays day"
+                }
+                else -> {
+                    "$expDays days"
+                }
             }
             productViewHolder.productExpirationDate.text = expText
             productViewHolder.productNameTextView.text = currentItem.productName

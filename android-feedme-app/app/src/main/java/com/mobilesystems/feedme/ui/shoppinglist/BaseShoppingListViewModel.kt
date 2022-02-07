@@ -32,4 +32,8 @@ interface BaseShoppingListViewModel {
 
     fun removeProductFromCurrentShoppingList(product: Product)
 
+    fun deleteCurrentProductByPosition(position: Int): Product?
+
+    fun deleteOldProductByPosition(position: Int): Product?
+
 }

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
     tools:context=".ui.recipedetail.RecipeDetailFragment">
 
     <!-- Header View -->
@@ -21,7 +20,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -31,26 +31,27 @@
                     android:id="@+id/recipe_detail_image"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/recipe_detail_image_height"
+                    android:contentDescription="@string/recipe_detail_image"
                     android:scaleType="centerCrop"
                     android:src="@drawable/pizza"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="@string/recipe_detail_image" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/text_recipe_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginBottom="@dimen/large_text_margin"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center_horizontal"
                     android:text="@string/recipe_detail_information"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_large"
                     android:textStyle="bold"
-                    android:fontFamily="@font/roboto_bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/recipe_detail_image" />
@@ -60,9 +61,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginBottom="@dimen/large_text_margin"
+                    android:gravity="center_horizontal"
                     android:text="@string/example_description"
                     android:textColor="@color/black"
                     android:textSize="@dimen/text_small"
@@ -75,10 +77,11 @@
                     android:id="@+id/card_view_information_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginEnd="@dimen/super_large_text_margin"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
                     app:layout_constraintBottom_toTopOf="@+id/recipe_cooking_detail_container"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -87,11 +90,11 @@
                     <!-- Recipe Detail Information -->
 
                     <include
+                        layout="@layout/recipe_detail_information_tags"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/medium_text_margin"
-                        android:layout_marginEnd="@dimen/medium_text_margin"
-                        layout="@layout/recipe_detail_information_tags"/>
+                        android:layout_marginEnd="@dimen/medium_text_margin" />
 
                 </LinearLayout>
 
@@ -99,68 +102,30 @@
                     android:id="@+id/recipe_cooking_detail_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_marginStart="@dimen/super_large_text_margin"
-                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginTop="@dimen/large_text_margin"
+                    android:layout_marginEnd="@dimen/super_large_text_margin"
                     android:layout_marginBottom="@dimen/large_text_margin"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/card_view_information_container">
 
                     <!-- Recipe Detail InformationView -->
-
                     <include
                         android:id="@+id/recipe_cooking_details"
+                        layout="@layout/recipe_detail_information_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        layout="@layout/recipe_detail_information_view" />
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </RelativeLayout>
 
     </ScrollView>
-
-    <!-- Custom Floating Button -->
-    <FrameLayout
-        android:id="@+id/container_for_floating_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="@dimen/super_large_text_margin"
-        android:layout_marginEnd="@dimen/super_large_text_margin"
-        android:layout_marginTop="@dimen/large_text_margin"
-        android:layout_marginBottom="@dimen/super_large_text_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/button_export_ingredients_to_shoppinglist"
-            android:layout_width="@dimen/button_export_ingredient"
-            android:layout_height="@dimen/button_export_ingredient_height"
-            android:layout_margin="@dimen/tiny_text_margin"
-            android:layout_marginStart="@dimen/tiny_text_margin"
-            android:layout_marginEnd="@dimen/tiny_text_margin"
-            android:backgroundTint="@color/colorAccent"
-            android:clickable="true"
-            android:elevation="@dimen/medium_card_elevation"
-            android:src="@android:color/transparent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/small_text_margin"
-            android:elevation="@dimen/button_text_elevation"
-            android:text="@string/button_share_ingredients"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_medium" />
-
-    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

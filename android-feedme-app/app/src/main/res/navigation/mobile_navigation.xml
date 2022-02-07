@@ -56,12 +56,18 @@
         <action
             android:id="@+id/action_navigation_dashboard_to_logoutFragment"
             app:destination="@id/logoutFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_inventorylist"
+            app:destination="@id/navigation_inventorylist" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_recipes"
+            app:destination="@id/navigation_recipes" />
     </fragment>
 
     <fragment
         android:id="@+id/addProductToShoppingListFragment"
         android:name="com.mobilesystems.feedme.ui.shoppinglist.AddProductToShoppingListFragment"
-        android:label="Produkt hinzufügen"
+        android:label="@string/button_addProduct"
         tools:layout="@layout/shopping_list_add_product_fragment">
         <action
             android:id="@+id/action_addProductToShoppingListFragment_to_navigation_shoppingList"
@@ -71,7 +77,7 @@
     <fragment
         android:id="@+id/productFragment"
         android:name="com.mobilesystems.feedme.ui.productdetail.ProductFragment"
-        android:label="Produktdetails">
+        android:label="@string/Product_details">
         <action
             android:id="@+id/action_productFragment_to_navigation_inventorylist"
             app:destination="@id/navigation_inventorylist" />
@@ -86,7 +92,7 @@
     <fragment
         android:id="@+id/addProductToInventoryFragment"
         android:name="com.mobilesystems.feedme.ui.inventorylist.AddProductToInventoryFragment"
-        android:label="Produkt hinzufügen"
+        android:label="@string/button_addProduct"
         tools:layout="@layout/inventory_add_product_fragment" >
         <action
             android:id="@+id/action_addProductToInventoryFragment_to_navigation_inventorylist"
@@ -96,7 +102,7 @@
     <fragment
         android:id="@+id/recipeFragment"
         android:name="com.mobilesystems.feedme.ui.recipedetail.RecipeDetailFragment"
-        android:label="Rezeptdetails"
+        android:label="@string/recipe_details"
         tools:layout="@layout/recipe_detail_fragment" >
         <action
             android:id="@+id/action_recipeFragment_to_navigation_recipes"
@@ -112,7 +118,7 @@
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="com.mobilesystems.feedme.ui.profile.UserProfileFragment"
-        android:label="Nutzerprofil"
+        android:label="@string/user_profile"
         tools:layout="@layout/user_profile_fragment" >
         <action
             android:id="@+id/action_userProfileFragment_to_navigation_dashboard"
@@ -121,7 +127,7 @@
     <fragment
         android:id="@+id/logoutFragment"
         android:name="com.mobilesystems.feedme.ui.logout.LogoutFragment"
-        android:label="logout_fragment"
+        android:label="@string/logout"
         tools:layout="@layout/logout_fragment" >
         <action
             android:id="@+id/action_logoutFragment_to_navigation_dashboard"

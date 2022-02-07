@@ -70,7 +70,8 @@ class ShoppingListRepositoryImpl @Inject constructor(
 
     override suspend fun removeProductFromOldShoppingList(userId: Int, product: Product) {
         val request = convertShoppingListProductIDRequest(userId, product)
-        dataSourceImpl.removeProductFromOldShoppingList(request)
+        val result = dataSourceImpl.removeProductFromOldShoppingList(request)
+        Log.d("ShoppingList Repository", "Remove Product from oldshoppinglist: " + result.data.toString())
     }
 
     override suspend fun updateCurrentShoppingList(userId: Int, currentShoppingList: List<Product>?) {

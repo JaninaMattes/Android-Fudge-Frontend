@@ -51,7 +51,8 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/old_shopping_list_item_name"/>
+                app:layout_constraintBottom_toTopOf="@id/old_shopping_list_item_name"
+                android:contentDescription="@string/content_description_food_icon" />
 
             <TextView
                 android:id="@+id/old_shopping_list_item_name"
@@ -63,7 +64,7 @@
                 android:layout_marginBottom="@dimen/tiny_text_margin"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:text="Pizza"
+                android:text="@string/pizza"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/old_shopping_item_food_icon"/>

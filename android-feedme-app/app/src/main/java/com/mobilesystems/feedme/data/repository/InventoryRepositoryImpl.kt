@@ -63,7 +63,8 @@ class InventoryRepositoryImpl @Inject constructor(
     override suspend fun removeProductFromInventory(userId: Int, product: Product) {
         val request = DeleteProductRequest(userId, product.productId)
         Log.d("InventoryRepository", "Remove product.")
-        //inventoryDataSource.removeProductFromInventoryList(request)
+        val result = inventoryDataSource.removeProductFromInventoryList(request)
+        Log.d("Delete Product from Inventory", result.data.toString())
     }
 
     override suspend fun getBarcodeScanResult(result: String): Product? {

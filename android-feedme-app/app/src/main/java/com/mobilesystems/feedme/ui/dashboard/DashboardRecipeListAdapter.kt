@@ -11,6 +11,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilesystems.feedme.databinding.DashboardNumberOneRecipeItemBinding
 import com.mobilesystems.feedme.domain.model.Recipe
+import com.mobilesystems.feedme.ui.common.utils.abbreviateString
 import com.squareup.picasso.Picasso
 
 class DashboardRecipeListAdapter (
@@ -71,18 +72,13 @@ class DashboardRecipeListAdapter (
             // pass values to view items
             imageUrl = currentItem.imageUrl
             if(imageUrl.isNotEmpty()) {
-                Picasso.get().load(imageUrl).into(recipeViewHolder.recipeImageView)
-                Log.d("RecipeListAdapter", "Load image url $imageUrl")
+                // fit image
+                Picasso.get().load(imageUrl).fit().centerCrop().into(recipeViewHolder.recipeImageView)
             }
             recipeViewHolder.recipeCookingDifficulty.text = currentItem.difficulty
             recipeViewHolder.recipeRatingBar.rating = currentItem.cummulativeRating
-            recipeViewHolder.recipeNameTextView.text = currentItem.recipeName
-
-            var recipeLabel = ""
-            if(currentItem.recipeLabel.trim().length <= 20){
-                recipeLabel = currentItem.recipeLabel
-            }
-            recipeViewHolder.recipeTypeLabelTextView.text = recipeLabel
+            recipeViewHolder.recipeNameTextView.text = abbreviateString(currentItem.recipeName, 35)
+            recipeViewHolder.recipeTypeLabelTextView.text = abbreviateString(currentItem.recipeLabel, 20)
         }
     }
 

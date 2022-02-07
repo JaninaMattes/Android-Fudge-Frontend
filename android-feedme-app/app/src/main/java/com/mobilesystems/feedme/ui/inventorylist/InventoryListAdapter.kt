@@ -1,7 +1,6 @@
 package com.mobilesystems.feedme.ui.inventorylist
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
 import android.view.View
@@ -74,12 +73,10 @@ class InventoryListAdapter(
             val bitmap = currentItem.productImage?.bitmap
             if (bitmap != null){
                 viewHolder.imageView.setImageBitmap(bitmap)
-                Log.d("InventoryListAdapter", "Set bitmap")
             }else {
                 val imageUrl = currentItem.productImage?.imageUrl ?:
                     "https://cdn.pixabay.com/photo/2017/06/06/22/37/italian-cuisine-2378729_960_720.jpg"
-                Picasso.get().load(imageUrl).into(viewHolder.imageView)
-                //Log.d("InventoryListAdapter", "Set image $imageUrl with Picasso")
+                Picasso.get().load(imageUrl).fit().centerCrop().into(viewHolder.imageView)
             }
             viewHolder.productName.text = currentItem.productName
             viewHolder.productQuantity.text = currentItem.quantity
@@ -94,11 +91,13 @@ class InventoryListAdapter(
             }
             val productExpText: String
 
-            if(expDays > 0){
-                productExpText = "$expDays Tagen"
+            if(expDays > 1){
+                productExpText = "$expDays days"
+            } else if (expDays == 1L){
+                productExpText = "$expDays day"
             }
             else{
-                productExpText = "Heute"
+                productExpText = "Today"
             }
             viewHolder.productExpiration.text = productExpText
             viewHolder.productExpirationDate.text = currentItem.expirationDate

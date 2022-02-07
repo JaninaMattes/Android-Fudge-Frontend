@@ -11,12 +11,16 @@ import com.mobilesystems.feedme.domain.model.FoodType
 import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.Settings
 import com.mobilesystems.feedme.domain.model.User
-import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
+import com.mobilesystems.feedme.ui.common.utils.*
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * SharedViewModel to propagate shared Data between Fragments.
+ */
 @HiltViewModel
 class SharedUserProfileViewModel @Inject constructor(
     androidApplication: Application,
@@ -39,14 +43,15 @@ class SharedUserProfileViewModel @Inject constructor(
     init {
         if(currentUserId.value == null || currentUserId.value == 0){
             val context = getApplication<Application>().applicationContext
-            // pre-fetch user from sharedPreferences
+            // get pre-fetched user data from sharedPreferences
             getCurrentUserId(context)
+            getPreFetchedUserData(context)
         }
-        // load user from backend
-        if(loggedInUser.value == null){
-            loadLoggedInUser()
+        // load full user data from backend
+        loadLoggedInUser()
+
+        if(foodTypesHasNoValues()){
             loadLoggedInUserFoodTypeList()
-            Log.d("UserViewModel", "Loading all data.")
         }
     }
 
@@ -60,7 +65,6 @@ class SharedUserProfileViewModel @Inject constructor(
                 Log.d("UserViewModel", "Loaded User ${loggedInUser.value?.firstName} with Id ${loggedInUser.value?.userId}")
             }else{
                 Log.e("UserViewModel", "No user found.")
-                // TODO: If no user, then log user out
             }
         }
     }
@@ -124,6 +128,8 @@ class SharedUserProfileViewModel @Inject constructor(
                 tempUser.userSettings = settings
                 userRepository.allowReminder(tempUser.userId, remindMe)
                 Log.d("UserViewModel", "Update expiration reminder settings.")
+            }else{
+                Log.d("UserViewModel", "User is null.")
             }
         }
     }
@@ -140,6 +146,8 @@ class SharedUserProfileViewModel @Inject constructor(
                 tempUser.userSettings = settings
                 userRepository.allowPushNotification(tempUser.userId, remindMe)
                 Log.d("UserViewModel", "Update push notification settings.")
+            }else{
+                Log.d("UserViewModel", "User is null.")
             }
         }
     }
@@ -157,6 +165,20 @@ class SharedUserProfileViewModel @Inject constructor(
                 tempUser.userSettings = settings
                 userRepository.allowSuggestion(tempUser.userId, remindMe)
                 Log.d("UserViewModel", "Update recommend for shoppinglist settings.")
+            }else{
+                Log.d("UserViewModel", "User is null.")
+            }
+        }
+    }
+
+    fun refresh(){
+        // refresh after certain time for better user experience
+        viewModelScope.launch {
+            delay(1500)
+            val userId = loggedInUser.value?.userId
+            if(userId != null && userId != 0) {
+                val result = userRepository.getLoggedInUser(userId)
+                _loggedInUser.value = result
             }
         }
     }
@@ -164,6 +186,21 @@ class SharedUserProfileViewModel @Inject constructor(
     private fun getCurrentUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
         _currentUserId.value = result?.userId
-        return  currentUserId
+        return currentUserId
+    }
+
+    private fun getPreFetchedUserData(context: Context){
+        if(doesPreferenceExist(context, "mPreference", "userData")) {
+            val result = getUserDataFromSharedPreference(context)
+            if (result != null) {
+                removeDataFromSharedPreferences(context, result)
+                val user = convertUserDataToUser(result)
+                _loggedInUser.value = user
+            }
+        }
+    }
+
+    private fun foodTypesHasNoValues(): Boolean{
+        return loggedInUserFoodTypeList.value.isNullOrEmpty()
     }
 }

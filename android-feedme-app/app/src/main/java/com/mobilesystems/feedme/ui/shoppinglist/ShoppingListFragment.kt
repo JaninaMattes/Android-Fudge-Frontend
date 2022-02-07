@@ -56,10 +56,6 @@ class ShoppingListFragment : Fragment() {
         addChildFragment(R.id.old_shopping_list_fragment, oldShoppingListFragment)
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         // Persist current state

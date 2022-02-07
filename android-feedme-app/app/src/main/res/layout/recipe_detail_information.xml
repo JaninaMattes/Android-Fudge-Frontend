@@ -40,7 +40,8 @@
                     android:layout_height="22dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_star_icon"/>
+                    android:src="@mipmap/ic_star_icon"
+                    android:contentDescription="@string/content_description_recipe_card_star" />
 
                 <TextView
                     android:id="@+id/text_recipe_card_rating"
@@ -49,7 +50,7 @@
                     android:layout_marginStart="@dimen/small_text_margin"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:text="5.0"/>
+                    android:text="@string/dummy_text"/>
 
             </LinearLayout>
 
@@ -88,7 +89,8 @@
                     android:layout_height="22dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_flame_icon"/>
+                    android:src="@mipmap/ic_flame_icon"
+                    android:contentDescription="@string/content_description_nutrition_icon" />
 
                 <TextView
                     android:id="@+id/text_recipe_card_nutrition"
@@ -97,7 +99,7 @@
                     android:layout_marginStart="@dimen/small_text_margin"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:text="128 Kcal"/>
+                    android:text="@string/dummy_text_kcal"/>
 
             </LinearLayout>
 
@@ -136,7 +138,8 @@
                     android:layout_height="22dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_time_icon"/>
+                    android:src="@mipmap/ic_time_icon"
+                    android:contentDescription="@string/content_description_cooking_time" />
 
                 <TextView
                     android:id="@+id/text_recipe_card_cooking_time"
@@ -145,7 +148,7 @@
                     android:layout_marginStart="@dimen/small_text_margin"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:text="30 Min."/>
+                    android:text="@string/dummy_text_min"/>
 
             </LinearLayout>
 

@@ -50,7 +50,6 @@ class ProductFragment : Fragment() {
 
     // content on view
     private var productImageBitmap: Bitmap? = null
-    private var productId: Int = 0
     private var productImg: Image? = null
 
     private lateinit var productImageview: ImageView
@@ -83,19 +82,20 @@ class ProductFragment : Fragment() {
 
         //set editTexts non-editable
         setEditTextEnabled(false)
-        setImageViewExchangeable(true)
+        setImageViewExchangeable(false)
 
         //get argument safargs
         val product: Product = args.product
-        productId = product.productId
         productNameTextView.text = product.productName
         productQuantityTextView.text = product.quantity
         productExpirationTextView.text = product.expirationDate
         productNutritionTextView.text = product.nutritionValue
         productManufacturerTextView.text = product.manufacturer
+
         // set values
         labelList = product.labels
         productImg = product.productImage
+
         val imageUrl = productImg?.imageUrl ?:
             "https://cdn.pixabay.com/photo/2017/06/06/22/37/italian-cuisine-2378729_960_720.jpg"
         productImageBitmap = productImg?.bitmap
@@ -116,7 +116,7 @@ class ProductFragment : Fragment() {
 
             //set editText editable
             setEditTextEnabled(true)
-            //setImageViewExchangeable(true)
+            setImageViewExchangeable(true)
         }
 
         binding.btnCancelSaveProduct.setOnClickListener{
@@ -127,22 +127,24 @@ class ProductFragment : Fragment() {
             binding.btnCancelSaveProduct.visibility = View.GONE
             //set editText editable
             setEditTextEnabled(false)
-            //setImageViewExchangeable(false)
+            setImageViewExchangeable(false)
         }
 
         binding.btnSaveProduct.setOnClickListener{
 
-            val productname = productNameTextView.text.toString()// TODO: Productname cannot be empty!!
+            // get values from edit text
+            val productname = productNameTextView.text.toString()
             var productquantity = productQuantityTextView.text.toString()
             val productExpirationDate = productExpirationTextView.text.toString()
             var productManufacturer = productManufacturerTextView.text.toString()
             var productNutrition = productNutritionTextView.text.toString()
+
             // check quantity
             if(productquantity.isEmpty()){
-                productquantity = "1 Stück"
+                productquantity = "1 Piece"
             }else if (productquantity.isDigitsOnly()){
                 val quantity = productquantity.filter { it.isDigit() }
-                productquantity = "$quantity Stück"
+                productquantity = "$quantity Piece"
             }
             // Check product manufacturer
             if(productManufacturer.isEmpty()){
@@ -156,15 +158,24 @@ class ProductFragment : Fragment() {
                 productNutrition = "$quantity kcal"
             }
             // create new image instance with new values
-            val productImage = createUpdateImage(productImg, productImageBitmap)
-            // create new product instance
-            val product = Product(
-                productId, productname, productExpirationDate, labelList,
-                productquantity, productManufacturer,
-                productNutrition, productImage)
+            val selectedProduct = sharedViewModel.selectedProduct.value
+            val productImage = createUpdateImage(selectedProduct, productImageBitmap)
 
-            sharedViewModel.updateProductOnInventory(product)
-
+            if(selectedProduct != null) {
+                // create new product instance
+                val product = Product(
+                    productId = selectedProduct.productId,
+                    productName = productname,
+                    expirationDate = productExpirationDate,
+                    labels = labelList,
+                    quantity = productquantity,
+                    manufacturer = productManufacturer,
+                    nutritionValue = productNutrition,
+                    productImage = productImage
+                )
+                sharedViewModel.updateProductOnInventory(product)
+                sharedViewModel.refresh()
+            }
             //navigate to inventory list
             val action = ProductFragmentDirections.actionProductFragmentToNavigationInventorylist2()
             findNavController().navigate(action)
@@ -193,7 +204,25 @@ class ProductFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // Gallery picker to select custom image
         if (requestCode == AddProductToInventoryFragment.IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            productImageBitmap = loadImageFromGallery(data)
+            // exchange bitmap
+            try {
+                val uri = data?.data
+                if(uri != null) {
+                    // read bitmap from input stream
+                    val inputStream: InputStream? = activity?.contentResolver?.openInputStream(uri)
+                    productImageBitmap = BitmapFactory.decodeStream(inputStream)
+                    if(productImageBitmap != null){
+                        productImageview.setImageBitmap(productImageBitmap)
+                        Log.d(TAG, "Set image from gallery.")
+                    }
+                } else {
+                    Log.d(TAG, "URI is null.")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                val context = activity?.applicationContext
+                Toast.makeText(context,"Gallery picker failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -201,7 +230,6 @@ class ProductFragment : Fragment() {
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
         val productTagListFragment = ProductTagListFragment()
-
         childFragmentManager.beginTransaction().apply {
             add(R.id.product_label_list_fragment, productTagListFragment)
             addToBackStack(null)
@@ -217,10 +245,10 @@ class ProductFragment : Fragment() {
                 val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 // code for crop image to reduce size
                 i.putExtra("crop", "true")
-                i.putExtra("aspectX", 80)
-                i.putExtra("aspectY", 80)
-                i.putExtra("outputX", 156)
-                i.putExtra("outputY", 256)
+                i.putExtra("aspectX", 60)
+                i.putExtra("aspectY", 60)
+                i.putExtra("outputX", 124)
+                i.putExtra("outputY", 156)
 
                 try {
                     i.putExtra("return-data", true)
@@ -237,38 +265,19 @@ class ProductFragment : Fragment() {
         }
     }
 
-    private fun loadImageFromGallery(data: Intent?) : Bitmap? {
-        try {
-            //profileImageView.setImageURI(data?.data)
-            val uri = data?.data
-            if(uri != null) {
-                val inputStream: InputStream? = activity?.contentResolver?.openInputStream(uri)
-                productImageBitmap = BitmapFactory.decodeStream(inputStream)
-                val newProductImage = createUpdateImage(productImg, productImageBitmap)
-                sharedViewModel.updateImage(newProductImage)
-                Log.d(TAG, "Set image from gallery.")
-            } else {
-                Log.d(TAG, "URI is null.")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            val context = activity?.applicationContext
-            Toast.makeText(context,"Gallery picker failed", Toast.LENGTH_SHORT).show()
-        }
-
-        return productImageBitmap
-    }
-
-    private fun createUpdateImage(img: Image?, bitmap: Bitmap?): Image{
+    private fun createUpdateImage(product: Product?, newBitmap: Bitmap?): Image? {
         // Create new user object with correct image to pass to backend
-        val newImg = Image(
-                imageId = img?.imageId ?: 0,
-                imageName = img?.imageName ?: "Produktbild",
-                imageUrl = img?.imageUrl ?: "https://cdn.pixabay.com/photo/2017/06/06/22/37/italian-cuisine-2378729_960_720.jpg",
-                bitmap = productImageBitmap ?: img?.bitmap // place new image from gallery if available
+        val img = product?.productImage
+        var newImg: Image? = null
+        if(img != null){
+            newImg = Image(
+                imageId = img.imageId,
+                imageName = img.imageName,
+                imageUrl = img.imageUrl,
+                bitmap = newBitmap ?: productImageBitmap // place new image from gallery if available
             )
-        Log.d(UserProfileFragment.TAG, "Create new product image.")
-        productImg = newImg
+            Log.d(UserProfileFragment.TAG, "Create new product image.")
+        }
         return newImg
     }
 

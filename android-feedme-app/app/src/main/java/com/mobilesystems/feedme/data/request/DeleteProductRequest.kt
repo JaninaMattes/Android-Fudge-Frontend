@@ -5,8 +5,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class DeleteProductRequest(
+    private val userId: Int,
     private val productId: Int,
-    private val userId: Int
 ): Parcelable {
 
     override fun equals(other: Any?): Boolean {

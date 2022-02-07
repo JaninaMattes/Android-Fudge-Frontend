@@ -1,11 +1,14 @@
 package com.mobilesystems.feedme.data.repository
 
+import com.mobilesystems.feedme.data.response.UserResponse
 import com.mobilesystems.feedme.domain.model.Image
 import com.mobilesystems.feedme.domain.model.User
 
 interface UserRepository {
 
     suspend fun getLoggedInUser(userId: Int): User?
+
+    suspend fun preFetchLoggedInUser(userId: Int): UserResponse?
 
     suspend fun updateLoggedInUser(user: User)
 
