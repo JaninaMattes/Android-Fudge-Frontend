@@ -130,8 +130,6 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             try {
                 i.putExtra("return-data", true)
                 startActivityForResult(Intent.createChooser(i, "Select Picture"), IMAGE_REQUEST_CODE)
-                val context = activity?.applicationContext
-                Toast.makeText(context,"Image is loaded!", Toast.LENGTH_LONG).show()
             } catch (ex: ActivityNotFoundException) {
                 ex.printStackTrace()
                 val context = activity?.applicationContext
@@ -166,7 +164,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
                 if(productLabel.isNotEmpty()) {
                     newLabel = Label.from(productLabel)
                     if (newLabel != null) {
-                        productLabelList.add(newLabel)
+                        // productLabelList.add(newLabel)
                         if(productExpirationDate.isEmpty()){
                             // calculate expiration
                             productExpirationDate = calculateExpDate(newLabel)

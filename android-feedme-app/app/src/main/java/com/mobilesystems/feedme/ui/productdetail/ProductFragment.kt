@@ -213,7 +213,7 @@ class ProductFragment : Fragment() {
                     productImageBitmap = BitmapFactory.decodeStream(inputStream)
                     if(productImageBitmap != null){
                         productImageview.setImageBitmap(productImageBitmap)
-                        Log.d(TAG, "Set image from gallery.")
+                        Toast.makeText(context,"Image selected!", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Log.d(TAG, "URI is null.")
