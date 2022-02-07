@@ -99,7 +99,6 @@ class RecipeListFragment : Fragment() {
 
         // update adapter after data is loaded
         sharedViewModel.recipeList.observe(viewLifecycleOwner, recipeListObserver)
-
     }
 
     override fun onDestroyView() {

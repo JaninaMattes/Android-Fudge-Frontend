@@ -109,9 +109,14 @@ class SharedRecipesViewModel @Inject constructor(
     override fun addRecipeToFavorites(recipeId: Int) {
         // For future features
         viewModelScope.launch {
-            val userId = currentUserId.value
-            if(userId != null) {
-                recipeRepository.addRecipeToFavoriteList(userId, recipeId)
+            try{
+                val userId = currentUserId.value
+                if(userId != null) {
+                    recipeRepository.addRecipeToFavoriteList(userId, recipeId)
+                }
+            }catch (e: Exception){
+                Log.d("Recipe", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -136,9 +141,14 @@ class SharedRecipesViewModel @Inject constructor(
 
     override fun saveCurrentShoppingState() {
         viewModelScope.launch {
-            val userId = currentUserId.value
-            if (userId != null) {
-                //recipeRepository.updateCurrentShoppingList(userId, shoppingList.value)
+            try{
+                val userId = currentUserId.value
+                if (userId != null) {
+                    //recipeRepository.updateCurrentShoppingList(userId, shoppingList.value)
+                }
+            }catch (e: Exception){
+                Log.d("Recipe", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -146,10 +156,11 @@ class SharedRecipesViewModel @Inject constructor(
     override fun exportUnavailableIngredientsToShoppingList() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-        val userId = currentUserId.value
+
+            val userId = currentUserId.value
             val currentValues = shoppingList.value
-        var tempList: MutableList<Product>
-        tempList = currentValues as MutableList<Product>
+            var tempList: MutableList<Product>
+            tempList = currentValues as MutableList<Product>
             if (userId != null) {
                 // Check if ingredientlist is empty
                 _notAvailableIngredients.value?.forEach {
@@ -167,18 +178,28 @@ class SharedRecipesViewModel @Inject constructor(
                                     duplicateValue[i],
                                     newProduct
                                 ) as MutableList<Product>// Replace with new product
-                                recipeRepository.updateSingleProductOnCurrentShoppingList(
-                                    userId,
-                                    newProduct
-                                )
+                                try{
+                                    recipeRepository.updateSingleProductOnCurrentShoppingList(
+                                        userId,
+                                        newProduct
+                                    )
+                                }catch (e: Exception){
+                                    Log.d("Recipe", "Error occured $e")
+                                    e.stackTrace
+                                }
                             }
                         }
                     }
                     //if ingredient is not on shoppinglist, add new product
                     else {
-                        val updatedProduct =
-                            recipeRepository.addNewProductToCurrentShoppingList(userId, it)
-                        tempList.add(updatedProduct)
+                        try{
+                            val updatedProduct =
+                                recipeRepository.addNewProductToCurrentShoppingList(userId, it)
+                            tempList.add(updatedProduct)
+                        }catch (e: Exception){
+                            Log.d("Recipe", "Error occured $e")
+                            e.stackTrace
+                        }
                     }
                 }
             }
@@ -217,7 +238,12 @@ class SharedRecipesViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if(userId != null) {
-                _shoppingList.value = recipeRepository.loadCurrentShoppingListProducts(userId)
+                try{
+                    _shoppingList.value = recipeRepository.loadCurrentShoppingListProducts(userId)
+                }catch (e: Exception){
+                    Log.d("Recipe", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -227,7 +253,12 @@ class SharedRecipesViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if(userId != null) {
-                _inventoryList.value = inventoryRepository.loadInventoryListProducts(userId)
+                try{
+                    _inventoryList.value = inventoryRepository.loadInventoryListProducts(userId)
+                }catch (e: Exception){
+                    Log.d("Recipe", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -237,9 +268,14 @@ class SharedRecipesViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if(userId != null) {
-                val result = recipeRepository.loadAllRecipesBasedOnInventory(userId)
-                // filter by rating
-                _recipeList.value = filterListByRating(filterDuplicates(result))
+                try{
+                    val result = recipeRepository.loadAllRecipesBasedOnInventory(userId)
+                    // filter by rating
+                    _recipeList.value = filterListByRating(filterDuplicates(result))
+                }catch (e: Exception){
+                    Log.d("Recipe", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }

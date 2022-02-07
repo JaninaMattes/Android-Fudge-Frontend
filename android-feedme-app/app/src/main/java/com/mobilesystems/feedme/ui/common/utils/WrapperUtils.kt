@@ -195,7 +195,6 @@ fun convertRecipeResponse(recipeListResponse: RecipeListResponse?) : List<Recipe
                 val ingredients = recipe.ingredients
                 val nIngredients: MutableList<Product> = mutableListOf()
                 if (ingredients != null && ingredients.isNotEmpty()) {
-                    // TODO: Fix nested for-loops
                     Log.d("Utils", "Convert $ingredients object to Ingredient.")
                     for (ingredient in ingredients) {
                         val nIngredient = Product(
