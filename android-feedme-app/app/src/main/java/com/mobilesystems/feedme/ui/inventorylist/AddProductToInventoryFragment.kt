@@ -122,10 +122,10 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             val i = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             // code for crop image
             i.putExtra("crop", "true")
-            i.putExtra("aspectX", 100)
-            i.putExtra("aspectY", 100)
-            i.putExtra("outputX", 256)
-            i.putExtra("outputY", 356)
+            i.putExtra("aspectX", 80)
+            i.putExtra("aspectY", 80)
+            i.putExtra("outputX", 156)
+            i.putExtra("outputY", 256)
 
             try {
                 i.putExtra("return-data", true)
@@ -321,6 +321,7 @@ class AddProductToInventoryFragment : Fragment(), AdapterView.OnItemSelectedList
             if(uri != null) {
                 val inputStream: InputStream? = activity?.contentResolver?.openInputStream(uri)
                 newProductImage = BitmapFactory.decodeStream(inputStream)
+                Toast.makeText(context,"Picture is loaded!", Toast.LENGTH_SHORT).show()
             } else {
                 Log.d(TAG, "URI is null.")
             }
