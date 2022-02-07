@@ -29,7 +29,7 @@ fun convertUserDietryTagRequest(user: User): UserDietryTagRequest?{
             dietryTag = ProductTagRequest(0, "")
         }
         userDietryTagRequest = UserDietryTagRequest(userId, dietryTag)
-    }catch (e: Exception){
+    } catch (e: Exception){
         e.stackTrace
     }
     return userDietryTagRequest
@@ -66,14 +66,12 @@ fun convertUserResponse(userResponse: UserResponse?) : User? {
     var user: User? = null
     try {
         if (userResponse != null) {
-            Log.d("Utils", "Convert $userResponse object to User.")
             val dietaryPreferences: MutableList<FoodType> = mutableListOf()
             if (userResponse.dietaryPreferences != null) {
                 for (tag in userResponse.dietaryPreferences) {
                     val dietPref = FoodType.from(tag.label)
                     if (dietPref != null) {
                         dietaryPreferences.add(dietPref)
-                        Log.d("Utils", "User convert dietry prefs to $dietPref")
                     }
                 }
             } else {
@@ -85,7 +83,6 @@ fun convertUserResponse(userResponse: UserResponse?) : User? {
                 val suggestion = userResponse.userSettings.suggestProductsForShoppingList
                 val pushNotification = userResponse.userSettings.allowPushNotifications
                 settings = Settings(reminder, pushNotification, suggestion)
-                Log.e("Utils", "Converted user setting $settings.")
             }
 
             var userImage: Image? = null
@@ -95,7 +92,6 @@ fun convertUserResponse(userResponse: UserResponse?) : User? {
                     val byteArray = base64ToBytes(userResponse.userImage.base64ImageString)
                     if(byteArray != null) {
                         nbitmap = convertByteArrayToBitmap(byteArray)
-                        Log.e("Utils", "Converted to bitmap $nbitmap.")
                     }else{
                         Log.e("Utils", "User image byte array is empty!")
                     }
@@ -120,7 +116,6 @@ fun convertUserResponse(userResponse: UserResponse?) : User? {
                 dietaryPreferences = dietaryPreferences,
                 userImage = userImage
             )
-            Log.d("Utils", "Konvertierter User $user")
         } else {
             Log.d("Utils", "UserResponse is null!")
         }
@@ -188,14 +183,10 @@ fun convertRecipeResponse(recipeListResponse: RecipeListResponse?) : List<Recipe
 
     try {
         if(recipeListResponse != null && recipeListResponse.isNotEmpty()) {
-            Log.d("Utils", "Convert ${recipeListResponse.size} objects to Recipelist.")
             for(recipe in recipeListResponse) {
-
-                Log.d("Utils", "Convert $recipe object to Recipe.")
                 val ingredients = recipe.ingredients
                 val nIngredients: MutableList<Product> = mutableListOf()
                 if (ingredients != null && ingredients.isNotEmpty()) {
-                    Log.d("Utils", "Convert $ingredients object to Ingredient.")
                     for (ingredient in ingredients) {
                         val nIngredient = Product(
                             productId = ingredient.ingredientId,
@@ -268,10 +259,8 @@ fun convertInventoryListResponse(inventoryListResponse: InventoryListResponse?) 
     val products: MutableList<Product> = mutableListOf()
     try{
         if(inventoryListResponse != null) {
-            Log.d("Utils", "Convert $inventoryListResponse object to Productlist.")
             if (inventoryListResponse.inventoryList.isNotEmpty()) {
                 for (product in inventoryListResponse.inventoryList) {
-                    Log.d("Utils", "Convert ${product.productId} object to Product.")
                     val nImage = createProductImg(product)
                     val productTags = createProductTags(product)
                     val nProduct = Product(
@@ -337,10 +326,8 @@ fun convertShoppingListResponse(shoppingListResponse: ShoppingListResponse?) : L
     val products: MutableList<Product> = mutableListOf()
     try{
         if (shoppingListResponse != null) {
-            Log.d("Utils", "Convert ShoppingList $shoppingListResponse object to Shoppinglist.")
             if (shoppingListResponse.shoppingList.isNotEmpty()) {
                 for (product in shoppingListResponse.shoppingList) {
-                    Log.d("Utils", "Convert $product object to Product.")
                     val newProduct = Product(
                         productId = product.productId,
                         productName = product.productName,
@@ -356,10 +343,9 @@ fun convertShoppingListResponse(shoppingListResponse: ShoppingListResponse?) : L
             }
         }
     } catch (e: Exception) {
-        e.stackTrace
         Log.e("Convert Shoppinglist", "Error $e")
+        e.stackTrace
     }
-    Log.d("Utils","Konvertierte Shoppingliste: $products")
     return products
 }
 
@@ -422,7 +408,6 @@ fun convertProductRequest(userId: Int, product: Product): ProductRequest?{
             productImage,
             productTags
         )
-        Log.d("Utils", "Converted added product to $productRequest")
     } catch(e: Exception){
         e.stackTrace
         Log.e("Convert Shoppinglist Product", "Error $e")
@@ -463,8 +448,8 @@ fun convertUserDataToUser(user: UserResponse): User?{
     var result: User? = null
     try{
         result = convertUserResponse(user)
-    }catch (e: Exception){
-        e.printStackTrace()
+    } catch (e: Exception){
+        e.stackTrace
     }
     return result
 }

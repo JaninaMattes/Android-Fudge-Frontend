@@ -38,7 +38,6 @@ class ShoppingListFragment : Fragment() {
         val createNewProductButton: FloatingActionButton = binding.buttonCreateNewProductForShoppingList
 
         createNewProductButton.setOnClickListener {
-            Log.d(TAG, "Add a new product to the shopping list.")
             val action = ShoppingListFragmentDirections.actionNavigationShoppingListToAddProductToShoppingListFragment()
             findNavController().navigate(action)
         }
@@ -51,7 +50,6 @@ class ShoppingListFragment : Fragment() {
         // Add nested child fragment
         val currentShoppingListFragment = ShoppingListCurrentProductsGridFragment()
         val oldShoppingListFragment = ShoppingListOldProductsGridFragment()
-
         addChildFragment(R.id.current_shopping_list_fragment, currentShoppingListFragment)
         addChildFragment(R.id.old_shopping_list_fragment, oldShoppingListFragment)
     }
@@ -65,8 +63,6 @@ class ShoppingListFragment : Fragment() {
     private fun addChildFragment(viewId: Int, childFragment: Fragment){
         // nest child fragment into parent fragment
         // https://developer.android.com/about/versions/android-4.2#NestedFragments
-        Log.d(TAG, "Add child fragment to parent.")
-
         val child = childFragmentManager.findFragmentById(viewId)
 
         if(child == null) {

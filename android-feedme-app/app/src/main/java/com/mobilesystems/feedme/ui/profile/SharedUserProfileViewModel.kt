@@ -60,9 +60,13 @@ class SharedUserProfileViewModel @Inject constructor(
             // This is a coroutine scope with the lifecycle of the ViewModel
             val userId = currentUserId.value
             if(userId != null && userId != 0) {
-                val result = userRepository.getLoggedInUser(userId)
-                _loggedInUser.value = result
-                Log.d("UserViewModel", "Loaded User ${loggedInUser.value?.firstName} with Id ${loggedInUser.value?.userId}")
+                try{
+                    val result = userRepository.getLoggedInUser(userId)
+                    _loggedInUser.value = result
+                }catch (e: Exception){
+                    Log.d("UserProfile", "Error occured $e")
+                    e.stackTrace
+                }
             }else{
                 Log.e("UserViewModel", "No user found.")
             }
@@ -72,9 +76,13 @@ class SharedUserProfileViewModel @Inject constructor(
     override fun updateLoggedInUser(user: User) {
         viewModelScope.launch {
             // Update user profile information
-            userRepository.updateLoggedInUser(user)
-            _loggedInUser.value = user
-            Log.d("UserViewModel", "Update user profile.")
+            try{
+                userRepository.updateLoggedInUser(user)
+                _loggedInUser.value = user
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
+            }
         }
     }
 
@@ -83,8 +91,12 @@ class SharedUserProfileViewModel @Inject constructor(
             // Update user profile information
             val userId = currentUserId.value
             if(userId != null && userId != 0){
-                userRepository.updateUserImage(userId, image)
-                Log.d("UserViewModel", "Update user image.")
+                try{
+                    userRepository.updateUserImage(userId, image)
+                }catch (e: Exception){
+                    Log.d("UserProfile", "Error occured $e")
+                    e.stackTrace
+                }
             }else{
                 Log.d("UserViewModel", "No user found.")
             }
@@ -95,9 +107,14 @@ class SharedUserProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if(userId != null && userId != 0) {
-                userRepository.deleteUser(userId)
-                _loggedInUser.value = null
-                Log.d("UserViewModel", "Delete user.")
+                try{
+                    userRepository.deleteUser(userId)
+                    _loggedInUser.value = null
+                    Log.d("UserViewModel", "Delete user.")
+                }catch (e: Exception){
+                    Log.d("UserProfile", "Error occured $e")
+                    e.stackTrace
+                }
             }else{
                 Log.d("UserViewModel", "No user found.")
             }
@@ -107,11 +124,15 @@ class SharedUserProfileViewModel @Inject constructor(
     override fun loadLoggedInUserFoodTypeList(): LiveData<List<FoodType>?> {
         // Helper function
         val tempUser = loggedInUser.value
-        if(tempUser != null) {
-            _loggedInUserFoodTypeList.value = tempUser.dietaryPreferences
-            Log.e("UserViewModel", "Load dietary preferences ${tempUser.dietaryPreferences}.")
-        }else{
-            Log.d("UserViewModel", "User is null.")
+        try{
+            if(tempUser != null) {
+                _loggedInUserFoodTypeList.value = tempUser.dietaryPreferences
+            }else{
+                Log.d("UserViewModel", "User is null.")
+            }
+        }catch (e: Exception){
+            Log.d("UserProfile", "Error occured $e")
+            e.stackTrace
         }
         return loggedInUserFoodTypeList
     }
@@ -119,17 +140,21 @@ class SharedUserProfileViewModel @Inject constructor(
     override fun updateExpirationReminderSetting(remindMe: Boolean) {
         viewModelScope.launch {
             val tempUser = loggedInUser.value
-            if (tempUser != null) {
-                val settings = Settings(
-                    remindMe,
-                    tempUser.userSettings?.allowPushNotifications,
-                    tempUser.userSettings?.suggestRecipes
-                )
-                tempUser.userSettings = settings
-                userRepository.allowReminder(tempUser.userId, remindMe)
-                Log.d("UserViewModel", "Update expiration reminder settings.")
-            }else{
-                Log.d("UserViewModel", "User is null.")
+            try{
+                if (tempUser != null) {
+                    val settings = Settings(
+                        remindMe,
+                        tempUser.userSettings?.allowPushNotifications,
+                        tempUser.userSettings?.suggestRecipes
+                    )
+                    tempUser.userSettings = settings
+                    userRepository.allowReminder(tempUser.userId, remindMe)
+                }else{
+                    Log.d("UserViewModel", "User is null.")
+                }
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -137,17 +162,21 @@ class SharedUserProfileViewModel @Inject constructor(
     override fun updatePushNotficicationsSetting(remindMe: Boolean) {
         viewModelScope.launch {
             val tempUser = loggedInUser.value
-            if (tempUser != null) {
-                val settings = Settings(
-                    tempUser.userSettings?.reminderProductExp,
-                    remindMe,
-                    tempUser.userSettings?.suggestRecipes
-                )
-                tempUser.userSettings = settings
-                userRepository.allowPushNotification(tempUser.userId, remindMe)
-                Log.d("UserViewModel", "Update push notification settings.")
-            }else{
-                Log.d("UserViewModel", "User is null.")
+            try{
+                if (tempUser != null) {
+                    val settings = Settings(
+                        tempUser.userSettings?.reminderProductExp,
+                        remindMe,
+                        tempUser.userSettings?.suggestRecipes
+                    )
+                    tempUser.userSettings = settings
+                    userRepository.allowPushNotification(tempUser.userId, remindMe)
+                }else{
+                    Log.d("UserViewModel", "User is null.")
+                }
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -156,17 +185,21 @@ class SharedUserProfileViewModel @Inject constructor(
     override fun updateRecommendShopplingListSetting(remindMe: Boolean) {
         viewModelScope.launch {
             val tempUser = loggedInUser.value
-            if (tempUser != null) {
-                val settings = Settings(
-                    tempUser.userSettings?.reminderProductExp,
-                    tempUser.userSettings?.allowPushNotifications,
-                    remindMe
-                )
-                tempUser.userSettings = settings
-                userRepository.allowSuggestion(tempUser.userId, remindMe)
-                Log.d("UserViewModel", "Update recommend for shoppinglist settings.")
-            }else{
-                Log.d("UserViewModel", "User is null.")
+            try{
+                if (tempUser != null) {
+                    val settings = Settings(
+                        tempUser.userSettings?.reminderProductExp,
+                        tempUser.userSettings?.allowPushNotifications,
+                        remindMe
+                    )
+                    tempUser.userSettings = settings
+                    userRepository.allowSuggestion(tempUser.userId, remindMe)
+                }else{
+                    Log.d("UserViewModel", "User is null.")
+                }
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -174,11 +207,16 @@ class SharedUserProfileViewModel @Inject constructor(
     fun refresh(){
         // refresh after certain time for better user experience
         viewModelScope.launch {
-            delay(1500)
-            val userId = loggedInUser.value?.userId
-            if(userId != null && userId != 0) {
-                val result = userRepository.getLoggedInUser(userId)
-                _loggedInUser.value = result
+            try{
+                delay(1500)
+                val userId = loggedInUser.value?.userId
+                if(userId != null && userId != 0) {
+                    val result = userRepository.getLoggedInUser(userId)
+                    _loggedInUser.value = result
+                }
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -191,11 +229,16 @@ class SharedUserProfileViewModel @Inject constructor(
 
     private fun getPreFetchedUserData(context: Context){
         if(doesPreferenceExist(context, "mPreference", "userData")) {
-            val result = getUserDataFromSharedPreference(context)
-            if (result != null) {
-                removeDataFromSharedPreferences(context, result)
-                val user = convertUserDataToUser(result)
-                _loggedInUser.value = user
+            try{
+                val result = getUserDataFromSharedPreference(context)
+                if (result != null) {
+                    removeDataFromSharedPreferences(context, result)
+                    val user = convertUserDataToUser(result)
+                    _loggedInUser.value = user
+                }
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
             }
         }
     }

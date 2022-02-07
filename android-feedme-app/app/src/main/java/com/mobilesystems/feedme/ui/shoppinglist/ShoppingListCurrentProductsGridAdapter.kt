@@ -79,7 +79,6 @@ class ShoppingListCurrentProductsGridAdapter(
     }
 
     override fun getItem(position: Int): Any {
-        // TODO: Correct this workaround with dummy data
         var currentItem = Product(0, "", "", mutableListOf(),
             "", "", "", null)
         if (dataSet != null) {
