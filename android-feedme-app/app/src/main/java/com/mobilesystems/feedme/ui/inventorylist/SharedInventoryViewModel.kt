@@ -98,7 +98,8 @@ class SharedInventoryViewModel @Inject constructor(
         var result: Product? = null
         viewModelScope.launch {
             try{
-                result = loadProductInformationFromScan(barcodeScanRes)
+                result = inventoryRepository.getBarcodeScanResult(barcodeScanRes)
+                _barcodeScanProduct.value = result
             }catch (e: Exception){
                 Log.d("Inventorylist", "Error occured $e")
                 e.stackTrace
