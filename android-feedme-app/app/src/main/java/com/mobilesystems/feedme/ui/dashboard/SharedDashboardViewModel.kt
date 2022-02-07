@@ -61,7 +61,7 @@ class SharedDashboardViewModel @Inject constructor(
         getLoggedInUserId(context)
 
         // Preload user
-        if(currentUserId.value != 0 && loggedInUser.value == null){
+        if(currentUserId.value != 0){
             loadLoggedInUser()
             updateLogin()
         }
@@ -89,13 +89,20 @@ class SharedDashboardViewModel @Inject constructor(
     override fun loadExpiringProducts() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            Log.d("Dashboard", "Load expiring products.")
-            val userId = currentUserId.value
-            if(userId != null) {
-                val result = dashboardRepository.getAllExpiringProducts(userId)
-                // filter by date
-                filterListByExpirationDate(result)
-                Log.d("Dashboard", "Load expiring products:  ${result.size}.")
+
+            try {
+                Log.d("Dashboard", "Load expiring products.")
+                val userId = currentUserId.value
+                if(userId != null) {
+                    val result = dashboardRepository.getAllExpiringProducts(userId)
+                    // filter by date
+                    filterListByExpirationDate(result)
+                    Log.d("Dashboard", "Load expiring products:  ${result.size}.")
+                }
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
             }
         }
     }
@@ -103,50 +110,75 @@ class SharedDashboardViewModel @Inject constructor(
     override fun loadNumberOneRecipes() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            Log.d("Dashboard", "Load recipes.")
-            val userId = currentUserId.value
-            if(userId != null) {
-                val result  = dashboardRepository.getNumberOneRecipes(userId)
-                filterListByRating(result)
-                Log.d("Dashboard", "Load no one recipes:  ${result.size}.")
+            try{
+                Log.d("Dashboard", "Load recipes.")
+                val userId = currentUserId.value
+                if(userId != null) {
+                    val result  = dashboardRepository.getNumberOneRecipes(userId)
+                    filterListByRating(result)
+                    Log.d("Dashboard", "Load no one recipes:  ${result.size}.")
+                }
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
             }
         }
     }
 
     override fun loadLoggedInUser() {
         viewModelScope.launch {
-            Log.d("Dashboard", "Load current user.")
-            val userId = currentUserId.value
-            if(userId != null) {
-                try {
-                    _loggedInUser.value = dashboardRepository.getCurrentLoggedInUser(userId)
-                } catch (error: Throwable){
-                    // Notify view login attempt failed
-                    Log.e("Dashboard", "error during login $error")
-                    error.stackTrace
+            try{
+                Log.d("Dashboard", "Load current user.")
+                val userId = currentUserId.value
+                if(userId != null) {
+                    try {
+                        val result = dashboardRepository.getCurrentLoggedInUser(userId)
+                        _loggedInUser.value = result
+                    } catch (error: Throwable){
+                        // Notify view login attempt failed
+                        Log.e("Dashboard", "error during login $error")
+                        error.stackTrace
+                    }
                 }
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
             }
         }
     }
 
     override fun logout(){
         viewModelScope.launch {
-            val context = getApplication<Application>().applicationContext
-            val userId = currentUserId.value
-            if(userId != null && userId != 0){
-                authRepository.logout(userId)
-                Log.d("Logout", "UserId: " + userId.toString())
-                removeAllValuesFromSharedPreferences(context)
+            try{
+                val context = getApplication<Application>().applicationContext
+                val userId = currentUserId.value
+                if(userId != null && userId != 0){
+                    authRepository.logout(userId)
+                    Log.d("Logout", "UserId: " + userId.toString())
+                    removeAllValuesFromSharedPreferences(context)
+                }
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
             }
         }
     }
 
     override fun updateLogin() {
         viewModelScope.launch {
-            val userId = currentUserId.value
-            if(userId != null && userId != 0){
-                authRepository.updateLogin(userId)
-                Log.d("Update Login", "User $userId")
+            try{
+                val userId = currentUserId.value
+                if(userId != null && userId != 0){
+                    authRepository.updateLogin(userId)
+                    Log.d("Update Login", "User $userId")
+                }
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
             }
         }
     }
@@ -169,9 +201,15 @@ class SharedDashboardViewModel @Inject constructor(
 
     private fun filterListByRating(result: List<Recipe>?): LiveData<List<Recipe>?>{
         if(result != null) {
-            val bestRating = filterDuplicates(result)?.filter { it.cummulativeRating > 4.3 } as MutableList<Recipe>
-            val cmp = compareBy<Recipe> { it.cummulativeRating }
-            _noOneRecipesList.value = bestRating.sortedWith(cmp).reversed() // ascending
+            try{
+                val bestRating = filterDuplicates(result)?.filter { it.cummulativeRating > 4.3 } as MutableList<Recipe>
+                val cmp = compareBy<Recipe> { it.cummulativeRating }
+                _noOneRecipesList.value = bestRating.sortedWith(cmp).reversed() // ascending
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
+            }
         }else{
             Log.d("SharedDashboardViewModel", "Expiring products list is empty.")
         }
@@ -180,10 +218,16 @@ class SharedDashboardViewModel @Inject constructor(
 
     private fun filterListByExpirationDate(result: List<Product>?): LiveData<List<Product>?>{
         if(result != null) {
-            val tempList = result as MutableList<Product>
-            val cmp = compareBy<Product> { convertStringToDate(it.expirationDate) }
-            _expProductsList.value = tempList.sortedWith(cmp) // ascending
-            Log.d("SharedDashboardViewModel", "List sorted by expiration date.")
+            try{
+                val tempList = result as MutableList<Product>
+                val cmp = compareBy<Product> { convertStringToDate(it.expirationDate) }
+                _expProductsList.value = tempList.sortedWith(cmp) // ascending
+                Log.d("SharedDashboardViewModel", "List sorted by expiration date.")
+            } catch (error: Throwable){
+                // Notify view login attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
+            }
         }else{
             Log.d("SharedDashboardViewModel", "Expiring products list is empty.")
         }
@@ -191,17 +235,22 @@ class SharedDashboardViewModel @Inject constructor(
     }
 
     private fun getLoggedInUserId(context: Context): LiveData<Int?>{
-        val result = getLoggedInUser(context)
-        _currentUserId.value = result?.userId
-        if(result?.userId != null){
-            // get loggedin user from shared preferences
-                // tloaded from backend
-            _loggedInUser.value = User(
-                userId = result.userId,
-                firstName = result.firstName,
-                lastName = result.lastName,
-                email = result.email,
-                password = "-")
+        try{
+            val result = getLoggedInUser(context)
+            _currentUserId.value = result?.userId
+            if(result?.userId != null){
+                // get loggedin user from shared preferences loaded from backend
+                _loggedInUser.value = User(
+                    userId = result.userId,
+                    firstName = result.firstName,
+                    lastName = result.lastName,
+                    email = result.email,
+                    password = "-")
+            }
+        } catch (error: Throwable){
+            // Notify view login attempt failed
+            Log.e("Dashboard", "error $error")
+            error.stackTrace
         }
         return  currentUserId
     }
