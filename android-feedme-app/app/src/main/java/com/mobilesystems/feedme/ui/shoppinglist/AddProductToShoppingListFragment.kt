@@ -53,7 +53,6 @@ class AddProductToShoppingListFragment : Fragment(R.layout.shopping_list_add_pro
                 val labels : MutableList<Label> = arrayListOf() // empty placeholder list add correct labels later in inventory list
                 sharedViewModel.addNewProductToCurrentShoppingList(Product(0, productname,
                     "2022-02-02", labels, productquantity, "", "", null))
-                Log.d(TAG, "Add product to current shopping list.")
                 //navigate to shoppinglist
                 val action = AddProductToShoppingListFragmentDirections.actionAddProductToShoppingListFragmentToNavigationShoppingList()
                 findNavController().navigate(action)
@@ -80,10 +79,6 @@ class AddProductToShoppingListFragment : Fragment(R.layout.shopping_list_add_pro
                 true
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     override fun onDestroyView() {

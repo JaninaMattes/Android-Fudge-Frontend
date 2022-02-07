@@ -283,13 +283,18 @@ class SharedRecipesViewModel @Inject constructor(
     override fun removeRecipeByPosition(position: Int) {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val currentValues = recipeList.value
-            var tempList: MutableList<Recipe> = ArrayList()
-            if (currentValues != null) {
-                tempList = currentValues as MutableList<Recipe>
-                tempList.removeAt(position)
+            try{
+                val currentValues = recipeList.value
+                var tempList: MutableList<Recipe> = ArrayList()
+                if (currentValues != null) {
+                    tempList = currentValues as MutableList<Recipe>
+                    tempList.removeAt(position)
+                }
+                _recipeList.value = tempList
+            }catch (e: Exception){
+                Log.d("Recipe", "Error occured $e")
+                e.stackTrace
             }
-            _recipeList.value = tempList
         }
     }
 
@@ -297,8 +302,13 @@ class SharedRecipesViewModel @Inject constructor(
         var available = false
         viewModelScope.launch {
             if (productList != null) {
-                if (containsSubstring(productList, product)) {
-                    available = true
+                try{
+                    if (containsSubstring(productList, product)) {
+                        available = true
+                    }
+                }catch (e: Exception){
+                    Log.d("Recipe", "Error occured $e")
+                    e.stackTrace
                 }
             }
         }
@@ -322,21 +332,26 @@ class SharedRecipesViewModel @Inject constructor(
         val tempListUnAvailable = arrayListOf<Product>()
         val ingList = selectedRecipeIngredients.value
 
-        ingList?.forEach {
-            if (isProductAvailable(inventoryList.value, it)) {
-                tempListAvailable.add(it)
-            } else {
-                tempListUnAvailable.add(it)
+        try{
+            ingList?.forEach {
+                if (isProductAvailable(inventoryList.value, it)) {
+                    tempListAvailable.add(it)
+                } else {
+                    tempListUnAvailable.add(it)
+                }
+                _availableIngredients.value = tempListAvailable
+                _notAvailableIngredients.value = tempListUnAvailable
             }
-            _availableIngredients.value = tempListAvailable
-            _notAvailableIngredients.value = tempListUnAvailable
+        }catch (e: Exception){
+            Log.d("Recipe", "Error occured $e")
+            e.stackTrace
         }
     }
 
     private fun getLoggedInUserId(context: Context): LiveData<Int?>{
         val result = getLoggedInUser(context)
         _currentUserId.value = result?.userId
-        if(result?.userId != null){
+        if(result?.userId != null && result.userId != 0){
             // get loggedin user from shared preferences
             _loggedInUser.value = User(
                 userId = result.userId,
@@ -351,8 +366,13 @@ class SharedRecipesViewModel @Inject constructor(
     private fun filterListByRating(result: List<Recipe>?): List<Recipe>?{
         var filtered: List<Recipe>? = null
         if(result != null) {
-            val sorted = result.sortedBy { it.cummulativeRating }
-            filtered = sorted.reversed() // ascending
+            try{
+                val sorted = result.sortedBy { it.cummulativeRating }
+                filtered = sorted.reversed() // ascending
+            }catch (e: Exception){
+                Log.d("Recipe", "Error occured $e")
+                e.stackTrace
+            }
         }
         return filtered
     }
@@ -360,7 +380,12 @@ class SharedRecipesViewModel @Inject constructor(
     private fun filterDuplicates(result: List<Recipe>?): List<Recipe>?{
         var noDuplicates: List<Recipe>? = null
         if(result != null) {
-            noDuplicates = result.distinctBy { it.recipeName }
+            try{
+                noDuplicates = result.distinctBy { it.recipeName }
+            }catch (e: Exception){
+                Log.d("Recipe", "Error occured $e")
+                e.stackTrace
+            }
         }
         return noDuplicates
     }

@@ -89,7 +89,6 @@ class UserProfileFragment : Fragment() {
                 btnPushNotification.isChecked = user.userSettings?.allowPushNotifications == true
                 btnSuggestionsShopping.isChecked = user.userSettings?.suggestRecipes == true
 
-                Log.d(TAG, "Observer called.")
             } else {
                 Log.d(TAG, "User is null.")
             }

@@ -89,15 +89,12 @@ class SharedDashboardViewModel @Inject constructor(
     override fun loadExpiringProducts() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-
             try {
-                Log.d("Dashboard", "Load expiring products.")
                 val userId = currentUserId.value
                 if(userId != null) {
                     val result = dashboardRepository.getAllExpiringProducts(userId)
                     // filter by date
                     filterListByExpirationDate(result)
-                    Log.d("Dashboard", "Load expiring products:  ${result.size}.")
                 }
             } catch (error: Throwable){
                 // Notify view login attempt failed
@@ -111,12 +108,10 @@ class SharedDashboardViewModel @Inject constructor(
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
             try{
-                Log.d("Dashboard", "Load recipes.")
                 val userId = currentUserId.value
                 if(userId != null) {
                     val result  = dashboardRepository.getNumberOneRecipes(userId)
                     filterListByRating(result)
-                    Log.d("Dashboard", "Load no one recipes:  ${result.size}.")
                 }
             } catch (error: Throwable){
                 // Notify view login attempt failed
@@ -128,23 +123,17 @@ class SharedDashboardViewModel @Inject constructor(
 
     override fun loadLoggedInUser() {
         viewModelScope.launch {
-            try{
-                Log.d("Dashboard", "Load current user.")
-                val userId = currentUserId.value
-                if(userId != null) {
-                    try {
-                        val result = dashboardRepository.getCurrentLoggedInUser(userId)
-                        _loggedInUser.value = result
-                    } catch (error: Throwable){
-                        // Notify view login attempt failed
-                        Log.e("Dashboard", "error during login $error")
-                        error.stackTrace
-                    }
+
+            val userId = currentUserId.value
+            if(userId != null) {
+                try {
+                    val result = dashboardRepository.getCurrentLoggedInUser(userId)
+                    _loggedInUser.value = result
+                } catch (error: Throwable){
+                    // Notify view attempt failed
+                    Log.e("Dashboard", "error during login $error")
+                    error.stackTrace
                 }
-            } catch (error: Throwable){
-                // Notify view login attempt failed
-                Log.e("Dashboard", "error $error")
-                error.stackTrace
             }
         }
     }
@@ -156,11 +145,10 @@ class SharedDashboardViewModel @Inject constructor(
                 val userId = currentUserId.value
                 if(userId != null && userId != 0){
                     authRepository.logout(userId)
-                    Log.d("Logout", "UserId: " + userId.toString())
                     removeAllValuesFromSharedPreferences(context)
                 }
             } catch (error: Throwable){
-                // Notify view login attempt failed
+                // Notify view attempt failed
                 Log.e("Dashboard", "error $error")
                 error.stackTrace
             }
@@ -176,7 +164,7 @@ class SharedDashboardViewModel @Inject constructor(
                     Log.d("Update Login", "User $userId")
                 }
             } catch (error: Throwable){
-                // Notify view login attempt failed
+                // Notify view when attempt failed
                 Log.e("Dashboard", "error $error")
                 error.stackTrace
             }
@@ -194,7 +182,13 @@ class SharedDashboardViewModel @Inject constructor(
     private fun filterDuplicates(result: List<Recipe>?): List<Recipe>?{
         var noDuplicates: List<Recipe>? = null
         if(result != null) {
-            noDuplicates = result.distinctBy { it.recipeName }
+            try{
+                noDuplicates = result.distinctBy { it.recipeName }
+            } catch (error: Throwable){
+                // Notify view when attempt failed
+                Log.e("Dashboard", "error $error")
+                error.stackTrace
+            }
         }
         return noDuplicates
     }
@@ -206,7 +200,7 @@ class SharedDashboardViewModel @Inject constructor(
                 val cmp = compareBy<Recipe> { it.cummulativeRating }
                 _noOneRecipesList.value = bestRating.sortedWith(cmp).reversed() // ascending
             } catch (error: Throwable){
-                // Notify view login attempt failed
+                // Notify view when attempt failed
                 Log.e("Dashboard", "error $error")
                 error.stackTrace
             }
@@ -222,9 +216,8 @@ class SharedDashboardViewModel @Inject constructor(
                 val tempList = result as MutableList<Product>
                 val cmp = compareBy<Product> { convertStringToDate(it.expirationDate) }
                 _expProductsList.value = tempList.sortedWith(cmp) // ascending
-                Log.d("SharedDashboardViewModel", "List sorted by expiration date.")
             } catch (error: Throwable){
-                // Notify view login attempt failed
+                // Notify view when attempt failed
                 Log.e("Dashboard", "error $error")
                 error.stackTrace
             }
@@ -248,7 +241,7 @@ class SharedDashboardViewModel @Inject constructor(
                     password = "-")
             }
         } catch (error: Throwable){
-            // Notify view login attempt failed
+            // Notify view when attempt failed
             Log.e("Dashboard", "error $error")
             error.stackTrace
         }
@@ -257,8 +250,6 @@ class SharedDashboardViewModel @Inject constructor(
 
     private fun convertStringToDate(dateStr: String): Date {
         val sdf = SimpleDateFormat("dd.MM.yyyy")
-        val date = sdf.parse(dateStr)
-        Log.d("SharedInventoryViewModel", "Current date $date")
-        return date
+        return sdf.parse(dateStr)
     }
 }

@@ -12,6 +12,7 @@ import com.mobilesystems.feedme.domain.model.*
 import com.mobilesystems.feedme.ui.common.utils.getLoggedInUser
 import com.mobilesystems.feedme.ui.common.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -79,26 +80,56 @@ class SharedInventoryViewModel @Inject constructor(
         var product: Product? = null
         val currentValues = inventoryList.value
         if (currentValues != null) {
-            val tempList = currentValues.toMutableList()
-            product = tempList[position]
-            tempList.removeAt(position)
-            _inventoryList.postValue(tempList)
+            try{
+                val tempList = currentValues.toMutableList()
+                product = tempList[position]
+                tempList.removeAt(position)
+                _inventoryList.postValue(tempList)
+            }catch (e: Exception){
+                Log.d("Inventorylist", "Error occured $e")
+                e.stackTrace
+            }
         }
         return product
     }
 
     override fun getProductFromBarcodeScanResult(barcodeScanRes: String): Product? {
         // This is a coroutine scope with the lifecycle of the ViewModel
+        var result: Product? = null
         viewModelScope.launch {
-            val result = inventoryRepository.getBarcodeScanResult(barcodeScanRes)
-            _barcodeScanProduct.value = result
+            try{
+                result = loadProductInformationFromScan(barcodeScanRes)
+            }catch (e: Exception){
+                Log.d("Inventorylist", "Error occured $e")
+                e.stackTrace
+            }
         }
-        return _barcodeScanProduct.value
+        return result
+    }
+
+    private suspend fun loadProductInformationFromScan(barcodeScanRes: String): Product? {
+        var result: Product? = null
+        val job = viewModelScope.launch {
+            try{
+                result = inventoryRepository.getBarcodeScanResult(barcodeScanRes)
+                _barcodeScanProduct.value = result
+            }catch (e: Exception){
+                Log.d("Inventorylist", "Error occured $e")
+                e.stackTrace
+            }
+        }
+        job.join() // wait
+        return result
     }
 
     override fun addProductFromBarcodeScanResultToInventory(product: Product) {
         // Add newly created product
-        addProductToInventoryList(product)
+        try{
+            addProductToInventoryList(product)
+        }catch (e: Exception){
+            Log.d("Inventorylist", "Error occured $e")
+            e.stackTrace
+        }
     }
 
     override fun updateProductOnInventory(product: Product) {
@@ -109,15 +140,20 @@ class SharedInventoryViewModel @Inject constructor(
             val currentValues = inventoryList.value
             var tempList: MutableList<Product> = ArrayList<Product>()
             if(userId != null) {
-                if (currentValues != null) {
-                    tempList = currentValues.toMutableList()
-                    tempList.forEachIndexed { index, oldProduct ->
-                        if (oldProduct.productId == product.productId) {
-                            tempList[index] = product
-                            inventoryRepository.updateProductOnInventory(userId, product)
-                            updateInventoryList(tempList)
+                try{
+                    if (currentValues != null) {
+                        tempList = currentValues.toMutableList()
+                        tempList.forEachIndexed { index, oldProduct ->
+                            if (oldProduct.productId == product.productId) {
+                                tempList[index] = product
+                                inventoryRepository.updateProductOnInventory(userId, product)
+                                updateInventoryList(tempList)
+                            }
                         }
                     }
+                }catch (e: Exception){
+                    Log.d("Inventorylist", "Error occured $e")
+                    e.stackTrace
                 }
             }
         }
@@ -131,32 +167,37 @@ class SharedInventoryViewModel @Inject constructor(
 
             // Network call
             if(userId != null && userId != 0) {
-                var tempList: MutableList<Product> = mutableListOf()
-                // Check if currentlist is empty
-                if (currentItems != null) {
-                    tempList = currentItems.toMutableList()
-                    // find duplicate items
-                    val duplicateValue = tempList.filter { p -> p.productName == product.productName }
-                    // iterate over duplicate values (best case only 1)
-                    if (duplicateValue.isNotEmpty()) {
-                        for (i in duplicateValue.indices) {
-                            if (duplicateValue[i].productName == product.productName) {
-                                val newProduct = calculateNewAmount(duplicateValue[i], product)
-                                tempList = tempList.replace(duplicateValue[i], newProduct).toMutableList()
-                                inventoryRepository.updateProductOnInventory(userId, newProduct)
+                try{
+                    var tempList: MutableList<Product> = mutableListOf()
+                    // Check if currentlist is empty
+                    if (currentItems != null) {
+                        tempList = currentItems.toMutableList()
+                        // find duplicate items
+                        val duplicateValue = tempList.filter { p -> p.productName == product.productName }
+                        // iterate over duplicate values (best case only 1)
+                        if (duplicateValue.isNotEmpty()) {
+                            for (i in duplicateValue.indices) {
+                                if (duplicateValue[i].productName == product.productName) {
+                                    val newProduct = calculateNewAmount(duplicateValue[i], product)
+                                    tempList = tempList.replace(duplicateValue[i], newProduct).toMutableList()
+                                    inventoryRepository.updateProductOnInventory(userId, newProduct)
+                                }
                             }
+                            // no duplicate values
+                        } else {
+                            val newProduct = inventoryRepository.addProductToInventory(userId, product)
+                            tempList.add(newProduct)
                         }
-                        // no duplicate values
+                        // empty list
                     } else {
                         val newProduct = inventoryRepository.addProductToInventory(userId, product)
                         tempList.add(newProduct)
                     }
-                // empty list
-                } else {
-                    val newProduct = inventoryRepository.addProductToInventory(userId, product)
-                    tempList.add(newProduct)
+                    updateInventoryList(tempList)
+                }catch (e: Exception){
+                    Log.d("Inventorylist", "Error occured $e")
+                    e.stackTrace
                 }
-                updateInventoryList(tempList)
             }
         }
     }
@@ -190,7 +231,12 @@ class SharedInventoryViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = loggedInUser.value?.userId
             if(userId != null && userId != 0) {
-                inventoryRepository.removeProductFromInventory(userId, product)
+                try{
+                    inventoryRepository.removeProductFromInventory(userId, product)
+                }catch (e: Exception){
+                    Log.d("Inventorylist", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -200,15 +246,25 @@ class SharedInventoryViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = loggedInUser.value?.userId
             if(userId != null) {
-                val result = inventoryRepository.loadInventoryListProducts(userId)
-                filterListByExpirationDate(result)
+                try{
+                    val result = inventoryRepository.loadInventoryListProducts(userId)
+                    filterListByExpirationDate(result)
+                }catch (e: Exception){
+                    Log.d("Inventorylist", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
 
     override fun loadSelectedProductTagList(): LiveData<List<Label>?> {
         // Helper function to load all tags from a product
+        try{
         _selectedTagList.postValue(selectedProduct.value?.labels)
+        }catch (e: Exception){
+            Log.d("Inventorylist", "Error occured $e")
+            e.stackTrace
+        }
         return selectedProductTagList
     }
 
@@ -217,9 +273,14 @@ class SharedInventoryViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = loggedInUser.value?.userId
             if (userId != null && userId != 0) {
-                val currentValues = inventoryList.value
-                if(currentValues != null) {
-                    inventoryRepository.updateProductInventoryList(userId, currentValues)
+                try{
+                    val currentValues = inventoryList.value
+                    if(currentValues != null) {
+                        inventoryRepository.updateProductInventoryList(userId, currentValues)
+                    }
+                }catch (e: Exception){
+                    Log.d("Inventorylist", "Error occured $e")
+                    e.stackTrace
                 }
             }
         }

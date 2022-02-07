@@ -14,7 +14,8 @@ fun abbreviateString(text: String, maxLength: Int): String{
             result = text.substring(0, maxLength-2) + ".." // shorten
         }
     }catch (e: Exception){
-        e.printStackTrace()
+        Log.d("String Utils", "Error occured $e")
+        e.stackTrace
     }
     return result
 }
@@ -57,7 +58,8 @@ fun abbreviateUnitString(text: String): String{
             }
         }
     }catch (e: Exception){
-        e.printStackTrace()
+        Log.d("String Utils", "Error occured $e")
+        e.stackTrace
     }
     return "$quantity $unit"
 }
@@ -69,21 +71,23 @@ fun abbreviateUnitString(text: String): String{
 fun containsSubstring(products: List<Product>?, ingredient: Product): Boolean{
     var isContained = false
     if(products != null){
+        try{
         // split multiple words in string
         val wordArray = splitSentenceRegex(ingredient.productName)
         for(word in wordArray){
             // whilst it is not contained search
             if(!isContained) {
                 val filtered = products.filter { p ->
-                    p.productName.contains(
-                        word,
-                        true
-                    )
+                    p.productName.contains(word, true)
                 }
                 if (filtered.isNotEmpty()) {
                     isContained = true
                 }
             }
+        }
+        }catch (e: Exception){
+            Log.d("String Utils", "Error occured $e")
+            e.stackTrace
         }
     }
     return isContained

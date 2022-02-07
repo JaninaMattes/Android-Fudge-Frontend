@@ -66,10 +66,15 @@ class SharedShoppingListViewModel @Inject constructor(
         // refresh after certain time for better user experience
         viewModelScope.launch {
             delay(3500)
-            val userId = currentUserId.value
-            if (userId != null && userId != 0) {
-                val result = shoppingListRepository.loadCurrentShoppingListProducts(userId)
-                _currentShoppingList.value = result
+            try{
+                val userId = currentUserId.value
+                if (userId != null && userId != 0) {
+                    val result = shoppingListRepository.loadCurrentShoppingListProducts(userId)
+                    _currentShoppingList.value = result
+                }
+            }catch (e: Exception){
+                Log.d("Shoppinglist", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -77,10 +82,15 @@ class SharedShoppingListViewModel @Inject constructor(
     override fun loadAllCurrentShoppingListProducts() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUserId.value
-            if (userId != null && userId != 0) {
-                val result = shoppingListRepository.loadCurrentShoppingListProducts(userId)
-                _currentShoppingList.value = result
+            try{
+                val userId = currentUserId.value
+                if (userId != null && userId != 0) {
+                    val result = shoppingListRepository.loadCurrentShoppingListProducts(userId)
+                    _currentShoppingList.value = result
+                }
+            }catch (e: Exception){
+                Log.d("Shoppinglist", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -88,20 +98,30 @@ class SharedShoppingListViewModel @Inject constructor(
     override fun loadAllOldShoppingListProducts() {
         // This is a coroutine scope with the lifecycle of the ViewModel
         viewModelScope.launch {
-            val userId = currentUserId.value
-            if (userId != null && userId != 0) {
-                val result = shoppingListRepository.loadOldShoppingListProducts(userId)
-                passToOldShoppingList(result)
+            try{
+                val userId = currentUserId.value
+                if (userId != null && userId != 0) {
+                    val result = shoppingListRepository.loadOldShoppingListProducts(userId)
+                    passToOldShoppingList(result)
+                }
+            }catch (e: Exception){
+                Log.d("UserProfile", "Error occured $e")
+                e.stackTrace
             }
         }
     }
 
     override fun saveCurrentState() {
         viewModelScope.launch {
-            val userId = currentUserId.value
-            if (userId != null && userId != 0) {
-                shoppingListRepository.updateCurrentShoppingList(userId, currentShoppingList.value)
-                shoppingListRepository.updateOldShoppingList(userId, oldShoppingList.value)
+            try{
+                val userId = currentUserId.value
+                if (userId != null && userId != 0) {
+                    shoppingListRepository.updateCurrentShoppingList(userId, currentShoppingList.value)
+                    shoppingListRepository.updateOldShoppingList(userId, oldShoppingList.value)
+                }
+            }catch (e: Exception){
+                Log.d("Shoppinglist", "Error occured $e")
+                e.stackTrace
             }
         }
     }
@@ -124,43 +144,44 @@ class SharedShoppingListViewModel @Inject constructor(
 
             // add product to shoppinglist
             if (userId != null && userId != 0) {
+                try{
                     // Check if currentlist is empty
-                if (currentItems != null) {
-                    tempList = currentItems as MutableList<Product>
-                    // find duplicate items
-                    val duplicateValue = tempList.filter { p -> p.productName == product.productName }
-                    // duplicate values
-                    if (duplicateValue.isNotEmpty()) {
-                        Log.d("SharedShoppingListViewModel", "Duplicate product found")
-                        for (p in duplicateValue) {
-                            if (p.productName == product.productName) {
-                                val newProduct = calculateNewProductAmount(p, product, currentShoppingList = true)
-                                tempList =
-                                    tempList.replace(p, newProduct) as MutableList<Product>// Replace with new product
-                                passToCurrentShoppingList(tempList)
-                                // update product
-                                shoppingListRepository.updateSingleProductOnCurrentShoppingList(userId, newProduct)
-                                Log.d("SharedShoppingListViewModel", "Update product to current shoppinglist.")
+                    if (currentItems != null) {
+                        tempList = currentItems as MutableList<Product>
+                        // find duplicate items
+                        val duplicateValue = tempList.filter { p -> p.productName == product.productName }
+                        // duplicate values
+                        if (duplicateValue.isNotEmpty()) {
+                            for (p in duplicateValue) {
+                                if (p.productName == product.productName) {
+                                    val newProduct = calculateNewProductAmount(p, product, currentShoppingList = true)
+                                    tempList =
+                                        tempList.replace(p, newProduct) as MutableList<Product>// Replace with new product
+                                    passToCurrentShoppingList(tempList)
+                                    // update product
+                                    shoppingListRepository.updateSingleProductOnCurrentShoppingList(userId, newProduct)
+                                }
                             }
+                            // no duplicate values
+                        } else {
+                            // create new product
+                            val updatedProduct = shoppingListRepository.addNewProductToCurrentShoppingList(userId, product)
+                            tempList.add(updatedProduct)
+                            passToCurrentShoppingList(tempList)
                         }
-                    // no duplicate values
+                        // empty list or no duplicate values
                     } else {
                         // create new product
                         val updatedProduct = shoppingListRepository.addNewProductToCurrentShoppingList(userId, product)
                         tempList.add(updatedProduct)
                         passToCurrentShoppingList(tempList)
-                        Log.d("SharedShoppingListViewModel", "Add product to current shoppinglist.")
                     }
-                // empty list or no duplicate values
-                } else {
-                    // create new product
-                    val updatedProduct = shoppingListRepository.addNewProductToCurrentShoppingList(userId, product)
-                    tempList.add(updatedProduct)
-                    passToCurrentShoppingList(tempList)
-                    Log.d("SharedShoppingListViewModel", "Add product to current shoppinglist.")
+
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
                 }
             }
-            loadAllCurrentShoppingListProducts()
         }
     }
 
@@ -170,47 +191,49 @@ class SharedShoppingListViewModel @Inject constructor(
             // add product to shoppinglist
             if (userId != null && userId != 0) {
 
-                // remove from old shoppinglist
-                updateOldShopList(product)
+                try{
+                    // remove from old shoppinglist
+                    updateOldShopList(product)
 
-                // Check if currentlist is empty and update current shoppinglist
-                val curShoppingList = currentShoppingList.value
-                var tempList: MutableList<Product> = mutableListOf()
+                    // Check if currentlist is empty and update current shoppinglist
+                    val curShoppingList = currentShoppingList.value
+                    var tempList: MutableList<Product> = mutableListOf()
 
-                // not empty
-                if (curShoppingList != null) {
-                    tempList = curShoppingList as MutableList<Product>
-                    // find duplicate items (expected only one)
-                    val duplicateValue = tempList.filter { p -> p.productName == product.productName }
+                    // not empty
+                    if (curShoppingList != null) {
+                        tempList = curShoppingList as MutableList<Product>
+                        // find duplicate items (expected only one)
+                        val duplicateValue = tempList.filter { p -> p.productName == product.productName }
 
-                    // duplicate values
-                    if (duplicateValue.isNotEmpty()) {
-                        Log.d("SharedShoppingListViewModel", "Duplicate product found")
-                        for (p in duplicateValue) {
-                            if (p.productName == product.productName) {
-                                val newProduct = calculateNewProductAmount(p, product, currentShoppingList = true)
-                                // replace old product with new product values
-                                tempList = tempList.replace(p, newProduct) as MutableList<Product>
-                                passToCurrentShoppingList(tempList)
-                                shoppingListRepository.updateSingleProductOnCurrentShoppingList(userId, newProduct)
-                                Log.d("SharedShoppingListViewModel", "Update product in current shoppinglist.")
+                        // duplicate values
+                        if (duplicateValue.isNotEmpty()) {
+                            for (p in duplicateValue) {
+                                if (p.productName == product.productName) {
+                                    val newProduct = calculateNewProductAmount(p, product, currentShoppingList = true)
+                                    // replace old product with new product values
+                                    tempList = tempList.replace(p, newProduct) as MutableList<Product>
+                                    passToCurrentShoppingList(tempList)
+                                    shoppingListRepository.updateSingleProductOnCurrentShoppingList(userId, newProduct)
+                                }
                             }
+                        } else {
+                            // no duplicate values
+                            tempList.add(product)
+                            passToCurrentShoppingList(tempList)
+                            shoppingListRepository.addProductToCurrentShoppingList(userId, product)
                         }
+                        // empty list
                     } else {
-                        // no duplicate values
                         tempList.add(product)
                         passToCurrentShoppingList(tempList)
                         shoppingListRepository.addProductToCurrentShoppingList(userId, product)
-                        Log.d("SharedShoppingListViewModel", "Add product in current shoppinglist.")
                     }
-                // empty list
-                } else {
-                    tempList.add(product)
-                    passToCurrentShoppingList(tempList)
-                    shoppingListRepository.addProductToCurrentShoppingList(userId, product)
-                    Log.d("SharedShoppingListViewModel", "Add product in current shoppinglist.")
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
                 }
             }
+
         }
     }
 
@@ -219,43 +242,45 @@ class SharedShoppingListViewModel @Inject constructor(
             val userId = currentUserId.value
             if (userId != null && userId != 0) {
                 // update current shoppinglist
-                    updateCurShopList(product)
+                updateCurShopList(product)
 
-                val oldShoppingList = oldShoppingList.value
-                var tempList: MutableList<Product> = mutableListOf()
-                // update old shoppinglist with product
-                val newProduct = createProductForOldShoppingList(product)
+                try{
+                    val oldShoppingList = oldShoppingList.value
+                    var tempList: MutableList<Product> = mutableListOf()
+                    // update old shoppinglist with product
+                    val newProduct = createProductForOldShoppingList(product)
 
-                // Check if currentlist is empty
-                if (oldShoppingList != null) {
-                    tempList = oldShoppingList as MutableList<Product>
-                    // find duplicate items (expected only single product)
-                    val duplicateValue= tempList.filter { p -> p.productName == newProduct.productName }
+                    // Check if currentlist is empty
+                    if (oldShoppingList != null) {
+                        tempList = oldShoppingList as MutableList<Product>
+                        // find duplicate items (expected only single product)
+                        val duplicateValue= tempList.filter { p -> p.productName == newProduct.productName }
 
-                    // duplicate values
-                    if (duplicateValue.isNotEmpty()) {
-                        Log.d("SharedShoppingListViewModel", "Duplicate product found")
-                        for (p in duplicateValue) {
-                            if (p.productName == newProduct.productName) {
-                                tempList = tempList.replace(p, newProduct) as MutableList<Product>
-                                passToOldShoppingList(tempList)
-                                shoppingListRepository.updateSingleProductOnOldShoppingList(userId, newProduct)
-                                Log.d("SharedShoppingListViewModel", "Update product in old shoppinglist.")
+                        // duplicate values
+                        if (duplicateValue.isNotEmpty()) {
+                            for (p in duplicateValue) {
+                                if (p.productName == newProduct.productName) {
+                                    tempList = tempList.replace(p, newProduct) as MutableList<Product>
+                                    passToOldShoppingList(tempList)
+                                    shoppingListRepository.updateSingleProductOnOldShoppingList(userId, newProduct)
+                                }
                             }
+                            // no duplicate values
+                        } else {
+                            tempList.add(newProduct)
+                            passToOldShoppingList(tempList)
+                            shoppingListRepository.addProductToOldShoppingList(userId, newProduct)
                         }
-                    // no duplicate values
+                        // empty list
                     } else {
                         tempList.add(newProduct)
                         passToOldShoppingList(tempList)
                         shoppingListRepository.addProductToOldShoppingList(userId, newProduct)
-                        Log.d("SharedShoppingListViewModel", "Add product to old shoppinglist. ")
                     }
-                // empty list
-                } else {
-                    tempList.add(newProduct)
-                    passToOldShoppingList(tempList)
-                    shoppingListRepository.addProductToOldShoppingList(userId, newProduct)
-                    Log.d("SharedShoppingListViewModel", "Add product to old shoppinglist.")
+
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
                 }
             }
         }
@@ -265,8 +290,12 @@ class SharedShoppingListViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if (userId != null && userId != 0) {
-                shoppingListRepository.updateSingleProductOnOldShoppingList(userId, product)
-                Log.d("SharedShoppingListViewModel", "Update product on old shoppinglist.")
+                try{
+                    shoppingListRepository.updateSingleProductOnOldShoppingList(userId, product)
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -276,7 +305,12 @@ class SharedShoppingListViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if (userId != null) {
-                shoppingListRepository.updateCurrentShoppingList(userId, shoppingList)
+                try{
+                    shoppingListRepository.updateCurrentShoppingList(userId, shoppingList)
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -285,8 +319,12 @@ class SharedShoppingListViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if (userId != null && userId != 0) {
-                shoppingListRepository.updateSingleProductOnCurrentShoppingList(userId, product)
-                Log.d("SharedShoppingListViewModel", "Update product on current shoppinglist.")
+                try{
+                    shoppingListRepository.updateSingleProductOnCurrentShoppingList(userId, product)
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -296,7 +334,12 @@ class SharedShoppingListViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if (userId != null) {
-                shoppingListRepository.updateOldShoppingList(userId, shoppingList)
+                try{
+                    shoppingListRepository.updateOldShoppingList(userId, shoppingList)
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
+                }
             }
         }
     }
@@ -306,10 +349,15 @@ class SharedShoppingListViewModel @Inject constructor(
         var product: Product? = null
         val currentValues = currentShoppingList.value
         if (currentValues != null) {
-            val tempList = currentValues.toMutableList()
-            product = tempList[position]
-            tempList.removeAt(position)
-            _currentShoppingList.postValue(tempList)
+            try{
+                val tempList = currentValues.toMutableList()
+                product = tempList[position]
+                tempList.removeAt(position)
+                _currentShoppingList.postValue(tempList)
+            }catch (e: Exception){
+                Log.d("Shoppinglist", "Error occured $e")
+                e.stackTrace
+            }
         }
         return product
     }
@@ -319,15 +367,19 @@ class SharedShoppingListViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if (userId != null) {
-                val currentValues = currentShoppingList.value
-                var tempList: MutableList<Product> = ArrayList()
-                if (currentValues != null) {
-                    tempList = currentValues as MutableList<Product>
-                    tempList.remove(product)
+                try{
+                    val currentValues = currentShoppingList.value
+                    var tempList: MutableList<Product> = ArrayList()
+                    if (currentValues != null) {
+                        tempList = currentValues as MutableList<Product>
+                        tempList.remove(product)
+                    }
+                    shoppingListRepository.removeProductFromCurrentShoppingList(userId, product)
+                    _currentShoppingList.value = tempList
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
                 }
-                shoppingListRepository.removeProductFromCurrentShoppingList(userId, product)
-                _currentShoppingList.value = tempList
-                Log.d("SharedShoppingListViewModel", "Remove product from current shoppinglist.")
             }
         }
     }
@@ -337,10 +389,15 @@ class SharedShoppingListViewModel @Inject constructor(
         var product: Product? = null
         val currentValues = oldShoppingList.value
         if (currentValues != null) {
-            val tempList = currentValues.toMutableList()
-            product = tempList[position]
-            tempList.removeAt(position)
-            _oldShoppingList.postValue(tempList)
+            try{
+                val tempList = currentValues.toMutableList()
+                product = tempList[position]
+                tempList.removeAt(position)
+                _oldShoppingList.postValue(tempList)
+            }catch (e: Exception){
+                Log.d("Shoppinglist", "Error occured $e")
+                e.stackTrace
+            }
         }
         return product
     }
@@ -350,15 +407,19 @@ class SharedShoppingListViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = currentUserId.value
             if (userId != null) {
-                val currentValues = oldShoppingList.value
-                var tempList: MutableList<Product> = ArrayList()
-                if (currentValues != null) {
-                    tempList = currentValues as MutableList<Product>
-                    tempList.remove(product)
+                try{
+                    val currentValues = oldShoppingList.value
+                    var tempList: MutableList<Product> = ArrayList()
+                    if (currentValues != null) {
+                        tempList = currentValues as MutableList<Product>
+                        tempList.remove(product)
+                    }
+                    shoppingListRepository.removeProductFromOldShoppingList(userId, product)
+                    _oldShoppingList.value = tempList
+                }catch (e: Exception){
+                    Log.d("Shoppinglist", "Error occured $e")
+                    e.stackTrace
                 }
-                shoppingListRepository.removeProductFromOldShoppingList(userId, product)
-                _oldShoppingList.value = tempList
-                Log.d("SharedShoppingListViewModel", "Remove product from old shoppinglist.")
             }
         }
     }
