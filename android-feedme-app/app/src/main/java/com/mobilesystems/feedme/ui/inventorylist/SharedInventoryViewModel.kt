@@ -95,17 +95,16 @@ class SharedInventoryViewModel @Inject constructor(
 
     override fun getProductFromBarcodeScanResult(barcodeScanRes: String): Product? {
         // This is a coroutine scope with the lifecycle of the ViewModel
-        var result: Product? = null
         viewModelScope.launch {
             try{
-                result = inventoryRepository.getBarcodeScanResult(barcodeScanRes)
+                val result = inventoryRepository.getBarcodeScanResult(barcodeScanRes)
                 _barcodeScanProduct.value = result
             }catch (e: Exception){
                 Log.d("Inventorylist", "Error occured $e")
                 e.stackTrace
             }
         }
-        return result
+        return barcodeScanProduct.value
     }
 
     private suspend fun loadProductInformationFromScan(barcodeScanRes: String): Product? {
