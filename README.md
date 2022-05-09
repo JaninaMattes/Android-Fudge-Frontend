@@ -81,7 +81,11 @@
 
 <!-- ABOUT THE PROJECT -->
 ## Project Demo
-![](Demo1.mp4)
+<div>
+  <video width="320" height="240" controls>
+    <source src="Demo1.mp4" type="video/mp4">
+  </video>
+</div>
 
 ## About The Project
 
